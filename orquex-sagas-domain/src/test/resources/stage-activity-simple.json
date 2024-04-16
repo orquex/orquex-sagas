@@ -1,0 +1,26 @@
+{
+  "type": "activity",
+  "name": "Simple Activity",
+  "activityTasks": [
+    {
+      "task": "simple-task",
+      "preProcessor": {
+        "task": "pre-impl-id",
+        "metadata": {}
+      },
+      "postProcessor": {
+        "task": "post-impl-id",
+        "metadata": {}
+      },
+      "compensation": {
+        "task": "comp-impl-id",
+        "metadata": {}
+      },
+      "metadata": {}
+    }
+  ],
+  "outgoing": "outgoing-test",
+  "metadata": {
+    "meta-key": "meta-value"
+  }
+}

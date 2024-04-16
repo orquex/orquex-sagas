@@ -1,0 +1,81 @@
+@startuml usecase
+!theme plain
+autonumber
+
+title Choreography Sequence - Initial part
+
+actor Client as clnt
+box "Sagas Framework"
+    participant Executor as exec
+    participant Engine as chor
+    participant Stage as stage
+end box
+database Repository as repo
+queue "Message\nBroker" as queue
+
+clnt -> exec: Execute a flow.
+exec -> chor: execute(ExecuteRequest)
+
+chor -> repo: Find Flow by ExecuteRequest.FlowID
+return Flow or null
+
+alt flow not present in Repository
+    chor --> queue: Error(Flow not found)
+end
+
+chor -> repo: Gets a Transaction by ID
+return Transaction
+
+' Checks the transaction status.
+alt is not transaction present
+    chor -->> queue: Execute initial stage
+    chor -->> repo: Initialize transaction state (in_progress).
+else transaction.status eq in_progress
+    chor --> queue: Error(Transaction already started)
+else transaction.status eq (canceled | completed | error)
+    chor --> queue: Error(Non-executable transaction)
+end
+
+newpage Choreography Sequence - Second part
+autonumber 1
+
+queue --> stage: executeStage(Message)
+
+stage ->> repo: Update stage state (in_progress).
+create participant Service as svc <<Third Party Service>>
+
+stage -> svc: Consumer the service
+return Return a resource
+
+alt is stage execution ok?
+    stage ->> repo: Update stage state (completed).
+    alt has stage compensation?
+        stage -->> queue: Register compensation.
+    end
+else
+    stage ->> repo: Update stage state (error | canceled).
+end
+stage -->> queue: StageResponse
+
+newpage Choreography Sequence - Third part
+autonumber 1
+
+queue ->> exec: Message(StageResponse)
+exec ->> chor: execute(StageResponse)
+
+alt StageResponse has Error
+    chor --> queue: Error(StageResponse.Error)
+    chor -->> repo: Update transaction state (error | canceled).
+else
+    chor -> repo: Gets a Transaction by ID
+    return Transaction
+
+    ' Checks the transaction status.
+    alt is not transaction present
+        chor -->> queue: Error(Invalid transaction state)
+    else transaction.status eq in_progress
+        chor -->> queue: Execute next stage (StageResponse.Outgoing).
+    end
+end
+
+@enduml

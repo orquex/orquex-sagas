@@ -1,0 +1,21 @@
+@startuml
+hide empty description
+
+title Transaction and Stage States
+
+state "In Progress" as ip
+state "Canceled" as cnc
+state "Error" as err
+state "Completed" as cmp
+
+[*] --> ip
+ip --> cnc
+ip --> err
+ip --> cmp
+
+cnc --> [*]
+err --> [*]
+err --> ip
+cmp --> [*]
+
+@enduml

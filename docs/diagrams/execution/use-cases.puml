@@ -1,0 +1,13 @@
+@startuml usecase
+!theme plain
+left to right direction
+
+actor Client as clnt <<External Service>>
+rectangle {
+usecase "Orchestration" as orc
+usecase "Choreography" as cho
+
+clnt --> orc
+clnt --> cho
+
+@enduml

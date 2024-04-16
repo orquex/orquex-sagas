@@ -1,0 +1,56 @@
+package co.orquex.sagas.core.stage.strategy.impl.decorator;
+
+import co.orquex.sagas.core.event.EventManager;
+import co.orquex.sagas.core.event.impl.EventMessage;
+import co.orquex.sagas.core.stage.strategy.StageProcessingStrategy;
+import co.orquex.sagas.core.stage.strategy.StrategyResponse;
+import co.orquex.sagas.domain.event.Error;
+import co.orquex.sagas.domain.exception.WorkflowException;
+import co.orquex.sagas.domain.execution.ExecutionRequest;
+import co.orquex.sagas.domain.stage.Stage;
+import co.orquex.sagas.domain.transaction.Checkpoint;
+import co.orquex.sagas.domain.transaction.Status;
+import lombok.RequiredArgsConstructor;
+
+@RequiredArgsConstructor
+public class EventHandlerProcessingStrategy<S extends Stage> implements StageProcessingStrategy<S> {
+
+  private final StageProcessingStrategy<S> strategy;
+  private final EventManager<Checkpoint> eventManager;
+
+  @Override
+  public StrategyResponse process(String transactionId, S stage, ExecutionRequest request) {
+    try {
+      eventManager.send(
+          EventMessage.<Checkpoint>builder()
+              .message(
+                  Checkpoint.builder()
+                      .status(Status.IN_PROGRESS)
+                      .transactionId(transactionId)
+                      .flowId(request.flowId())
+                      .correlationId(request.correlationId())
+                      .metadata(request.metadata())
+                      .request(request.payload())
+                      .build())
+              .build());
+      final var response = strategy.process(transactionId, stage, request);
+      eventManager.send(
+          EventMessage.<Checkpoint>builder()
+              .message(
+                  Checkpoint.builder()
+                      .status(Status.COMPLETED)
+                      .transactionId(transactionId)
+                      .response(response.payload())
+                      .outgoing(response.outgoing())
+                      .build())
+              .build());
+      return response;
+    } catch (WorkflowException e) {
+      eventManager.send(
+          EventMessage.<Checkpoint>builder()
+              .error(Error.builder().message(e.getMessage()).build())
+              .build());
+      throw e;
+    }
+  }
+}

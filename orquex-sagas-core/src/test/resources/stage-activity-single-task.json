@@ -1,0 +1,10 @@
+{
+  "type": "activity",
+  "name": "Single Task Activity",
+  "activityTasks": [
+    {
+      "task": "single-task"
+    }
+  ],
+  "outgoing": "outgoing-test"
+}

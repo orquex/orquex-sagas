@@ -1,0 +1,16 @@
+{
+  "id": "task-impl-id",
+  "name": "Task implementation name",
+  "implementation": "task-id",
+  "compensation": {
+    "task": "task-comp-id"
+  },
+  "metadata": {
+    "meta-key": "meta-value"
+  },
+  "configuration": {
+    "resilience": {
+      "timeout": "PT5S"
+    }
+  }
+}

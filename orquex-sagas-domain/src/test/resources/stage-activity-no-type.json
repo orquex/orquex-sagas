@@ -1,0 +1,9 @@
+{
+  "name": "Not Type Activity",
+  "activityTasks": [],
+  "outgoing": "outgoing-test",
+  "metadata": {},
+  "configuration": {
+    "implementation": "default"
+  }
+}

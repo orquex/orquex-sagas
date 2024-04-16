@@ -1,0 +1,26 @@
+{
+  "type": "evaluation",
+  "name": "Simple Evaluation",
+  "evaluationTask": {
+    "task": "task-evaluator-id",
+    "preProcessor": null,
+    "metadata": null
+  },
+  "conditions": [
+    {
+      "expression": "MSA9PSAxCg==",
+      "outgoing": "outgoing-test-1"
+    },
+    {
+      "expression": "MSA9PSAyCg==",
+      "outgoing": "outgoing-test-2"
+    }
+  ],
+  "defaultOutgoing": "outgoing-test-1",
+  "metadata": {
+    "meta-key": "meta-value"
+  },
+  "configuration": {
+    "implementation": "default"
+  }
+}

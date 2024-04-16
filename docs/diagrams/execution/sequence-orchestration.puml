@@ -1,0 +1,57 @@
+@startuml usecase
+!theme plain
+autonumber
+autoactivate on
+
+title Orchestration Sequence
+
+actor Client as clnt
+box "Sagas Framework"
+participant Executor as exec
+participant Engine as orch
+participant Stage as stage
+end box
+database Repository as repo
+
+clnt -> exec: Execute a flow.
+exec -> orch: execute(ExecuteRequest)
+orch -> repo: Find Flow by ExecuteRequest.FlowID
+return Flow or null
+
+alt flow not present in Repository
+    orch --> exec: Error(Flow not found)
+    exec --> clnt: Error(Flow not found)
+end
+
+orch -> orch: Get initial stage
+
+loop until not stages
+    alt stage.type is activity
+        orch -> stage: Execute activity stage
+        return Response of the stage
+        alt has activity.outgoing
+            orch -> orch: Set next stage
+        else
+           orch -> orch: Set next stage as null
+        end
+    else stage.type is evaluator
+        orch -> stage: Execute evaluation stage
+        ' Check is exclusive or inclusive
+        stage -> stage: Set default condition
+        loop evaluator.conditions
+            alt condition.expression is valid
+                alt has default
+                    stage --> orch: Return one outgoing (Stage).
+                else
+                    stage --> stage: Add to list of outgoing.
+                end
+            end
+        end
+        stage --> orch: Return list of outgoings (Stages).
+    end
+end
+
+orch --> exec: Payload
+exec --> clnt: ExecutionResponse
+
+@enduml
