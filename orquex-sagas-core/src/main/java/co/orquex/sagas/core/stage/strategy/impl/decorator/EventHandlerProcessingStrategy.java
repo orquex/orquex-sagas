@@ -20,26 +20,25 @@ public class EventHandlerProcessingStrategy<S extends Stage> implements StagePro
 
   @Override
   public StrategyResponse process(String transactionId, S stage, ExecutionRequest request) {
+    final var checkpointBuilder =
+        Checkpoint.builder()
+            .transactionId(transactionId)
+            .flowId(request.flowId())
+            .correlationId(request.correlationId())
+            .metadata(request.metadata())
+            .request(request.payload())
+            .incoming(stage);
     try {
       eventManager.send(
           EventMessage.<Checkpoint>builder()
-              .message(
-                  Checkpoint.builder()
-                      .status(Status.IN_PROGRESS)
-                      .transactionId(transactionId)
-                      .flowId(request.flowId())
-                      .correlationId(request.correlationId())
-                      .metadata(request.metadata())
-                      .request(request.payload())
-                      .build())
+              .message(checkpointBuilder.status(Status.IN_PROGRESS).build())
               .build());
       final var response = strategy.process(transactionId, stage, request);
       eventManager.send(
           EventMessage.<Checkpoint>builder()
               .message(
-                  Checkpoint.builder()
+                  checkpointBuilder
                       .status(Status.COMPLETED)
-                      .transactionId(transactionId)
                       .response(response.payload())
                       .outgoing(response.outgoing())
                       .build())
@@ -48,6 +47,7 @@ public class EventHandlerProcessingStrategy<S extends Stage> implements StagePro
     } catch (WorkflowException e) {
       eventManager.send(
           EventMessage.<Checkpoint>builder()
+              .message(checkpointBuilder.status(Status.ERROR).build())
               .error(Error.builder().message(e.getMessage()).build())
               .build());
       throw e;

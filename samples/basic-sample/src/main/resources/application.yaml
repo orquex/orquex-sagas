@@ -1,0 +1,8 @@
+spring:
+  application:
+    name: basic-sample
+
+logging:
+  level:
+    root: error
+    co.orquex.sagas: debug

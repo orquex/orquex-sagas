@@ -29,7 +29,7 @@ public sealed class Stage implements Serializable permits Activity, Evaluation {
       final StageConfiguration configuration) {
     this.type = checkArgumentNotNull(type, "stage's type required");
     this.id = checkArgumentNotNullOrElse(id, UUID.randomUUID().toString());
-    this.name = checkArgumentNotNullOrElse(name, id);
+    this.name = checkArgumentNotNullOrElse(name, this.id);
     this.metadata = checkArgumentNotNullOrElse(metadata, new HashMap<>());
     this.configuration = checkArgumentNotNullOrElse(configuration, new StageConfiguration());
   }

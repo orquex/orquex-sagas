@@ -6,7 +6,7 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
 import co.orquex.sagas.core.flow.WorkflowExecutor;
-import co.orquex.sagas.domain.api.Executable;
+import co.orquex.sagas.core.stage.ExecutableStage;
 import co.orquex.sagas.domain.exception.WorkflowException;
 import co.orquex.sagas.domain.execution.ExecutionRequest;
 import co.orquex.sagas.domain.flow.Flow;
@@ -25,7 +25,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 @ExtendWith(MockitoExtension.class)
 class WorkflowExecutorTest {
 
-  @Mock private Executable<StageRequest> executableStage;
+  @Mock private ExecutableStage executableStage;
   @Mock private FlowRepository flowRepository;
   @Mock private TransactionRepository transactionRepository;
   private static WorkflowExecutor executor;
@@ -35,7 +35,7 @@ class WorkflowExecutorTest {
   void setUp() {
     executor = new WorkflowExecutor(executableStage, flowRepository, transactionRepository);
     simpleFlow = readValue("flow-simple.json", Flow.class);
-    }
+  }
 
   @Test
   void shouldThrowExceptionWhenRequestNull() {
@@ -50,7 +50,7 @@ class WorkflowExecutorTest {
     when(flowRepository.findById(anyString())).thenReturn(Optional.empty());
     assertThatThrownBy(() -> executor.execute(request))
         .isInstanceOf(WorkflowException.class)
-        .hasMessage("workflow not found");
+        .hasMessage("Flow 'flow-id' not found.");
   }
 
   @Test

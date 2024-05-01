@@ -15,9 +15,9 @@ public final class InMemoryTaskExecutorRegistry implements Registry<TaskExecutor
     this.registry = new ConcurrentHashMap<>();
   }
 
-  public static InMemoryTaskExecutorRegistry of(final List<TaskExecutor> stagedList) {
+  public static InMemoryTaskExecutorRegistry of(final List<TaskExecutor> taskExecutorList) {
     final var instance = new InMemoryTaskExecutorRegistry();
-    stagedList.forEach(instance::add);
+    taskExecutorList.forEach(instance::add);
     return instance;
   }
 

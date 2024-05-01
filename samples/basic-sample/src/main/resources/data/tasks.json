@@ -1,0 +1,25 @@
+[
+  {
+    "id": "get-user",
+    "name": "Get user from JSON place holder",
+    "implementation": "get-user",
+    "metadata": {
+      "host": "https://jsonplaceholder.typicode.com/users"
+    }
+  },
+  {
+    "id": "default-groovy-activity",
+    "name": "Default Groovy Activity",
+    "implementation": "groovy"
+  },
+  {
+    "id": "default-groovy-evaluator",
+    "name": "Default Groovy Evaluator",
+    "implementation": "groovy-eval"
+  },
+  {
+    "id": "general-error",
+    "name": "General Error Task",
+    "implementation": "general-error"
+  }
+]

@@ -1,5 +1,6 @@
 package co.orquex.sagas.domain.transaction;
 
+import co.orquex.sagas.domain.stage.Stage;
 import co.orquex.sagas.domain.version.OrquexSagasVersion;
 import java.io.Serial;
 import java.io.Serializable;
@@ -17,6 +18,7 @@ public record Checkpoint(
     Map<String, Serializable> request,
     Map<String, Serializable> response,
     String outgoing,
+    Stage incoming,
     Instant createdAt,
     Instant updatedAt)
     implements Serializable {
