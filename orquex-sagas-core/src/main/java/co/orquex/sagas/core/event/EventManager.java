@@ -31,4 +31,9 @@ public final class EventManager<T> {
   public void send(EventMessage<T> message) {
     this.eventLoop.push(message);
   }
+
+  public void send(T message) {
+    final var eventMessage = EventMessage.<T>builder().message(message).build();
+    this.send(eventMessage);
+  }
 }

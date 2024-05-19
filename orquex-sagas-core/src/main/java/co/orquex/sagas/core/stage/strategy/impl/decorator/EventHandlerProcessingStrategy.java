@@ -29,19 +29,13 @@ public class EventHandlerProcessingStrategy<S extends Stage> implements StagePro
             .request(request.payload())
             .incoming(stage);
     try {
-      eventManager.send(
-          EventMessage.<Checkpoint>builder()
-              .message(checkpointBuilder.status(Status.IN_PROGRESS).build())
-              .build());
+      eventManager.send(checkpointBuilder.status(Status.IN_PROGRESS).build());
       final var response = strategy.process(transactionId, stage, request);
       eventManager.send(
-          EventMessage.<Checkpoint>builder()
-              .message(
-                  checkpointBuilder
-                      .status(Status.COMPLETED)
-                      .response(response.payload())
-                      .outgoing(response.outgoing())
-                      .build())
+          checkpointBuilder
+              .status(Status.COMPLETED)
+              .response(response.payload())
+              .outgoing(response.outgoing())
               .build());
       return response;
     } catch (WorkflowException e) {

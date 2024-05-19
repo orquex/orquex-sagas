@@ -1,11 +1,12 @@
 package co.orquex.sagas.core.flow;
 
-import co.orquex.sagas.core.stage.ExecutableStage;
+import co.orquex.sagas.core.event.EventManager;
 import co.orquex.sagas.domain.exception.WorkflowException;
 import co.orquex.sagas.domain.execution.ExecutionRequest;
 import co.orquex.sagas.domain.flow.Flow;
 import co.orquex.sagas.domain.repository.FlowRepository;
 import co.orquex.sagas.domain.repository.TransactionRepository;
+import co.orquex.sagas.domain.stage.StageRequest;
 import co.orquex.sagas.domain.transaction.Status;
 import co.orquex.sagas.domain.transaction.Transaction;
 import java.time.Instant;
@@ -15,14 +16,14 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class WorkflowExecutor extends AbstractWorkflowExecutor<ExecutionRequest> {
 
-  private final ExecutableStage executableStage;
+  private final EventManager<StageRequest> stageRequestEventManager;
 
   public WorkflowExecutor(
-      ExecutableStage executableStage,
+      EventManager<StageRequest> stageRequestEventManager,
       FlowRepository flowRepository,
       TransactionRepository transactionRepository) {
     super(flowRepository, transactionRepository);
-    this.executableStage = executableStage;
+    this.stageRequestEventManager = stageRequestEventManager;
   }
 
   @Override
@@ -44,7 +45,7 @@ public class WorkflowExecutor extends AbstractWorkflowExecutor<ExecutionRequest>
     // Get initial stage from stages.
     final var stage = getStage(flow, flow.initialStage());
     // Start execution of the workflow.
-    executableStage.execute(getStageRequest(transaction, stage, request));
+    stageRequestEventManager.send(getStageRequest(transaction, stage, request));
   }
 
   private Transaction saveTransaction(Flow flow, ExecutionRequest request) {

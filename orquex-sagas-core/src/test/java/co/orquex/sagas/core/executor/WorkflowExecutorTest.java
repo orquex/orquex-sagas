@@ -5,7 +5,9 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
+import co.orquex.sagas.core.event.EventManager;
 import co.orquex.sagas.core.flow.WorkflowExecutor;
+import co.orquex.sagas.core.stage.DefaultStageEventListener;
 import co.orquex.sagas.core.stage.ExecutableStage;
 import co.orquex.sagas.domain.exception.WorkflowException;
 import co.orquex.sagas.domain.execution.ExecutionRequest;
@@ -33,7 +35,10 @@ class WorkflowExecutorTest {
 
   @BeforeEach
   void setUp() {
-    executor = new WorkflowExecutor(executableStage, flowRepository, transactionRepository);
+    // Create the event manager to send stages
+    final var stageRequestEventManager = new EventManager<StageRequest>();
+    stageRequestEventManager.addListener(new DefaultStageEventListener(executableStage));
+    executor = new WorkflowExecutor(stageRequestEventManager, flowRepository, transactionRepository);
     simpleFlow = readValue("flow-simple.json", Flow.class);
   }
 
@@ -76,6 +81,6 @@ class WorkflowExecutorTest {
     when(transactionRepository.save(any(Transaction.class)))
         .thenReturn(Transaction.builder().transactionId(UUID.randomUUID().toString()).build());
     executor.execute(request);
-    verify(executableStage).execute(any(StageRequest.class));
+    verify(executableStage, timeout(100)).execute(any(StageRequest.class));
   }
 }

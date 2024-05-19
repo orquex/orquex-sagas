@@ -1,5 +1,10 @@
 # Sagas Framework
 
+## Requirements
+
+- Java 21
+- Maven >=3.8.x
+
 ## Installation
 
 ```shell
@@ -67,7 +72,9 @@ In the choreography scenario, the flow execution is distributed using a message 
 
 > This implementation uses the Saga Engine as a coordinator, to re-use the different Stages in multiple Flows.
 
-![sequence-orchestration](./docs/assets/sequence-choreography.png)
+![sequence-orchestration](./docs/assets/sequence-choreography-1.png)
+![sequence-orchestration](./docs/assets/sequence-choreography-2.png)
+![sequence-orchestration](./docs/assets/sequence-choreography-3.png)
 
 ### Flow Domain
 

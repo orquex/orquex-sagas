@@ -3,6 +3,7 @@ package co.orquex.sagas.sample.config;
 import co.orquex.sagas.core.event.EventManager;
 import co.orquex.sagas.core.flow.WorkflowExecutor;
 import co.orquex.sagas.core.flow.WorkflowStageExecutor;
+import co.orquex.sagas.core.stage.DefaultStageEventListener;
 import co.orquex.sagas.core.stage.DefaultStageExecutor;
 import co.orquex.sagas.core.stage.ExecutableStage;
 import co.orquex.sagas.core.stage.InMemoryTaskExecutorRegistry;
@@ -18,6 +19,7 @@ import co.orquex.sagas.domain.registry.Registry;
 import co.orquex.sagas.domain.repository.FlowRepository;
 import co.orquex.sagas.domain.repository.TaskRepository;
 import co.orquex.sagas.domain.repository.TransactionRepository;
+import co.orquex.sagas.domain.stage.StageRequest;
 import co.orquex.sagas.domain.transaction.Checkpoint;
 import co.orquex.sagas.sample.event.CheckpointListener;
 import co.orquex.sagas.task.groovy.GroovyActivity;
@@ -36,18 +38,19 @@ public class SagasConfig {
 
   @Bean
   public WorkflowExecutor workflowExecutor(
-      final ExecutableStage executableStage,
+      final EventManager<StageRequest> stageRequestEventManager,
       final FlowRepository flowRepository,
       final TransactionRepository transactionRepository) {
-    return new WorkflowExecutor(executableStage, flowRepository, transactionRepository);
+    return new WorkflowExecutor(stageRequestEventManager, flowRepository, transactionRepository);
   }
 
   @Bean
   public WorkflowStageExecutor workflowHandler(
-      final ExecutableStage executableStage,
+      final EventManager<StageRequest> stageRequestEventManager,
       final FlowRepository flowRepository,
       final TransactionRepository transactionRepository) {
-    return new WorkflowStageExecutor(executableStage, flowRepository, transactionRepository);
+    return new WorkflowStageExecutor(
+        stageRequestEventManager, flowRepository, transactionRepository);
   }
 
   @Bean
@@ -66,10 +69,17 @@ public class SagasConfig {
   }
 
   @Bean
-  public EventManager<Checkpoint> eventManager(
+  public EventManager<Checkpoint> checkpointEventManager(
       ApplicationEventPublisher applicationEventPublisher) {
     final var eventManager = new EventManager<Checkpoint>();
     eventManager.addListener(new CheckpointListener(applicationEventPublisher));
+    return eventManager;
+  }
+
+  @Bean
+  public EventManager<StageRequest> stageRequestEventManager(ExecutableStage executableStage) {
+    final var eventManager = new EventManager<StageRequest>();
+    eventManager.addListener(new DefaultStageEventListener(executableStage));
     return eventManager;
   }
 
