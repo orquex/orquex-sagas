@@ -27,6 +27,8 @@ public final class GroovyEvaluation implements TaskImplementation {
       final Map<String, Serializable> payload) {
 
     try {
+      if (!metadata.containsKey(EXPRESSION)) throw new WorkflowException("expression not found");
+
       final var expression = metadata.get(EXPRESSION).toString();
       final var context = new SimpleBindings(Map.of(METADATA, metadata, PAYLOAD, payload));
       if (groovyScriptEngine.eval(expression, context) instanceof Boolean result)

@@ -11,9 +11,12 @@ import co.orquex.sagas.domain.repository.TaskRepository;
 import co.orquex.sagas.domain.stage.Condition;
 import co.orquex.sagas.domain.stage.Evaluation;
 import co.orquex.sagas.domain.stage.EvaluationTask;
+import lombok.extern.slf4j.Slf4j;
+
 import java.io.Serializable;
 import java.util.Map;
 
+@Slf4j
 public class EvaluationProcessingStrategy extends AbstractStageProcessingStrategy<Evaluation> {
 
   public EvaluationProcessingStrategy(
@@ -24,7 +27,7 @@ public class EvaluationProcessingStrategy extends AbstractStageProcessingStrateg
   @Override
   public StrategyResponse process(
       String transactionId, Evaluation evaluation, ExecutionRequest request) {
-
+    log.debug("Executing evaluation stage '{}'", evaluation.getName());
     var outgoing = evaluation.getDefaultOutgoing();
 
     for (Condition condition : evaluation.getConditions()) {
@@ -43,7 +46,7 @@ public class EvaluationProcessingStrategy extends AbstractStageProcessingStrateg
     }
 
     // return the default outgoing.
-    return StrategyResponse.builder().outgoing(outgoing).build();
+    return StrategyResponse.builder().outgoing(outgoing).payload(request.payload()).build();
   }
 
   private Map<String, Serializable> processEvaluationTask(

@@ -9,6 +9,8 @@ import co.orquex.sagas.domain.repository.TaskRepository;
 import co.orquex.sagas.domain.stage.Activity;
 import co.orquex.sagas.domain.stage.ActivityTask;
 import co.orquex.sagas.domain.utils.Maps;
+import lombok.extern.slf4j.Slf4j;
+
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Collections;
@@ -18,6 +20,7 @@ import java.util.concurrent.*;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
+@Slf4j
 public class ActivityProcessingStrategy extends AbstractStageProcessingStrategy<Activity> {
 
   public ActivityProcessingStrategy(
@@ -28,6 +31,7 @@ public class ActivityProcessingStrategy extends AbstractStageProcessingStrategy<
   @Override
   public StrategyResponse process(
       String transactionId, Activity activity, ExecutionRequest request) {
+    log.debug("Executing activity stage '{}'", activity.getName());
     // Merge metadata
     final var updatedRequest = request.mergeMetadata(activity.getMetadata());
     // Check if not a parallel execution

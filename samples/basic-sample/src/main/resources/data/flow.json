@@ -1,0 +1,85 @@
+{
+  "id": "basic-sample-flow",
+  "name": "Basic Sample Flow",
+  "initialStage": "check-user-stage",
+  "stages": {
+    "get-user-stage": {
+      "type": "activity",
+      "name": "Get user stage",
+      "activityTasks": [
+        {
+          "task": "get-user"
+        }
+      ],
+      "outgoing": "check-odd-stage"
+    },
+    "check-user-stage": {
+      "type": "evaluation",
+      "name": "Check user stage",
+      "evaluationTask": {
+        "task": "default-groovy-evaluator"
+      },
+      "conditions": [
+        {
+          "expression": "payload.user.id <= 10",
+          "outgoing": "get-user-stage"
+        }
+      ],
+      "defaultOutgoing": "general-error-task"
+    },
+    "check-odd-stage": {
+      "type": "evaluation",
+      "name": "Check if ID is odd",
+      "evaluationTask": {
+        "task": "default-groovy-evaluator"
+      },
+      "conditions": [
+        {
+          "expression": "payload.user.id % 2 != 0",
+          "outgoing": "upper-case-stage"
+        }
+      ],
+      "defaultOutgoing": "lower-case-stage"
+    },
+    "upper-case-stage": {
+      "type": "activity",
+      "name": "Upper case stage",
+      "activityTasks": [
+        {
+          "task": "default-groovy-activity",
+          "metadata": {
+            "__script": "Y29udGV4dC5wdXQoInVzZXIiLCBwYXlsb2FkLnVzZXIubmFtZS50b1VwcGVyQ2FzZSgpKTs="
+          }
+        }
+      ],
+      "outgoing": "split-name-stage"
+    },
+    "lower-case-stage": {
+      "type": "activity",
+      "name": "Lower case stage",
+      "activityTasks": [
+        {
+          "task": "default-groovy-activity",
+          "metadata": {
+            "__script": "Y29udGV4dC5wdXQoInVzZXIiLCBwYXlsb2FkLnVzZXIubmFtZS50b0xvd2VyQ2FzZSgpKTs="
+          }
+        }
+      ],
+      "outgoing": "split-name-stage"
+    },
+    "split-name-stage": {
+      "type": "activity",
+      "name": "Split name",
+      "activityTasks": [
+        {
+          "task": "default-groovy-activity",
+          "metadata": {
+            "__script": "Y29udGV4dC5wdXQoInJlc3VsdCIsIHBheWxvYWQudXNlci5zcGxpdCgnXFxzJykpOw=="
+          }
+        }
+      ]
+    }
+  },
+  "configuration": {},
+  "metadata": {}
+}

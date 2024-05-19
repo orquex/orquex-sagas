@@ -1,5 +1,13 @@
 # Sagas Framework
 
+## Installation
+
+```shell
+mvn clean install
+```
+
+## Documentation
+
 Sagas is a known pattern to manage long-live transactions in distributed environments. Long Live Transactions (LLT), is a transaction that takes significant time to be completed and requires synchronization between multiple transactions.
 
 This project aims to define a way to implement this microservices pattern by specifying a structure that solves surrounding problems, developing an implementation of the Sagas pattern with multi-language support and a single communication interface between the different [Flow](#Flow) [Stages](#stage).
