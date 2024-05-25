@@ -31,6 +31,7 @@ class ExecutableStageTest {
   @Mock private StageProcessingStrategy<Activity> activityStrategy;
   @Mock private StageProcessingStrategy<Evaluation> evaluationStrategy;
   @Captor private ArgumentCaptor<EventMessage<Checkpoint>> eventMessageCaptor;
+  @Captor private ArgumentCaptor<Checkpoint> checkpointCaptor;
   private DefaultStageExecutor executableStage;
 
   @BeforeEach
@@ -55,9 +56,9 @@ class ExecutableStageTest {
     verify(evaluationStrategy, never())
         .process(anyString(), any(Evaluation.class), any(ExecutionRequest.class));
     // Capture the event message sent
-    verify(eventManager, times(2)).send(eventMessageCaptor.capture());
-    final var eventMessage = eventMessageCaptor.getValue();
-    assertThat(eventMessage).isNotNull();
+    verify(eventManager, times(2)).send(checkpointCaptor.capture());
+    final var checkpoint = checkpointCaptor.getValue();
+    assertThat(checkpoint).isNotNull();
   }
 
   @Test
@@ -74,9 +75,9 @@ class ExecutableStageTest {
     verify(evaluationStrategy)
         .process(anyString(), any(Evaluation.class), any(ExecutionRequest.class));
     // Capture the event message sent
-    verify(eventManager, times(2)).send(eventMessageCaptor.capture());
-    final var eventMessage = eventMessageCaptor.getValue();
-    assertThat(eventMessage).isNotNull();
+    verify(eventManager, times(2)).send(checkpointCaptor.capture());
+    final var checkpoint = checkpointCaptor.getValue();
+    assertThat(checkpoint).isNotNull();
   }
 
   @Test
@@ -91,7 +92,8 @@ class ExecutableStageTest {
     verify(evaluationStrategy)
         .process(anyString(), any(Evaluation.class), any(ExecutionRequest.class));
     // Capture the event message sent
-    verify(eventManager, times(2)).send(eventMessageCaptor.capture());
+    verify(eventManager).send(checkpointCaptor.capture());
+    verify(eventManager).send(eventMessageCaptor.capture());
     final var eventMessage = eventMessageCaptor.getValue();
     assertThat(eventMessage).isNotNull();
     assertThat(eventMessage.hasError()).isTrue();

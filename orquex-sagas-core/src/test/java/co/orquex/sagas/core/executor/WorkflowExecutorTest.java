@@ -8,14 +8,17 @@ import static org.mockito.Mockito.*;
 import co.orquex.sagas.core.event.EventManager;
 import co.orquex.sagas.core.flow.WorkflowExecutor;
 import co.orquex.sagas.core.stage.DefaultStageEventListener;
-import co.orquex.sagas.core.stage.ExecutableStage;
+import co.orquex.sagas.core.stage.DefaultStageExecutor;
+import co.orquex.sagas.core.stage.InMemoryStageExecutorRegistry;
 import co.orquex.sagas.domain.exception.WorkflowException;
 import co.orquex.sagas.domain.execution.ExecutionRequest;
 import co.orquex.sagas.domain.flow.Flow;
 import co.orquex.sagas.domain.repository.FlowRepository;
 import co.orquex.sagas.domain.repository.TransactionRepository;
+import co.orquex.sagas.domain.stage.StageConfiguration;
 import co.orquex.sagas.domain.stage.StageRequest;
 import co.orquex.sagas.domain.transaction.Transaction;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
@@ -27,7 +30,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 @ExtendWith(MockitoExtension.class)
 class WorkflowExecutorTest {
 
-  @Mock private ExecutableStage executableStage;
+  @Mock private DefaultStageExecutor stageExecutor;
   @Mock private FlowRepository flowRepository;
   @Mock private TransactionRepository transactionRepository;
   private static WorkflowExecutor executor;
@@ -35,9 +38,12 @@ class WorkflowExecutorTest {
 
   @BeforeEach
   void setUp() {
+    // Setting default stage executor
+    when(stageExecutor.getId()).thenReturn(StageConfiguration.DEFAULT_IMPLEMENTATION);
+    final var stageExecutorRegistry = InMemoryStageExecutorRegistry.of(List.of(stageExecutor));
     // Create the event manager to send stages
     final var stageRequestEventManager = new EventManager<StageRequest>();
-    stageRequestEventManager.addListener(new DefaultStageEventListener(executableStage));
+    stageRequestEventManager.addListener(new DefaultStageEventListener(stageExecutorRegistry));
     executor = new WorkflowExecutor(stageRequestEventManager, flowRepository, transactionRepository);
     simpleFlow = readValue("flow-simple.json", Flow.class);
   }
@@ -81,6 +87,6 @@ class WorkflowExecutorTest {
     when(transactionRepository.save(any(Transaction.class)))
         .thenReturn(Transaction.builder().transactionId(UUID.randomUUID().toString()).build());
     executor.execute(request);
-    verify(executableStage, timeout(100)).execute(any(StageRequest.class));
+    verify(stageExecutor, timeout(100)).execute(any(StageRequest.class));
   }
 }

@@ -1,4 +1,4 @@
-package co.orquex.sagas.core.stage;
+package co.orquex.sagas.core.task;
 
 import co.orquex.sagas.domain.api.TaskExecutor;
 import co.orquex.sagas.domain.registry.Registry;

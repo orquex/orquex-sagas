@@ -1,0 +1,23 @@
+[
+  {
+    "id": "service-checkout",
+    "name": "Checkout",
+    "implementation": "service-checkout",
+    "metadata": {
+      "products": [
+        {
+          "size": "small",
+          "price": 5
+        },
+        {
+          "size": "medium",
+          "price": 8
+        },
+        {
+          "size": "large",
+          "price": 10
+        }
+      ]
+    }
+  }
+]

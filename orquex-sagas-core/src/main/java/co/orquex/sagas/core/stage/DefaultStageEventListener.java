@@ -5,17 +5,19 @@ import static java.util.Objects.isNull;
 
 import co.orquex.sagas.core.event.EventListener;
 import co.orquex.sagas.core.event.impl.EventMessage;
+import co.orquex.sagas.domain.api.StageExecutor;
+import co.orquex.sagas.domain.registry.Registry;
 import co.orquex.sagas.domain.stage.StageRequest;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class DefaultStageEventListener implements EventListener<StageRequest> {
 
-  private final ExecutableStage executableStage;
+  private final Registry<StageExecutor> stageRegistry;
 
-  public DefaultStageEventListener(ExecutableStage executableStage) {
-    this.executableStage =
-        checkArgumentNotNull(executableStage, "ExecutableStage instance cannot be null");
+  public DefaultStageEventListener(Registry<StageExecutor> stageExecutorRegistry) {
+    this.stageRegistry =
+        checkArgumentNotNull(stageExecutorRegistry, "Stage executor registry cannot be null");
   }
 
   @Override
@@ -25,7 +27,17 @@ public class DefaultStageEventListener implements EventListener<StageRequest> {
       log.warn("Ignored a null stage request received");
       return;
     }
-    executableStage.execute(message.getMessage());
+    final var stage = request.stage();
+    if (isNull(stage)) {
+      log.warn("Ignored a null stage received");
+      return;
+    }
+    final var impl = stage.getConfiguration().implementation();
+    stageRegistry
+        .get(impl)
+        .ifPresentOrElse(
+            stageExecutor -> stageExecutor.execute(request),
+            () -> log.error("Stage executor '{}' not found", impl));
   }
 
   @Override

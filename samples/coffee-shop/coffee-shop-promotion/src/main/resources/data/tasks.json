@@ -1,0 +1,14 @@
+[
+  {
+    "id": "discount-calculator",
+    "name": "Calculates the discount",
+    "implementation": "discount-calculator",
+    "metadata": {
+      "references": {
+        "small": 2,
+        "medium": 5,
+        "large": 50
+      }
+    }
+  }
+]

@@ -11,11 +11,16 @@ import co.orquex.sagas.domain.repository.TaskRepository;
 import co.orquex.sagas.domain.stage.Condition;
 import co.orquex.sagas.domain.stage.Evaluation;
 import co.orquex.sagas.domain.stage.EvaluationTask;
-import lombok.extern.slf4j.Slf4j;
-
 import java.io.Serializable;
 import java.util.Map;
+import lombok.extern.slf4j.Slf4j;
 
+/**
+ * This evaluation processing strategy treats the expression stored in the metadata field {@code
+ * __expression} as the condition. It then retrieves the boolean result from the variable {@code
+ * __result}. If the retrieved value is either false or not a boolean type at all, the condition is
+ * considered not to match.
+ */
 @Slf4j
 public class EvaluationProcessingStrategy extends AbstractStageProcessingStrategy<Evaluation> {
 

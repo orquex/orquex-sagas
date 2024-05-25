@@ -1,0 +1,13 @@
+server:
+  port: 7070
+spring:
+  application:
+    name: coffee-shop-api
+  kafka:
+    bootstrap-servers: 127.0.0.1:19092
+    producer.value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+    consumer.value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+logging:
+  level:
+    root: error
+    co.orquex.sagas: trace

@@ -33,7 +33,7 @@ public final class EventManager<T> {
   }
 
   public void send(T message) {
-    final var eventMessage = EventMessage.<T>builder().message(message).build();
+    final var eventMessage = new EventMessage<>(message);
     this.send(eventMessage);
   }
 }

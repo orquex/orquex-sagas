@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import co.orquex.sagas.core.task.InMemoryTaskExecutorRegistry;
 import co.orquex.sagas.domain.api.TaskExecutor;
 import java.util.ArrayList;
 import java.util.List;

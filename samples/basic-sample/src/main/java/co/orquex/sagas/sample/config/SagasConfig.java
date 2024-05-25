@@ -5,12 +5,11 @@ import co.orquex.sagas.core.flow.WorkflowExecutor;
 import co.orquex.sagas.core.flow.WorkflowStageExecutor;
 import co.orquex.sagas.core.stage.DefaultStageEventListener;
 import co.orquex.sagas.core.stage.DefaultStageExecutor;
-import co.orquex.sagas.core.stage.ExecutableStage;
-import co.orquex.sagas.core.stage.InMemoryTaskExecutorRegistry;
+import co.orquex.sagas.core.stage.InMemoryStageExecutorRegistry;
 import co.orquex.sagas.core.stage.strategy.impl.ActivityProcessingStrategy;
 import co.orquex.sagas.core.stage.strategy.impl.EvaluationProcessingStrategy;
-import co.orquex.sagas.core.stage.strategy.impl.decorator.EventHandlerProcessingStrategy;
 import co.orquex.sagas.core.task.DefaultTaskExecutor;
+import co.orquex.sagas.core.task.InMemoryTaskExecutorRegistry;
 import co.orquex.sagas.core.task.InMemoryTaskImplementationRegistry;
 import co.orquex.sagas.domain.api.TaskExecutor;
 import co.orquex.sagas.domain.api.TaskImplementation;
@@ -54,18 +53,16 @@ public class SagasConfig {
   }
 
   @Bean
-  public ExecutableStage executableStage(
+  public DefaultStageExecutor defaultStageExecutor(
       final Registry<TaskExecutor> taskExecutorRegistry,
       final TaskRepository taskRepository,
       final EventManager<Checkpoint> eventManager) {
     // Decorate the strategy implementation with an event handler
     final var activityStrategy =
-        new EventHandlerProcessingStrategy<>(
-            new ActivityProcessingStrategy(taskExecutorRegistry, taskRepository), eventManager);
+        new ActivityProcessingStrategy(taskExecutorRegistry, taskRepository);
     final var evaluationStrategy =
-        new EventHandlerProcessingStrategy<>(
-            new EvaluationProcessingStrategy(taskExecutorRegistry, taskRepository), eventManager);
-    return new DefaultStageExecutor(activityStrategy, evaluationStrategy);
+        new EvaluationProcessingStrategy(taskExecutorRegistry, taskRepository);
+    return new DefaultStageExecutor(activityStrategy, evaluationStrategy, eventManager);
   }
 
   @Bean
@@ -77,9 +74,12 @@ public class SagasConfig {
   }
 
   @Bean
-  public EventManager<StageRequest> stageRequestEventManager(ExecutableStage executableStage) {
+  public EventManager<StageRequest> stageRequestEventManager(
+      DefaultStageExecutor defaultStageExecutor) {
     final var eventManager = new EventManager<StageRequest>();
-    eventManager.addListener(new DefaultStageEventListener(executableStage));
+    final var stageExecutorRegistry =
+        InMemoryStageExecutorRegistry.of(List.of(defaultStageExecutor));
+    eventManager.addListener(new DefaultStageEventListener(stageExecutorRegistry));
     return eventManager;
   }
 

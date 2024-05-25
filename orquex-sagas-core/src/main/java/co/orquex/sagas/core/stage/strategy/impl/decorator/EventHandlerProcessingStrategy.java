@@ -40,10 +40,9 @@ public class EventHandlerProcessingStrategy<S extends Stage> implements StagePro
       return response;
     } catch (WorkflowException e) {
       eventManager.send(
-          EventMessage.<Checkpoint>builder()
-              .message(checkpointBuilder.status(Status.ERROR).build())
-              .error(Error.builder().message(e.getMessage()).build())
-              .build());
+          new EventMessage<>(
+              checkpointBuilder.status(Status.ERROR).build(),
+              Error.builder().message(e.getMessage()).build()));
       throw e;
     }
   }
