@@ -13,25 +13,30 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class CheckpointListener implements EventListener<Checkpoint> {
 
-    private static final String checkpointTopic = "coffee.shop.stage.checkpoint";
-    private static final String errorTopic = "coffee.shop.stage.error";
-    private final KafkaTemplate<String, EventMessage<Checkpoint>> kafkaTemplate;
+  private static final String CHECKPOINT_TOPIC = "coffee.shop.stage.checkpoint";
+  private static final String ERROR_TOPIC = "coffee.shop.stage.error";
+  private final KafkaTemplate<String, EventMessage<Checkpoint>> kafkaTemplate;
 
-    @Override
-    public void onMessage(EventMessage<Checkpoint> message) {
-        final var checkpoint = message.getMessage();
-        log.debug(
-                "Received checkpoint for '{}' with correlation ID '{}' in stage '{}' and status '{}'",
-                checkpoint.flowId(), checkpoint.correlationId(), checkpoint.incoming().getName(),
-                checkpoint.status());
-        kafkaTemplate.send(checkpointTopic, message);
-    }
+  @Override
+  public void onMessage(EventMessage<Checkpoint> message) {
+    final var checkpoint = message.message();
+    log.debug(
+        "Received checkpoint for '{}' with correlation ID '{}' in stage '{}' and status '{}'",
+        checkpoint.flowId(),
+        checkpoint.correlationId(),
+        checkpoint.incoming().getName(),
+        checkpoint.status());
+    kafkaTemplate.send(CHECKPOINT_TOPIC, message);
+  }
 
-    @Override
-    public void onError(EventMessage<Checkpoint> message) {
-        final var checkpoint = message.getMessage();
-        log.error("Error received for '{}' with correlation ID '{}' in stage '{}'",
-                checkpoint.flowId(), checkpoint.correlationId(), checkpoint.incoming().getName());
-        kafkaTemplate.send(errorTopic, message);
-    }
+  @Override
+  public void onError(EventMessage<Checkpoint> message) {
+    final var checkpoint = message.message();
+    log.error(
+        "Error received for '{}' with correlation ID '{}' in stage '{}'",
+        checkpoint.flowId(),
+        checkpoint.correlationId(),
+        checkpoint.incoming().getName());
+    kafkaTemplate.send(ERROR_TOPIC, message);
+  }
 }

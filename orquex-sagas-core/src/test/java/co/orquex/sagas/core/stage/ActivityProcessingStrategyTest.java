@@ -8,6 +8,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
 
+import co.orquex.sagas.core.event.WorkflowEventPublisher;
 import co.orquex.sagas.core.stage.strategy.impl.ActivityProcessingStrategy;
 import co.orquex.sagas.domain.api.TaskExecutor;
 import co.orquex.sagas.domain.exception.WorkflowException;
@@ -32,12 +33,13 @@ class ActivityProcessingStrategyTest {
   @Mock private TaskRepository taskRepository;
   private ActivityProcessingStrategy strategy;
   @Mock TaskExecutor taskExecutor;
+  @Mock private WorkflowEventPublisher eventPublisher;
   private ExecutionRequest executionRequest;
   private String transactionId;
 
   @BeforeEach
   void setUp() {
-    strategy = new ActivityProcessingStrategy(taskExecutorRegistry, taskRepository);
+    strategy = new ActivityProcessingStrategy(taskExecutorRegistry, taskRepository, eventPublisher);
     executionRequest =
         new ExecutionRequest(UUID.randomUUID().toString(), UUID.randomUUID().toString());
     transactionId = UUID.randomUUID().toString();
@@ -74,7 +76,7 @@ class ActivityProcessingStrategyTest {
     final var activity = readValue("stage-activity-single-task.json", Activity.class);
     assertThatThrownBy(() -> strategy.process(transactionId, activity, executionRequest))
         .isInstanceOf(WorkflowException.class)
-        .hasMessage("task 'single-task' not found");
+        .hasMessage("Task 'single-task' not found");
   }
 
   @Test
@@ -85,7 +87,7 @@ class ActivityProcessingStrategyTest {
     final var activity = readValue("stage-activity-single-task.json", Activity.class);
     assertThatThrownBy(() -> strategy.process(transactionId, activity, executionRequest))
         .isInstanceOf(WorkflowException.class)
-        .hasMessage("task executor 'default' not registered");
+        .hasMessage("Task executor 'default' not registered");
   }
 
   @Test
@@ -119,14 +121,14 @@ class ActivityProcessingStrategyTest {
   void shouldThrowExceptionWhenActivityParallelTaskExecutorNotFound() {
     // Task executor registry
     when(taskExecutorRegistry.get(DEFAULT_EXECUTOR))
-            .thenReturn(Optional.of(taskExecutor))
-            .thenReturn(Optional.empty());
+        .thenReturn(Optional.of(taskExecutor))
+        .thenReturn(Optional.empty());
     when(taskRepository.findById(anyString()))
-            .thenReturn(Optional.of(getTask("task-1")))
-            .thenReturn(Optional.of(getTask("task-2")));
+        .thenReturn(Optional.of(getTask("task-1")))
+        .thenReturn(Optional.of(getTask("task-2")));
     final var activity = readValue("stage-activity-parallel-task.json", Activity.class);
     assertThatThrownBy(() -> strategy.process(transactionId, activity, executionRequest))
         .isInstanceOf(WorkflowException.class)
-        .hasMessage("task executor 'default' not registered");
+        .hasMessage("Task executor 'default' not registered");
   }
 }

@@ -12,3 +12,8 @@ logging:
   level:
     root: error
     co.orquex.sagas: debug
+orquex:
+  sagas:
+    spring:
+      stage:
+        enabled: true

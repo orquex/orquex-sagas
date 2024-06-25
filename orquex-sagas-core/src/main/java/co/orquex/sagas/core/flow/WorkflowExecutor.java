@@ -1,12 +1,12 @@
 package co.orquex.sagas.core.flow;
 
-import co.orquex.sagas.core.event.EventManager;
+import co.orquex.sagas.core.event.WorkflowEventPublisher;
+import co.orquex.sagas.core.event.impl.EventMessage;
 import co.orquex.sagas.domain.exception.WorkflowException;
 import co.orquex.sagas.domain.execution.ExecutionRequest;
 import co.orquex.sagas.domain.flow.Flow;
 import co.orquex.sagas.domain.repository.FlowRepository;
 import co.orquex.sagas.domain.repository.TransactionRepository;
-import co.orquex.sagas.domain.stage.StageRequest;
 import co.orquex.sagas.domain.transaction.Status;
 import co.orquex.sagas.domain.transaction.Transaction;
 import java.time.Instant;
@@ -16,20 +16,20 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class WorkflowExecutor extends AbstractWorkflowExecutor<ExecutionRequest> {
 
-  private final EventManager<StageRequest> stageRequestEventManager;
+  private final WorkflowEventPublisher workflowEventPublisher;
 
   public WorkflowExecutor(
-      EventManager<StageRequest> stageRequestEventManager,
-      FlowRepository flowRepository,
-      TransactionRepository transactionRepository) {
+      final WorkflowEventPublisher workflowEventPublisher,
+      final FlowRepository flowRepository,
+      final TransactionRepository transactionRepository) {
     super(flowRepository, transactionRepository);
-    this.stageRequestEventManager = stageRequestEventManager;
+    this.workflowEventPublisher = workflowEventPublisher;
   }
 
   @Override
-  public void execute(ExecutionRequest request) {
+  public void execute(final ExecutionRequest request) {
     // Check executionRequest is not null.
-    if (request == null) throw new WorkflowException("execution executionRequest required");
+    if (request == null) throw new WorkflowException("Execution request required");
     // Get flow by id.
     final var flow = getFlow(request.flowId());
     log.debug(
@@ -37,7 +37,7 @@ public class WorkflowExecutor extends AbstractWorkflowExecutor<ExecutionRequest>
     // Check transaction already exists by correlation id.
     if (transactionRepository.existByFlowIdAndCorrelationId(flow.id(), request.correlationId())) {
       throw new WorkflowException(
-          "flow '%s' with correlation id '%s' has already been initiated"
+          "Flow '%s' with correlation id '%s' has already been initiated"
               .formatted(flow.name(), request.correlationId()));
     }
     // Register the transaction.
@@ -45,10 +45,11 @@ public class WorkflowExecutor extends AbstractWorkflowExecutor<ExecutionRequest>
     // Get initial stage from stages.
     final var stage = getStage(flow, flow.initialStage());
     // Start execution of the workflow.
-    stageRequestEventManager.send(getStageRequest(transaction, stage, request));
+    final var stageEventMessage = new EventMessage<>(getStageRequest(transaction, stage, request));
+    workflowEventPublisher.publish(stageEventMessage);
   }
 
-  private Transaction saveTransaction(Flow flow, ExecutionRequest request) {
+  private Transaction saveTransaction(final Flow flow, final ExecutionRequest request) {
     return transactionRepository.save(
         Transaction.builder()
             .transactionId(UUID.randomUUID().toString())

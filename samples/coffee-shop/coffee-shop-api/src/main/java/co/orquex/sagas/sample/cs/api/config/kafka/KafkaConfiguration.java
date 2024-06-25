@@ -8,11 +8,8 @@ import org.springframework.kafka.config.TopicBuilder;
 @Configuration
 public class KafkaConfiguration {
 
-    @Bean
-    public NewTopic topic() {
-        return TopicBuilder.name("coffee.shop.check-size.stage")
-                .partitions(3)
-                .replicas(1)
-                .build();
-    }
+  @Bean
+  public NewTopic topic() {
+    return TopicBuilder.name("coffee.shop.check-size.stage").partitions(3).replicas(1).build();
+  }
 }

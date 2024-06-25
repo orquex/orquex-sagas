@@ -23,33 +23,30 @@
 				<groupId>co.orquex.sagas</groupId>
 				<artifactId>orquex-sagas</artifactId>
 				<version>1.0-SNAPSHOT</version>
+				<type>pom</type>
 				<scope>import</scope>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
 
 	<dependencies>
+		<!-- Spring -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
 		</dependency>
-
+		<!-- Orquex -->
 		<dependency>
 			<groupId>co.orquex.sagas</groupId>
-			<artifactId>orquex-sagas-core</artifactId>
-			<version>1.0-SNAPSHOT</version>
+			<artifactId>orquex-sagas-spring-boot</artifactId>
 		</dependency>
-		<dependency>
-			<groupId>co.orquex.sagas</groupId>
-			<artifactId>orquex-sagas-task-groovy</artifactId>
-			<version>1.0-SNAPSHOT</version>
-		</dependency>
-
+		<!-- Others -->
 		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
 			<optional>true</optional>
 		</dependency>
+		<!-- Testing -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>

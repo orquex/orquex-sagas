@@ -6,7 +6,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
-import co.orquex.sagas.core.event.EventManager;
+import co.orquex.sagas.core.event.WorkflowEventPublisher;
 import co.orquex.sagas.core.event.impl.EventMessage;
 import co.orquex.sagas.core.fixture.ExecutionRequestFixture;
 import co.orquex.sagas.core.stage.strategy.StageProcessingStrategy;
@@ -27,19 +27,18 @@ import org.mockito.junit.jupiter.MockitoExtension;
 @ExtendWith(MockitoExtension.class)
 class ExecutableStageTest {
 
-  @Mock private EventManager<Checkpoint> eventManager;
+  @Mock private WorkflowEventPublisher workflowEventPublisher;
   @Mock private StageProcessingStrategy<Activity> activityStrategy;
   @Mock private StageProcessingStrategy<Evaluation> evaluationStrategy;
   @Captor private ArgumentCaptor<EventMessage<Checkpoint>> eventMessageCaptor;
-  @Captor private ArgumentCaptor<Checkpoint> checkpointCaptor;
   private DefaultStageExecutor executableStage;
 
   @BeforeEach
   void setUp() {
     final var activityStrategyDecorator =
-        new EventHandlerProcessingStrategy<>(activityStrategy, eventManager);
+        new EventHandlerProcessingStrategy<>(activityStrategy, workflowEventPublisher);
     final var evaluationStrategyDecorator =
-        new EventHandlerProcessingStrategy<>(evaluationStrategy, eventManager);
+        new EventHandlerProcessingStrategy<>(evaluationStrategy, workflowEventPublisher);
     executableStage =
         new DefaultStageExecutor(activityStrategyDecorator, evaluationStrategyDecorator);
   }
@@ -56,8 +55,8 @@ class ExecutableStageTest {
     verify(evaluationStrategy, never())
         .process(anyString(), any(Evaluation.class), any(ExecutionRequest.class));
     // Capture the event message sent
-    verify(eventManager, times(2)).send(checkpointCaptor.capture());
-    final var checkpoint = checkpointCaptor.getValue();
+    verify(workflowEventPublisher, times(2)).publish(eventMessageCaptor.capture());
+    final var checkpoint = eventMessageCaptor.getValue();
     assertThat(checkpoint).isNotNull();
   }
 
@@ -75,8 +74,8 @@ class ExecutableStageTest {
     verify(evaluationStrategy)
         .process(anyString(), any(Evaluation.class), any(ExecutionRequest.class));
     // Capture the event message sent
-    verify(eventManager, times(2)).send(checkpointCaptor.capture());
-    final var checkpoint = checkpointCaptor.getValue();
+    verify(workflowEventPublisher, times(2)).publish(eventMessageCaptor.capture());
+    final var checkpoint = eventMessageCaptor.getValue();
     assertThat(checkpoint).isNotNull();
   }
 
@@ -92,8 +91,7 @@ class ExecutableStageTest {
     verify(evaluationStrategy)
         .process(anyString(), any(Evaluation.class), any(ExecutionRequest.class));
     // Capture the event message sent
-    verify(eventManager).send(checkpointCaptor.capture());
-    verify(eventManager).send(eventMessageCaptor.capture());
+    verify(workflowEventPublisher, times(2)).publish(eventMessageCaptor.capture());
     final var eventMessage = eventMessageCaptor.getValue();
     assertThat(eventMessage).isNotNull();
     assertThat(eventMessage.hasError()).isTrue();

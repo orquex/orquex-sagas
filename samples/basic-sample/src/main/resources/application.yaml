@@ -6,3 +6,9 @@ logging:
   level:
     root: error
     co.orquex.sagas: debug
+
+orquex:
+  sagas:
+    spring:
+      workflow:
+        enabled: true

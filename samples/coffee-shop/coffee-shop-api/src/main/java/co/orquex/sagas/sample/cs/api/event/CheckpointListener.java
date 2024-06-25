@@ -6,8 +6,10 @@ import co.orquex.sagas.domain.transaction.Checkpoint;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.stereotype.Component;
 
 @Slf4j
+@Component
 @RequiredArgsConstructor
 public class CheckpointListener implements EventListener<Checkpoint> {
 
@@ -15,7 +17,7 @@ public class CheckpointListener implements EventListener<Checkpoint> {
 
   @Override
   public void onMessage(EventMessage<Checkpoint> eventMessage) {
-    final var checkpoint = eventMessage.getMessage();
+    final var checkpoint = eventMessage.message();
     log.trace(
         "Received checkpoint for '{}' with correlation ID '{}' in stage '{}' and status '{}'",
         checkpoint.flowId(),
@@ -27,7 +29,7 @@ public class CheckpointListener implements EventListener<Checkpoint> {
 
   @Override
   public void onError(EventMessage<Checkpoint> eventMessage) {
-    final var checkpoint = eventMessage.getMessage();
+    final var checkpoint = eventMessage.message();
     log.error(
         "Error received for '{}' with correlation ID '{}' in stage '{}'",
         checkpoint.flowId(),

@@ -40,6 +40,4 @@ public abstract class AbstractWorkflowExecutor<T> implements Executable<T> {
         .executionRequest(request)
         .build();
   }
-
-  public abstract void execute(T request);
 }

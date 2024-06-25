@@ -1,6 +1,6 @@
 package co.orquex.sagas.core.stage.strategy.impl.decorator;
 
-import co.orquex.sagas.core.event.EventManager;
+import co.orquex.sagas.core.event.WorkflowEventPublisher;
 import co.orquex.sagas.core.event.impl.EventMessage;
 import co.orquex.sagas.core.stage.strategy.StageProcessingStrategy;
 import co.orquex.sagas.core.stage.strategy.StrategyResponse;
@@ -16,7 +16,7 @@ import lombok.RequiredArgsConstructor;
 public class EventHandlerProcessingStrategy<S extends Stage> implements StageProcessingStrategy<S> {
 
   private final StageProcessingStrategy<S> strategy;
-  private final EventManager<Checkpoint> eventManager;
+  private final WorkflowEventPublisher workflowEventPublisher;
 
   @Override
   public StrategyResponse process(String transactionId, S stage, ExecutionRequest request) {
@@ -29,17 +29,19 @@ public class EventHandlerProcessingStrategy<S extends Stage> implements StagePro
             .request(request.payload())
             .incoming(stage);
     try {
-      eventManager.send(checkpointBuilder.status(Status.IN_PROGRESS).build());
+      workflowEventPublisher.publish(
+          new EventMessage<>(checkpointBuilder.status(Status.IN_PROGRESS).build()));
       final var response = strategy.process(transactionId, stage, request);
-      eventManager.send(
-          checkpointBuilder
-              .status(Status.COMPLETED)
-              .response(response.payload())
-              .outgoing(response.outgoing())
-              .build());
+      workflowEventPublisher.publish(
+          new EventMessage<>(
+              checkpointBuilder
+                  .status(Status.COMPLETED)
+                  .response(response.payload())
+                  .outgoing(response.outgoing())
+                  .build()));
       return response;
     } catch (WorkflowException e) {
-      eventManager.send(
+      workflowEventPublisher.publish(
           new EventMessage<>(
               checkpointBuilder.status(Status.ERROR).build(),
               Error.builder().message(e.getMessage()).build()));

@@ -6,8 +6,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @SpringBootApplication
 public class CoffeeShopNotificationApplication {
 
-	public static void main(String[] args) {
-		SpringApplication.run(CoffeeShopNotificationApplication.class, args);
-	}
-
+  public static void main(String[] args) {
+    SpringApplication.run(CoffeeShopNotificationApplication.class, args);
+  }
 }

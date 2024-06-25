@@ -1,5 +1,7 @@
 package co.orquex.sagas.core.stage.strategy.impl;
 
+import co.orquex.sagas.core.event.WorkflowEventPublisher;
+import co.orquex.sagas.core.event.impl.EventMessage;
 import co.orquex.sagas.core.stage.strategy.StrategyResponse;
 import co.orquex.sagas.domain.api.TaskExecutor;
 import co.orquex.sagas.domain.exception.WorkflowException;
@@ -8,10 +10,10 @@ import co.orquex.sagas.domain.registry.Registry;
 import co.orquex.sagas.domain.repository.TaskRepository;
 import co.orquex.sagas.domain.stage.Activity;
 import co.orquex.sagas.domain.stage.ActivityTask;
+import co.orquex.sagas.domain.transaction.Compensation;
 import co.orquex.sagas.domain.utils.Maps;
-import lombok.extern.slf4j.Slf4j;
-
 import java.io.Serializable;
+import java.time.Instant;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Map;
@@ -19,13 +21,16 @@ import java.util.Optional;
 import java.util.concurrent.*;
 import java.util.function.Function;
 import java.util.function.Supplier;
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class ActivityProcessingStrategy extends AbstractStageProcessingStrategy<Activity> {
 
   public ActivityProcessingStrategy(
-      Registry<TaskExecutor> taskExecutorRegistry, TaskRepository taskRepository) {
-    super(taskExecutorRegistry, taskRepository);
+      Registry<TaskExecutor> taskExecutorRegistry,
+      TaskRepository taskRepository,
+      WorkflowEventPublisher eventPublisher) {
+    super(taskExecutorRegistry, taskRepository, eventPublisher);
   }
 
   @Override
@@ -40,21 +45,24 @@ public class ActivityProcessingStrategy extends AbstractStageProcessingStrategy<
     if (!activity.isParallel()) {
       payload =
           activity.getActivityTasks().stream()
-              .map(activityTask -> this.processActivityTask(transactionId, activityTask, updatedRequest))
+              .map(
+                  activityTask ->
+                      this.processActivityTask(transactionId, activityTask, updatedRequest))
               .filter(m -> m != null && !m.isEmpty())
               .reduce(Maps::merge);
     } else {
       final Function<ActivityTask, Supplier<Map<String, Serializable>>> createSubtask =
-              (activityTask) -> () -> processActivityTask(transactionId, activityTask, updatedRequest);
+          activityTask -> () -> processActivityTask(transactionId, activityTask, updatedRequest);
       try (final var executor = Executors.newVirtualThreadPerTaskExecutor()) {
         @SuppressWarnings("unchecked")
         final CompletableFuture<Map<String, Serializable>>[] subtasks =
-                activity.getActivityTasks().stream()
-                        .map(createSubtask)
-                        .map(supplier -> CompletableFuture.supplyAsync(supplier, executor))
-                        .toArray(CompletableFuture[]::new);
+            activity.getActivityTasks().stream()
+                .map(createSubtask)
+                .map(supplier -> CompletableFuture.supplyAsync(supplier, executor))
+                .toArray(CompletableFuture[]::new);
         CompletableFuture.allOf(subtasks);
-        payload = Arrays.stream(subtasks)
+        payload =
+            Arrays.stream(subtasks)
                 .map(CompletableFuture::join)
                 .filter(m -> m != null && !m.isEmpty())
                 .reduce(Maps::merge);
@@ -73,23 +81,45 @@ public class ActivityProcessingStrategy extends AbstractStageProcessingStrategy<
   }
 
   private Map<String, Serializable> processActivityTask(
-      String transactionId, ActivityTask activityTask, ExecutionRequest request) {
+      String transactionId, ActivityTask activityTask, ExecutionRequest executionRequest) {
     // Merge payload of the activity task with the current executionRequest
-    request = request.mergeMetadata(activityTask.metadata());
+    executionRequest = executionRequest.mergeMetadata(activityTask.metadata());
     // Pre-process the payload with a task
     if (activityTask.preProcessor() != null) {
       var preProcessorPayload =
-          executeProcessor(transactionId, activityTask.preProcessor(), request);
-      request = request.withPayload(preProcessorPayload);
+          executeProcessor(transactionId, activityTask.preProcessor(), executionRequest);
+      executionRequest = executionRequest.withPayload(preProcessorPayload);
     }
     // Execute the task with the pre-processed payload
-    var taskResponse = executeTask(transactionId, activityTask.task(), request);
-    // TODO Publish the event of Compensations once the task is executed
+    final var taskResponse = executeTask(transactionId, activityTask.task(), executionRequest);
+    // Publish the compensation's event once the task is executed
+    executeCompensation(transactionId, activityTask, executionRequest, taskResponse);
     // Post process the payload, generating a new one
     if (activityTask.postProcessor() != null) {
       return executeProcessor(
-          transactionId, activityTask.postProcessor(), request.withPayload(taskResponse));
+          transactionId, activityTask.postProcessor(), executionRequest.withPayload(taskResponse));
     }
     return taskResponse;
+  }
+
+  private void executeCompensation(
+      final String transactionId,
+      final ActivityTask activityTask,
+      final ExecutionRequest executionRequest,
+      final Map<String, Serializable> taskResponse) {
+    final var compensationProcessor = activityTask.compensation();
+    if (compensationProcessor != null) {
+      final var metadata =
+          Maps.merge(executionRequest.metadata(), compensationProcessor.metadata());
+      eventPublisher.publish(
+          new EventMessage<>(
+              new Compensation(
+                  transactionId,
+                  compensationProcessor.task(),
+                  metadata,
+                  executionRequest.payload(),
+                  taskResponse,
+                  Instant.now())));
+    }
   }
 }

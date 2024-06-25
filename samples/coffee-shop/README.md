@@ -1,21 +1,22 @@
-# Coffee-Shop  
+# Coffee-Shop
 
-This test demonstrates the use of the framework to distribute the different stages of a flow on different servers. In this specific case, Kafka was used as a mechanism for interaction between the saga coordinator and the stages.
+This test demonstrates the use of the framework to distribute the different stages of a flow on different servers. In
+this specific case, Kafka was used as a mechanism for interaction between the saga coordinator and the stages.
 
 ![flow.png](./docs/flow.png)
 
 * Coordinator [coffee-shop-api](coffee-shop-api)
 * Stages
-  * [coffee-shop-promotion](coffee-shop-promotion)
-    * discount-calculator
-  * [coffee-shop-service](coffee-shop-service)
-    * service-checkout
-  * [coffee-shop-notification](coffee-shop-notification)
-    * notification-sender
+    * [coffee-shop-promotion](coffee-shop-promotion)
+        * discount-calculator
+    * [coffee-shop-service](coffee-shop-service)
+        * service-checkout
+    * [coffee-shop-notification](coffee-shop-notification)
+        * notification-sender
 
 ## Installation
 
-Install and run the Kafka (Redpanda) server locally with docker. 
+Install and run the Kafka (Redpanda) server locally with docker.
 
 ```shell
 docker-compose up -d
@@ -60,7 +61,7 @@ From the root project:
   cd coffee-shop-notification
   mvn spring-boot:run
   ```
-  
+
 ## Testing
 
 Possible sizes: "small", "medium", "large"

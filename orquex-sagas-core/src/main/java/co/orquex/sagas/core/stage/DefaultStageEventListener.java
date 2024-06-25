@@ -22,7 +22,7 @@ public class DefaultStageEventListener implements EventListener<StageRequest> {
 
   @Override
   public void onMessage(EventMessage<StageRequest> message) {
-    final var request = message.getMessage();
+    final var request = message.message();
     if (isNull(request)) {
       log.warn("Ignored a null stage request received");
       return;
@@ -42,6 +42,6 @@ public class DefaultStageEventListener implements EventListener<StageRequest> {
 
   @Override
   public void onError(EventMessage<StageRequest> message) {
-    log.error("Receiving stage request error: {}", message.getError());
+    log.error("Receiving stage request error: {}", message.error());
   }
 }

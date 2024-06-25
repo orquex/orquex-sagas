@@ -49,12 +49,7 @@
     <dependencies>
         <dependency>
             <groupId>co.orquex.sagas</groupId>
-            <artifactId>orquex-sagas-core</artifactId>
-            <version>${orquex.sagas.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>co.orquex.sagas</groupId>
-            <artifactId>orquex-sagas-task-groovy</artifactId>
+            <artifactId>orquex-sagas-spring-boot</artifactId>
             <version>${orquex.sagas.version}</version>
         </dependency>
     </dependencies>

@@ -1,6 +1,6 @@
 package co.orquex.sagas.core.stage;
 
-import co.orquex.sagas.core.event.EventManager;
+import co.orquex.sagas.core.event.WorkflowEventPublisher;
 import co.orquex.sagas.core.stage.strategy.StageProcessingStrategy;
 import co.orquex.sagas.core.stage.strategy.impl.decorator.EventHandlerProcessingStrategy;
 import co.orquex.sagas.domain.api.StageExecutor;
@@ -9,7 +9,6 @@ import co.orquex.sagas.domain.stage.Activity;
 import co.orquex.sagas.domain.stage.Evaluation;
 import co.orquex.sagas.domain.stage.StageConfiguration;
 import co.orquex.sagas.domain.stage.StageRequest;
-import co.orquex.sagas.domain.transaction.Checkpoint;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -28,10 +27,11 @@ public class DefaultStageExecutor implements StageExecutor {
   public DefaultStageExecutor(
       final StageProcessingStrategy<Activity> activityStrategy,
       final StageProcessingStrategy<Evaluation> evaluationStrategy,
-      final EventManager<Checkpoint> eventManager) {
-    this.activityStrategy = new EventHandlerProcessingStrategy<>(activityStrategy, eventManager);
+      final WorkflowEventPublisher workflowEventPublisher) {
+    this.activityStrategy =
+        new EventHandlerProcessingStrategy<>(activityStrategy, workflowEventPublisher);
     this.evaluationStrategy =
-        new EventHandlerProcessingStrategy<>(evaluationStrategy, eventManager);
+        new EventHandlerProcessingStrategy<>(evaluationStrategy, workflowEventPublisher);
   }
 
   @Override
@@ -46,7 +46,7 @@ public class DefaultStageExecutor implements StageExecutor {
             evaluationStrategy.process(stageRequest.transactionId(), evaluation, request);
         default ->
             throw new WorkflowException(
-                "Unexpected stage: '%s' at flow '%s'".formatted(stage, request.flowId()));
+                "Unexpected stage '%s' at flow '%s'".formatted(stage, request.flowId()));
       }
     } catch (WorkflowException e) {
       log.error(e.getMessage());

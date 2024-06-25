@@ -14,12 +14,12 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class PromotionStageExecutor {
 
-    private final StageExecutor stageExecutor;
-    private final ObjectMapper objectMapper;
+  private final StageExecutor stageExecutor;
+  private final ObjectMapper objectMapper;
 
-    @KafkaListener(id = "promotion-listener", topics = "coffee.shop.stage.promotion")
-    public void listen(String request) throws JsonProcessingException {
-        final var stageRequest = objectMapper.readValue(request, StageRequest.class);
-        stageExecutor.execute(stageRequest);
-    }
+  @KafkaListener(id = "promotion-listener", topics = "coffee.shop.stage.promotion")
+  public void listen(String request) throws JsonProcessingException {
+    final var stageRequest = objectMapper.readValue(request, StageRequest.class);
+    stageExecutor.execute(stageRequest);
+  }
 }

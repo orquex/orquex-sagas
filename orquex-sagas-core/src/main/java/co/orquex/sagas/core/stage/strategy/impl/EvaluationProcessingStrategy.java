@@ -3,6 +3,7 @@ package co.orquex.sagas.core.stage.strategy.impl;
 import static co.orquex.sagas.domain.stage.Evaluation.EXPRESSION;
 import static co.orquex.sagas.domain.stage.Evaluation.RESULT;
 
+import co.orquex.sagas.core.event.WorkflowEventPublisher;
 import co.orquex.sagas.core.stage.strategy.StrategyResponse;
 import co.orquex.sagas.domain.api.TaskExecutor;
 import co.orquex.sagas.domain.execution.ExecutionRequest;
@@ -25,8 +26,10 @@ import lombok.extern.slf4j.Slf4j;
 public class EvaluationProcessingStrategy extends AbstractStageProcessingStrategy<Evaluation> {
 
   public EvaluationProcessingStrategy(
-      Registry<TaskExecutor> taskExecutorRegistry, TaskRepository taskRepository) {
-    super(taskExecutorRegistry, taskRepository);
+      Registry<TaskExecutor> taskExecutorRegistry,
+      TaskRepository taskRepository,
+      WorkflowEventPublisher eventPublisher) {
+    super(taskExecutorRegistry, taskRepository, eventPublisher);
   }
 
   @Override
@@ -44,7 +47,7 @@ public class EvaluationProcessingStrategy extends AbstractStageProcessingStrateg
       // get the evaluation result
       if (response.containsKey(RESULT)
           && response.get(RESULT) instanceof Boolean result
-          && result) {
+          && Boolean.TRUE.equals(result)) {
         outgoing = condition.outgoing();
         break;
       }

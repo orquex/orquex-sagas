@@ -8,11 +8,11 @@ import lombok.Getter;
 @Getter
 public class CheckpointEventMessage {
 
-    private final Checkpoint message;
-    private final Error error;
+  private final Checkpoint message;
+  private final Error error;
 
-    public CheckpointEventMessage(EventMessage<Checkpoint> eventMessage) {
-        this.message = eventMessage.getMessage();
-        this.error = eventMessage.getError();
-    }
+  public CheckpointEventMessage(EventMessage<Checkpoint> eventMessage) {
+    this.message = eventMessage.message();
+    this.error = eventMessage.error();
+  }
 }

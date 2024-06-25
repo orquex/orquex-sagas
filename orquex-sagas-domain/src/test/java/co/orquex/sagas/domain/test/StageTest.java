@@ -41,20 +41,22 @@ class StageTest {
   @Test
   void shouldSetMetadataEmptyWhenNull() {
     final var activityTasks = List.of(new ActivityTask("simple-task"));
-    final var activity = new Activity(null, null, null, null, activityTasks, false, "outgoing");
+    final var activity =
+        new Activity(null, null, null, null, activityTasks, false, "outgoing", null);
     assertThat(activity.getMetadata()).isEmpty();
   }
 
   @Test
-  public void shouldSetActivityParallelTrue() {
+  void shouldSetActivityParallelTrue() {
     final var activityTasks = List.of(new ActivityTask("simple-task"));
-    final var activity = new Activity(null, "single", null, null, activityTasks, true, "outgoing");
+    final var activity =
+        new Activity(null, "single", null, null, activityTasks, true, "outgoing", null);
     assertThat(activity.isParallel()).isTrue();
   }
 
   @Test
   void shouldThrowExceptionWhenActivityTaskNull() {
-    assertThatThrownBy(() -> new Activity(null, "empty-tasks", null, null, null, false, null))
+    assertThatThrownBy(() -> new Activity(null, "empty-tasks", null, null, null, false, null, null))
         .isInstanceOf(IllegalArgumentException.class)
         .hasMessage("activity 'empty-tasks' does not contains tasks");
   }
@@ -76,16 +78,21 @@ class StageTest {
 
   @Test
   void shouldThrowExceptionWhenEvaluationConditionsNull() {
-    assertThatThrownBy(() -> new Evaluation(null, null, null, null, new EvaluationTask("task-evaluator"), null, "default-outgoing"))
+    final var evaluationTask = new EvaluationTask("task-evaluator");
+    assertThatThrownBy(
+            () -> new Evaluation(null, null, null, null, evaluationTask, null, "default-outgoing"))
         .isInstanceOf(IllegalArgumentException.class)
         .hasMessage("evaluation's conditions required");
   }
 
   @Test
   void shouldThrowExceptionWhenEvaluationConditionsEmpty() {
+    final var evaluationTask = new EvaluationTask("task-evaluator");
+    final List<Condition> conditions = Collections.emptyList();
     assertThatThrownBy(
             () ->
-                new Evaluation(null, null, null, null, new EvaluationTask("task-evaluator"), Collections.emptyList(), "default-outgoing"))
+                new Evaluation(
+                    null, null, null, null, evaluationTask, conditions, "default-outgoing"))
         .isInstanceOf(IllegalArgumentException.class)
         .hasMessage("evaluation's conditions required");
   }
@@ -94,7 +101,9 @@ class StageTest {
   @NullSource
   @ValueSource(strings = {"", " "})
   void shouldThrowExceptionWhenEvaluationDefaultOutgoingNullOrEmpty(String defaultOutgoing) {
-    assertThatThrownBy(() -> new Evaluation(null, null, null, null, new EvaluationTask("task-evaluator"), null, defaultOutgoing))
+    final var evaluationTask = new EvaluationTask("task-evaluator");
+    assertThatThrownBy(
+            () -> new Evaluation(null, null, null, null, evaluationTask, null, defaultOutgoing))
         .isInstanceOf(IllegalArgumentException.class)
         .hasMessage("evaluation's conditions required");
   }

@@ -13,19 +13,19 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class NotificationTask implements TaskImplementation {
 
-    @Override
-    public Map<String, Serializable> execute(String transactionId,
-            Map<String, Serializable> metadata, Map<String, Serializable> payload) {
-        final var hasNotification = metadata.containsKey("notification");
-        if (hasNotification) {
-            log.info("Notification sent successfully");
-            return payload;
-        }
-        throw new WorkflowException("Notification checkout failed");
+  @Override
+  public Map<String, Serializable> execute(
+      String transactionId, Map<String, Serializable> metadata, Map<String, Serializable> payload) {
+    final var hasNotification = metadata.containsKey("notification");
+    if (hasNotification) {
+      log.info("Notification sent successfully");
+      return payload;
     }
+    throw new WorkflowException("Notification checkout failed");
+  }
 
-    @Override
-    public String getName() {
-        return "notification-sender";
-    }
+  @Override
+  public String getName() {
+    return "notification-sender";
+  }
 }

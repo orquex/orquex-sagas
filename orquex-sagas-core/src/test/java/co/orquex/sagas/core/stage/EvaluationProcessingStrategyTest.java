@@ -9,6 +9,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
+import co.orquex.sagas.core.event.WorkflowEventPublisher;
 import co.orquex.sagas.core.stage.strategy.impl.EvaluationProcessingStrategy;
 import co.orquex.sagas.domain.api.TaskExecutor;
 import co.orquex.sagas.domain.execution.ExecutionRequest;
@@ -32,12 +33,14 @@ class EvaluationProcessingStrategyTest {
   @Mock private TaskRepository taskRepository;
   private EvaluationProcessingStrategy strategy;
   @Mock TaskExecutor taskExecutor;
+  @Mock WorkflowEventPublisher eventPublisher;
   private ExecutionRequest executionRequest;
   private String transactionId;
 
   @BeforeEach
   void setUp() {
-    strategy = new EvaluationProcessingStrategy(taskExecutorRegistry, taskRepository);
+    strategy =
+        new EvaluationProcessingStrategy(taskExecutorRegistry, taskRepository, eventPublisher);
     executionRequest =
         new ExecutionRequest(UUID.randomUUID().toString(), UUID.randomUUID().toString());
     when(taskExecutorRegistry.get(DEFAULT_EXECUTOR)).thenReturn(Optional.of(taskExecutor));

@@ -1,6 +1,6 @@
 # Sagas Framework
 
-## Requirements
+## Prerequisites
 
 - Java 21
 - Maven >=3.8.x

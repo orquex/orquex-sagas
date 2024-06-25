@@ -5,7 +5,8 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
-import co.orquex.sagas.core.event.EventManager;
+import co.orquex.sagas.core.event.impl.DefaultWorkflowEventPublisher;
+import co.orquex.sagas.core.event.manager.impl.DefaultEventManagerFactory;
 import co.orquex.sagas.core.flow.WorkflowExecutor;
 import co.orquex.sagas.core.stage.DefaultStageEventListener;
 import co.orquex.sagas.core.stage.DefaultStageExecutor;
@@ -41,10 +42,15 @@ class WorkflowExecutorTest {
     // Setting default stage executor
     when(stageExecutor.getId()).thenReturn(StageConfiguration.DEFAULT_IMPLEMENTATION);
     final var stageExecutorRegistry = InMemoryStageExecutorRegistry.of(List.of(stageExecutor));
-    // Create the event manager to send stages
-    final var stageRequestEventManager = new EventManager<StageRequest>();
-    stageRequestEventManager.addListener(new DefaultStageEventListener(stageExecutorRegistry));
-    executor = new WorkflowExecutor(stageRequestEventManager, flowRepository, transactionRepository);
+    // Create the event manager factory to get the StageRequest
+    final var eventManagerFactory = new DefaultEventManagerFactory();
+    // Create and get the StageRequest event handler to send stages and add a listener
+    eventManagerFactory
+        .getEventManager(StageRequest.class)
+        .addListener(new DefaultStageEventListener(stageExecutorRegistry));
+    // Create the workflow event publisher
+    final var workflowEventPublisher = new DefaultWorkflowEventPublisher(eventManagerFactory);
+    executor = new WorkflowExecutor(workflowEventPublisher, flowRepository, transactionRepository);
     simpleFlow = readValue("flow-simple.json", Flow.class);
   }
 
@@ -52,7 +58,7 @@ class WorkflowExecutorTest {
   void shouldThrowExceptionWhenRequestNull() {
     assertThatThrownBy(() -> executor.execute(null))
         .isInstanceOf(WorkflowException.class)
-        .hasMessage("execution executionRequest required");
+        .hasMessage("Execution request required");
   }
 
   @Test
@@ -74,7 +80,7 @@ class WorkflowExecutorTest {
     assertThatThrownBy(() -> executor.execute(request))
         .isInstanceOf(WorkflowException.class)
         .hasMessage(
-            "flow 'Simple Flow' with correlation id 'correlation-id' has already been initiated");
+            "Flow 'Simple Flow' with correlation id 'correlation-id' has already been initiated");
   }
 
   @Test

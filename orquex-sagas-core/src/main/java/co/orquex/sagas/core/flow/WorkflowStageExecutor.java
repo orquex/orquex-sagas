@@ -2,7 +2,8 @@ package co.orquex.sagas.core.flow;
 
 import static java.util.Objects.isNull;
 
-import co.orquex.sagas.core.event.EventManager;
+import co.orquex.sagas.core.event.WorkflowEventPublisher;
+import co.orquex.sagas.core.event.impl.EventMessage;
 import co.orquex.sagas.domain.exception.WorkflowException;
 import co.orquex.sagas.domain.execution.ExecutionRequest;
 import co.orquex.sagas.domain.repository.FlowRepository;
@@ -14,14 +15,14 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class WorkflowStageExecutor extends AbstractWorkflowExecutor<Checkpoint> {
 
-  private final EventManager<StageRequest> stageRequestEventManager;
+  private final WorkflowEventPublisher eventPublisher;
 
   public WorkflowStageExecutor(
-      EventManager<StageRequest> stageRequestEventManager,
-      FlowRepository flowRepository,
-      TransactionRepository transactionRepository) {
+      final WorkflowEventPublisher eventPublisher,
+      final FlowRepository flowRepository,
+      final TransactionRepository transactionRepository) {
     super(flowRepository, transactionRepository);
-    this.stageRequestEventManager = stageRequestEventManager;
+    this.eventPublisher = eventPublisher;
   }
 
   @Override
@@ -62,7 +63,7 @@ public class WorkflowStageExecutor extends AbstractWorkflowExecutor<Checkpoint> 
             .executionRequest(executionRequest)
             .build();
     log.debug("Executing next stage '{}'", stage.getName());
-    // Continue execution of the workflow.
-    stageRequestEventManager.send(stageRequest);
+    // Continue the execution of the workflow.
+    eventPublisher.publish(new EventMessage<>(stageRequest));
   }
 }

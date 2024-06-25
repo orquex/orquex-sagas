@@ -11,11 +11,10 @@ import java.util.Map;
 import lombok.Builder;
 
 @Builder
-public record StageConfiguration(String implementation, boolean aon, Map<String, Serializable> parameters) implements Serializable {
+public record StageConfiguration(String implementation, Map<String, Serializable> parameters) implements Serializable {
 
   @Serial private static final long serialVersionUID = OrquexSagasVersion.SERIAL_VERSION;
   public static final String DEFAULT_IMPLEMENTATION = "default";
-  public static final boolean DEFAULT_ALL_OR_NOTHING = false;
 
   public StageConfiguration {
     implementation = checkArgumentNotNullOrElse(implementation, DEFAULT_IMPLEMENTATION);
@@ -23,6 +22,6 @@ public record StageConfiguration(String implementation, boolean aon, Map<String,
   }
 
   public StageConfiguration() {
-    this(DEFAULT_IMPLEMENTATION, DEFAULT_ALL_OR_NOTHING, null);
+    this(DEFAULT_IMPLEMENTATION, null);
   }
 }

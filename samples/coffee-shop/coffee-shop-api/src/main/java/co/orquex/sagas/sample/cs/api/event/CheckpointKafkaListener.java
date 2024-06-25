@@ -17,19 +17,21 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class CheckpointKafkaListener {
 
-    private final ApplicationEventPublisher eventPublisher;
-    private final ObjectMapper objectMapper;
+  private final ApplicationEventPublisher eventPublisher;
+  private final ObjectMapper objectMapper;
 
-    @KafkaListener(id = "checkpoint-listener", topics = "coffee.shop.stage.checkpoint")
-    public void listen(String message) throws JsonProcessingException {
-        final var eventMessage =
-                objectMapper.readValue(message, new TypeReference<EventMessage<Checkpoint>>() {});
-        final var checkpoint = eventMessage.getMessage();
-        log.debug("Checkpoint received {}", checkpoint);
-        log.trace(
-                "Received checkpoint for '{}' with correlation ID '{}' in stage '{}' and status '{}'",
-                checkpoint.flowId(), checkpoint.correlationId(), checkpoint.incoming().getName(),
-                checkpoint.status());
-        eventPublisher.publishEvent(new CheckpointEventMessage(eventMessage));
-    }
+  @KafkaListener(id = "checkpoint-listener", topics = "coffee.shop.stage.checkpoint")
+  public void listen(String message) throws JsonProcessingException {
+    final var eventMessage =
+        objectMapper.readValue(message, new TypeReference<EventMessage<Checkpoint>>() {});
+    final var checkpoint = eventMessage.message();
+    log.debug("Checkpoint received {}", checkpoint);
+    log.trace(
+        "Received checkpoint for '{}' with correlation ID '{}' in stage '{}' and status '{}'",
+        checkpoint.flowId(),
+        checkpoint.correlationId(),
+        checkpoint.incoming().getName(),
+        checkpoint.status());
+    eventPublisher.publishEvent(new CheckpointEventMessage(eventMessage));
+  }
 }
