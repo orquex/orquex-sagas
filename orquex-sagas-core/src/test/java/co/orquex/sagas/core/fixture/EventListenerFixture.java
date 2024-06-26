@@ -8,8 +8,10 @@ import lombok.Getter;
 @Getter
 public class EventListenerFixture<T> implements EventListener<T> {
 
-  private final ConcurrentLinkedQueue<EventMessage<T>> successMessages = new ConcurrentLinkedQueue<>();
-  private final ConcurrentLinkedQueue<EventMessage<T>> errorMessages = new ConcurrentLinkedQueue<>();
+  private final ConcurrentLinkedQueue<EventMessage<T>> successMessages =
+      new ConcurrentLinkedQueue<>();
+  private final ConcurrentLinkedQueue<EventMessage<T>> errorMessages =
+      new ConcurrentLinkedQueue<>();
 
   @Override
   public void onMessage(EventMessage<T> message) {

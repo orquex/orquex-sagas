@@ -14,10 +14,7 @@ import co.orquex.sagas.domain.transaction.Compensation;
 import co.orquex.sagas.domain.utils.Maps;
 import java.io.Serializable;
 import java.time.Instant;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.*;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -48,7 +45,8 @@ public class ActivityProcessingStrategy extends AbstractStageProcessingStrategy<
               .map(
                   activityTask ->
                       this.processActivityTask(transactionId, activityTask, updatedRequest))
-              .filter(m -> m != null && !m.isEmpty())
+              .filter(Objects::nonNull)
+              .filter(m -> !m.isEmpty())
               .reduce(Maps::merge);
     } else {
       final Function<ActivityTask, Supplier<Map<String, Serializable>>> createSubtask =

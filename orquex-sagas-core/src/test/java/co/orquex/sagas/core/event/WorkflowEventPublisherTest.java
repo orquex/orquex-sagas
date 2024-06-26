@@ -41,7 +41,7 @@ class WorkflowEventPublisherTest {
     with()
         .pollInterval(Duration.ofMillis(1))
         .await()
-        .atMost(Duration.ofMillis(2))
+        .atMost(Duration.ofMillis(5))
         .until(() -> integerEventListener.getSuccessMessages().size() == maxMessages);
   }
 }

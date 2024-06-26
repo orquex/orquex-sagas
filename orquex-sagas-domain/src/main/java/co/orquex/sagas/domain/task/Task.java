@@ -20,7 +20,7 @@ public record Task(
   @Serial private static final long serialVersionUID = OrquexSagasVersion.SERIAL_VERSION;
 
   public Task {
-    implementation = checkArgumentNotEmpty(implementation, "task`s implementation required");
+    implementation = checkArgumentNotEmpty(implementation, "Task`s implementation required");
     metadata = checkArgumentNotNullOrElse(metadata, new HashMap<>());
     configuration = checkArgumentNotNullOrElse(configuration, TaskConfiguration.builder().build());
   }

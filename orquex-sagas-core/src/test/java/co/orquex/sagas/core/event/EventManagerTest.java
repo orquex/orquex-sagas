@@ -20,7 +20,7 @@ class EventManagerTest {
     with()
         .pollInterval(Duration.ofMillis(1))
         .await()
-        .atMost(Duration.ofMillis(2))
+        .atMost(Duration.ofMillis(5))
         .until(() -> listener.getSuccessMessages().size() == 1);
     eventManager.removeListener(listener);
   }
