@@ -1,5 +1,7 @@
 package co.orquex.sagas.core.stage;
 
+import static co.orquex.sagas.core.fixture.ActivityFixture.getSimpleActivity;
+import static co.orquex.sagas.core.fixture.ActivityTaskFixture.getSimpleActivityTask;
 import static co.orquex.sagas.core.fixture.JacksonFixture.readValue;
 import static co.orquex.sagas.core.fixture.TaskFixture.getTask;
 import static co.orquex.sagas.core.fixture.WorkflowEventPublisherFixture.getWorkflowEventPublisher;
@@ -20,12 +22,15 @@ import co.orquex.sagas.domain.repository.TaskRepository;
 import co.orquex.sagas.domain.stage.Activity;
 import co.orquex.sagas.domain.task.Task;
 import co.orquex.sagas.domain.transaction.Compensation;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
@@ -43,7 +48,7 @@ class ActivityProcessingStrategyTest {
 
   @BeforeEach
   void setUp() {
-    // Create a event manager factory to check if the message are published.
+    // Create an event manager factory to check if the message are published.
     final var eventManagerFactory = EventManagerFactoryFixture.getEventManagerFactory();
     compensationEventListenerFixture = new EventListenerFixture<>();
     eventManagerFactory
@@ -145,5 +150,43 @@ class ActivityProcessingStrategyTest {
     assertThatThrownBy(() -> strategy.process(transactionId, activity, executionRequest))
         .isInstanceOf(WorkflowException.class)
         .hasMessage("Task executor 'default' not registered");
+  }
+
+  @ParameterizedTest
+  @ValueSource(booleans = {true, false})
+  void shouldContinueActivityTaskExecutionWhenAllOrNothingIsFalse(boolean parallel) {
+    // Task executor registry
+    when(taskExecutorRegistry.get(DEFAULT_EXECUTOR)).thenReturn(Optional.of(taskExecutor));
+    // Task repository
+    when(taskRepository.findById(anyString()))
+        .thenReturn(Optional.of(getTask("task-1")))
+        .thenReturn(Optional.of(getTask("task-2")))
+        .thenReturn(Optional.of(getTask("task-3")))
+        .thenReturn(Optional.of(getTask("task-4")));
+    // Task executor
+    when(taskExecutor.execute(anyString(), any(Task.class), any(ExecutionRequest.class)))
+        .thenReturn(Map.of("task-1", "1"))
+        .thenReturn(Map.of("task-2", "2"))
+        .thenThrow(new WorkflowException("Task 'task-3' failed"))
+        .thenReturn(Map.of("task-4", "4"));
+    // Parametrized parallel ActivityTask with allOrNothing = false
+    final var activity =
+        getSimpleActivity(
+            "activity-1",
+            List.of(
+                getSimpleActivityTask("task-1"),
+                getSimpleActivityTask("task-2"),
+                getSimpleActivityTask("task-3"),
+                getSimpleActivityTask("task-4")),
+                parallel,
+            false);
+    final var stageResponse = strategy.process(transactionId, activity, executionRequest);
+    assertThat(stageResponse).isNotNull();
+    assertThat(stageResponse.payload())
+        .isNotNull()
+        .hasSize(3)
+        .containsEntry("task-1", "1")
+        .containsEntry("task-2", "2")
+        .containsEntry("task-4", "4");
   }
 }
