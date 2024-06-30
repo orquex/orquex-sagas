@@ -11,6 +11,25 @@ import java.util.Map;
 import java.util.UUID;
 import lombok.*;
 
+/**
+ * The stage is the main unit of work in the flow, every stage is unique and contains all the
+ * information required to execute it.
+ *
+ * <p>JSON representation:
+ *
+ * <pre>
+ * {
+ *   "id": "stage-id",
+ *   "type": "stage-type",
+ *   "name": "stage-name",
+ *   "metadata": {},
+ *   "configuration": {},
+ * }
+ * </pre>
+ *
+ * @see Activity
+ * @see Evaluation
+ */
 @Getter
 public sealed class Stage implements Serializable permits Activity, Evaluation {
 

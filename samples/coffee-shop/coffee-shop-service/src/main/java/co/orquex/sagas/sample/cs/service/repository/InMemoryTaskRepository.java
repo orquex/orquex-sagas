@@ -1,6 +1,6 @@
 package co.orquex.sagas.sample.cs.service.repository;
 
-import co.orquex.sagas.domain.repository.TaskRepository;
+import co.orquex.sagas.domain.api.repository.TaskRepository;
 import co.orquex.sagas.domain.task.Task;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;

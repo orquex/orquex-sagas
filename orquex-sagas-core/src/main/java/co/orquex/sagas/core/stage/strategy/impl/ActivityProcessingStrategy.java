@@ -2,14 +2,14 @@ package co.orquex.sagas.core.stage.strategy.impl;
 
 import co.orquex.sagas.core.event.WorkflowEventPublisher;
 import co.orquex.sagas.core.event.impl.EventMessage;
-import co.orquex.sagas.core.stage.strategy.StrategyResponse;
 import co.orquex.sagas.domain.api.TaskExecutor;
+import co.orquex.sagas.domain.api.registry.Registry;
+import co.orquex.sagas.domain.api.repository.TaskRepository;
 import co.orquex.sagas.domain.exception.WorkflowException;
 import co.orquex.sagas.domain.execution.ExecutionRequest;
-import co.orquex.sagas.domain.registry.Registry;
-import co.orquex.sagas.domain.repository.TaskRepository;
 import co.orquex.sagas.domain.stage.Activity;
 import co.orquex.sagas.domain.stage.ActivityTask;
+import co.orquex.sagas.domain.stage.StageResponse;
 import co.orquex.sagas.domain.transaction.Compensation;
 import co.orquex.sagas.domain.utils.Maps;
 import java.io.Serializable;
@@ -43,12 +43,11 @@ public class ActivityProcessingStrategy extends AbstractStageProcessingStrategy<
    * @return The merged response of the executed tasks.
    */
   @Override
-  public StrategyResponse process(
-      String transactionId, Activity activity, ExecutionRequest request) {
+  public StageResponse process(String transactionId, Activity activity, ExecutionRequest request) {
     log.debug("Executing activity stage '{}'", activity.getName());
     // Merge metadata
     final var updatedRequest = request.mergeMetadata(activity.getMetadata());
-    // Define the payload to be returned on the StrategyResponse
+    // Define the payload to be returned on the StageResponse
     Optional<Map<String, Serializable>> payload;
     // Check if not a parallel execution
     if (!activity.isParallel()) {
@@ -57,7 +56,8 @@ public class ActivityProcessingStrategy extends AbstractStageProcessingStrategy<
       payload = executeInParallel(activity, transactionId, updatedRequest);
     }
 
-    return StrategyResponse.builder()
+    return StageResponse.builder()
+        .transactionId(transactionId)
         .outgoing(activity.getOutgoing())
         .payload(payload.orElse(Collections.emptyMap()))
         .build();
@@ -94,6 +94,7 @@ public class ActivityProcessingStrategy extends AbstractStageProcessingStrategy<
       Activity activity, String transactionId, ExecutionRequest updatedRequest) {
     final Function<ActivityTask, Supplier<Map<String, Serializable>>> createSubtask =
         activityTask -> () -> processActivityTask(transactionId, activityTask, updatedRequest);
+    // TODO set a thread name per virtual thread
     try (final var executor = Executors.newVirtualThreadPerTaskExecutor()) {
       @SuppressWarnings("unchecked")
       final CompletableFuture<Map<String, Serializable>>[] subtasks =

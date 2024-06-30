@@ -5,10 +5,9 @@ import java.io.Serial;
 
 public class WorkflowException extends RuntimeException {
 
-    @Serial
-    private static final long serialVersionUID = OrquexSagasVersion.SERIAL_VERSION;
+  @Serial private static final long serialVersionUID = OrquexSagasVersion.SERIAL_VERSION;
 
-    public WorkflowException(String message) {
-        super(message);
-    }
+  public WorkflowException(String message) {
+    super(message);
+  }
 }

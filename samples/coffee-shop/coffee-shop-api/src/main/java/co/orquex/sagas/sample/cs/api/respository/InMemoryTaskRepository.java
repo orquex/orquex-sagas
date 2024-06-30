@@ -1,6 +1,6 @@
 package co.orquex.sagas.sample.cs.api.respository;
 
-import co.orquex.sagas.domain.repository.TaskRepository;
+import co.orquex.sagas.domain.api.repository.TaskRepository;
 import co.orquex.sagas.domain.task.Task;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -19,8 +19,8 @@ public class InMemoryTaskRepository implements TaskRepository {
 
   public InMemoryTaskRepository(ObjectMapper objectMapper) throws IOException {
     final var file = ResourceUtils.getFile("classpath:data/tasks.json");
-    final var tasks = objectMapper.readValue(file, new TypeReference<List<Task>>() {});
-    this.tasks = tasks.stream().collect(Collectors.toConcurrentMap(Task::id, task -> task));
+    final var taskList = objectMapper.readValue(file, new TypeReference<List<Task>>() {});
+    this.tasks = taskList.stream().collect(Collectors.toConcurrentMap(Task::id, task -> task));
   }
 
   @Override

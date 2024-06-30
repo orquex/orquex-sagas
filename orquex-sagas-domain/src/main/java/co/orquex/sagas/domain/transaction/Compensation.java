@@ -6,6 +6,31 @@ import java.io.Serializable;
 import java.time.Instant;
 import java.util.Map;
 
+/**
+ * Represents a compensation event message in a workflow transaction.
+ *
+ * <p>A Compensation is generated every time an activity task is executed, and it contains a
+ * compensation task processor. It encapsulates the transaction identifier, task name, metadata,
+ * request and response data, and the timestamp when it was created.
+ *
+ * <p>This class is sent via an event for further processing.
+ *
+ * <p>JSON representation:
+ *
+ * <pre>
+ * {
+ *   "transactionId": "transaction-id",
+ *   "task": "task-name",
+ *   "metadata": {},
+ *   "request": {},
+ *   "response": {},
+ *   "createdAt": "timestamp"
+ * }
+ * </pre>
+ *
+ * @see co.orquex.sagas.domain.stage.ActivityTask
+ * @see co.orquex.sagas.domain.task.TaskProcessor
+ */
 public record Compensation(
     String transactionId,
     String task,

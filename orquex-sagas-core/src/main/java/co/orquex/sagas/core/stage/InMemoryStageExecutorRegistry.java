@@ -1,7 +1,7 @@
 package co.orquex.sagas.core.stage;
 
 import co.orquex.sagas.domain.api.StageExecutor;
-import co.orquex.sagas.domain.registry.Registry;
+import co.orquex.sagas.domain.api.registry.Registry;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;

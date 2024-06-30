@@ -10,6 +10,28 @@ import java.util.List;
 import java.util.Map;
 import lombok.*;
 
+/**
+ * The Activity is a type of stage that contains a list of tasks to be executed in parallel or
+ * sequentially.
+ *
+ * <p>JSON representation:
+ *
+ * <pre>
+ * {
+ *   "id": "stage-id",
+ *   "type": "activity",
+ *   "name": "stage-name",
+ *   "metadata": {},
+ *   "configuration": {},
+ *   "activityTasks": [],
+ *   "parallel": true,
+ *   "outgoing": "stage-id",
+ *   "allOrNothing": true
+ * }
+ * </pre>
+ *
+ * @see Stage
+ */
 @Getter
 public final class Activity extends Stage {
 

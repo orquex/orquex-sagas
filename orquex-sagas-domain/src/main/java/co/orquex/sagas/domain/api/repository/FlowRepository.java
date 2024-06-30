@@ -1,4 +1,4 @@
-package co.orquex.sagas.domain.repository;
+package co.orquex.sagas.domain.api.repository;
 
 import co.orquex.sagas.domain.flow.Flow;
 import java.util.Optional;

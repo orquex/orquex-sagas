@@ -1,7 +1,7 @@
 package co.orquex.sagas.sample.respository;
 
 import co.orquex.sagas.domain.flow.Flow;
-import co.orquex.sagas.domain.repository.FlowRepository;
+import co.orquex.sagas.domain.api.repository.FlowRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.util.Optional;

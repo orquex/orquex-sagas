@@ -45,11 +45,11 @@ public class FlowTest {
             assertThat(flow.configuration())
                 .isNotNull()
                 .matches(flowConfiguration -> flowConfiguration.timeout().equals(DEFAULT_TIMEOUT))
-                .matches(flowConfiguration -> flowConfiguration.aon() == DEFAULT_ALL_OR_NOTHING));
+                .matches(flowConfiguration -> flowConfiguration.allOrNothing() == DEFAULT_ALL_OR_NOTHING));
   }
 
   @Test
-  public void shouldCreateFlowWithNonNullValues() {
+  void shouldCreateFlowWithNonNullValues() {
     final var flow = new Flow(FLOW_ID, FLOW_NAME, INITIAL_STAGE, stages, METADATA, CONFIGURATION);
     assertAll(
         () -> assertThat(flow).isNotNull(),
@@ -62,17 +62,17 @@ public class FlowTest {
             assertThat(flow.configuration())
                 .isNotNull()
                 .matches(flowConfiguration -> flowConfiguration.timeout().equals(DEFAULT_TIMEOUT))
-                .matches(flowConfiguration -> flowConfiguration.aon() == DEFAULT_ALL_OR_NOTHING));
+                .matches(flowConfiguration -> flowConfiguration.allOrNothing() == DEFAULT_ALL_OR_NOTHING));
   }
 
   @Test
-  public void shouldSetNameAsIdIfNameIsNull() {
+  void shouldSetNameAsIdIfNameIsNull() {
     final var flow = new Flow(FLOW_ID, null, INITIAL_STAGE, stages, METADATA, CONFIGURATION);
     assertThat(flow.name()).isEqualTo(FLOW_ID);
   }
 
   @Test
-  public void shouldThrowExceptionWithNullId() {
+  void shouldThrowExceptionWithNullId() {
     assertThatThrownBy(
             () -> new Flow(null, FLOW_NAME, INITIAL_STAGE, stages, METADATA, CONFIGURATION))
         .isInstanceOf(IllegalArgumentException.class)
@@ -80,20 +80,20 @@ public class FlowTest {
   }
 
   @Test
-  public void shouldThrowExceptionWithNullInitialStage() {
+  void shouldThrowExceptionWithNullInitialStage() {
     assertThatThrownBy(() -> new Flow(FLOW_ID, FLOW_NAME, null, stages, METADATA, CONFIGURATION))
         .isInstanceOf(IllegalArgumentException.class)
         .hasMessage("flow's initial stage required");
   }
 
   @Test
-  public void shouldCreateWithNonNullDefaultMetadata() {
+  void shouldCreateWithNonNullDefaultMetadata() {
     final var flow = new Flow(FLOW_ID, FLOW_NAME, INITIAL_STAGE, stages, null, CONFIGURATION);
     assertThat(flow.metadata()).isEmpty();
   }
 
   @Test
-  public void shouldThrowExceptionWhenInitialStageNotFoundInStages() {
+  void shouldThrowExceptionWhenInitialStageNotFoundInStages() {
     assertThatThrownBy(() -> new Flow(FLOW_ID, "invalid-initial-stage", stages))
         .isInstanceOf(IllegalArgumentException.class)
         .hasMessage(

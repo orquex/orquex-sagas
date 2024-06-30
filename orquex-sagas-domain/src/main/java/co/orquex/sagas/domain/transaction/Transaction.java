@@ -7,6 +7,10 @@ import java.time.Instant;
 import lombok.Builder;
 import lombok.Getter;
 
+/**
+ * The Transaction encapsulates the status of a flow, including its unique identifiers, data, and
+ * timestamps.
+ */
 @Getter
 @Builder
 public class Transaction implements Serializable {
@@ -21,5 +25,4 @@ public class Transaction implements Serializable {
   private Instant startedAt;
   private Instant updatedAt;
   private Instant expiresAt;
-
 }

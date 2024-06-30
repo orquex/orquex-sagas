@@ -1,6 +1,6 @@
 package co.orquex.sagas.sample.respository;
 
-import co.orquex.sagas.domain.repository.TransactionRepository;
+import co.orquex.sagas.domain.api.repository.TransactionRepository;
 import co.orquex.sagas.domain.transaction.Transaction;
 import java.util.Map;
 import java.util.Optional;

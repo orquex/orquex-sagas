@@ -1,7 +1,7 @@
 package co.orquex.sagas.core.stage;
 
 import co.orquex.sagas.core.event.WorkflowEventPublisher;
-import co.orquex.sagas.core.stage.strategy.StageProcessingStrategy;
+import co.orquex.sagas.domain.api.StageProcessingStrategy;
 import co.orquex.sagas.core.stage.strategy.impl.decorator.EventHandlerProcessingStrategy;
 import co.orquex.sagas.domain.api.StageExecutor;
 import co.orquex.sagas.domain.exception.WorkflowException;

@@ -3,8 +3,8 @@ package co.orquex.sagas.spring.framework.config;
 import co.orquex.sagas.core.event.WorkflowEventPublisher;
 import co.orquex.sagas.core.flow.WorkflowExecutor;
 import co.orquex.sagas.core.flow.WorkflowStageExecutor;
-import co.orquex.sagas.domain.repository.FlowRepository;
-import co.orquex.sagas.domain.repository.TransactionRepository;
+import co.orquex.sagas.domain.api.repository.FlowRepository;
+import co.orquex.sagas.domain.api.repository.TransactionRepository;
 import org.springframework.context.annotation.*;
 
 /** Configure the required Workflow beans. */

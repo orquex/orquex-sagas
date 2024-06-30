@@ -1,7 +1,5 @@
 package co.orquex.sagas.task.groovy;
 
-import static co.orquex.sagas.domain.stage.Evaluation.EXPRESSION;
-import static co.orquex.sagas.domain.stage.Evaluation.RESULT;
 import static co.orquex.sagas.task.groovy.TaskConstant.METADATA;
 import static co.orquex.sagas.task.groovy.TaskConstant.PAYLOAD;
 
@@ -19,6 +17,8 @@ import org.codehaus.groovy.jsr223.GroovyScriptEngineImpl;
 public final class GroovyEvaluation implements TaskImplementation {
 
   private final GroovyScriptEngineImpl groovyScriptEngine = new GroovyScriptEngineImpl();
+  public static final String EXPRESSION = "__expression";
+  public static final String RESULT = "__result";
 
   @Override
   public Map<String, Serializable> execute(

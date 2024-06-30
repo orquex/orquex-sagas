@@ -2,12 +2,12 @@ package co.orquex.sagas.core.stage.strategy.impl.decorator;
 
 import co.orquex.sagas.core.event.WorkflowEventPublisher;
 import co.orquex.sagas.core.event.impl.EventMessage;
-import co.orquex.sagas.core.stage.strategy.StageProcessingStrategy;
-import co.orquex.sagas.core.stage.strategy.StrategyResponse;
+import co.orquex.sagas.domain.api.StageProcessingStrategy;
 import co.orquex.sagas.domain.event.Error;
 import co.orquex.sagas.domain.exception.WorkflowException;
 import co.orquex.sagas.domain.execution.ExecutionRequest;
 import co.orquex.sagas.domain.stage.Stage;
+import co.orquex.sagas.domain.stage.StageResponse;
 import co.orquex.sagas.domain.transaction.Checkpoint;
 import co.orquex.sagas.domain.transaction.Status;
 import lombok.RequiredArgsConstructor;
@@ -19,7 +19,7 @@ public class EventHandlerProcessingStrategy<S extends Stage> implements StagePro
   private final WorkflowEventPublisher workflowEventPublisher;
 
   @Override
-  public StrategyResponse process(String transactionId, S stage, ExecutionRequest request) {
+  public StageResponse process(String transactionId, S stage, ExecutionRequest request) {
     final var checkpointBuilder =
         Checkpoint.builder()
             .transactionId(transactionId)

@@ -7,9 +7,22 @@ import java.io.Serial;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
-
 import lombok.Builder;
 
+/**
+ * The stage configuration contains the implementation and parameters required to execute the stage.
+ *
+ * <p>JSON representation:
+ *
+ * <pre>
+ * {
+ *   "implementation": "implementation-name",
+ *   "parameters": {}
+ * }
+ * </pre>
+ *
+ * @see Stage
+ */
 @Builder
 public record StageConfiguration(String implementation, Map<String, Serializable> parameters) implements Serializable {
 

@@ -1,8 +1,8 @@
 package co.orquex.sagas.spring.boot.config;
 
-import co.orquex.sagas.domain.repository.FlowRepository;
-import co.orquex.sagas.domain.repository.TaskRepository;
-import co.orquex.sagas.domain.repository.TransactionRepository;
+import co.orquex.sagas.domain.api.repository.FlowRepository;
+import co.orquex.sagas.domain.api.repository.TaskRepository;
+import co.orquex.sagas.domain.api.repository.TransactionRepository;
 import org.mockito.Mockito;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

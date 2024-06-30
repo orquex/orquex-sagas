@@ -4,7 +4,7 @@ import co.orquex.sagas.domain.api.TaskExecutor;
 import co.orquex.sagas.domain.api.TaskImplementation;
 import co.orquex.sagas.domain.exception.WorkflowException;
 import co.orquex.sagas.domain.execution.ExecutionRequest;
-import co.orquex.sagas.domain.registry.Registry;
+import co.orquex.sagas.domain.api.registry.Registry;
 import co.orquex.sagas.domain.task.Task;
 import java.io.Serializable;
 import java.util.Map;

@@ -1,7 +1,7 @@
 package co.orquex.sagas.task.groovy.test;
 
-import static co.orquex.sagas.domain.stage.Evaluation.EXPRESSION;
-import static co.orquex.sagas.domain.stage.Evaluation.RESULT;
+import static co.orquex.sagas.task.groovy.GroovyEvaluation.EXPRESSION;
+import static co.orquex.sagas.task.groovy.GroovyEvaluation.RESULT;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import co.orquex.sagas.domain.exception.WorkflowException;
@@ -35,8 +35,8 @@ class GroovyEvaluationTest {
   void shouldThrowExceptionWhenExpressionNotBoolean() {
     final Map<String, Serializable> metadata = Map.of(EXPRESSION, "println \"hello\"");
     final Map<String, Serializable> payload = Collections.emptyMap();
-    Assertions.assertThatThrownBy(
-            () -> groovyEvaluation.execute(UUID.randomUUID().toString(), metadata, payload))
+    final var transactionId = UUID.randomUUID().toString();
+    Assertions.assertThatThrownBy(() -> groovyEvaluation.execute(transactionId, metadata, payload))
         .isInstanceOf(WorkflowException.class)
         .hasMessage("expression is not boolean");
   }
@@ -45,8 +45,8 @@ class GroovyEvaluationTest {
   void shouldThrowExceptionWhenSyntaxError() {
     final Map<String, Serializable> metadata = Map.of(EXPRESSION, "foo");
     final Map<String, Serializable> payload = Collections.emptyMap();
-    Assertions.assertThatThrownBy(
-                    () -> groovyEvaluation.execute(UUID.randomUUID().toString(), metadata, payload))
-            .isInstanceOf(WorkflowException.class);
+    final var transactionId = UUID.randomUUID().toString();
+    Assertions.assertThatThrownBy(() -> groovyEvaluation.execute(transactionId, metadata, payload))
+        .isInstanceOf(WorkflowException.class);
   }
 }

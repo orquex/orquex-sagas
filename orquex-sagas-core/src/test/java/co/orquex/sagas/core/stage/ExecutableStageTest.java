@@ -9,9 +9,8 @@ import static org.mockito.Mockito.*;
 import co.orquex.sagas.core.event.WorkflowEventPublisher;
 import co.orquex.sagas.core.event.impl.EventMessage;
 import co.orquex.sagas.core.fixture.ExecutionRequestFixture;
-import co.orquex.sagas.core.stage.strategy.StageProcessingStrategy;
-import co.orquex.sagas.core.stage.strategy.StrategyResponse;
 import co.orquex.sagas.core.stage.strategy.impl.decorator.EventHandlerProcessingStrategy;
+import co.orquex.sagas.domain.api.StageProcessingStrategy;
 import co.orquex.sagas.domain.exception.WorkflowException;
 import co.orquex.sagas.domain.execution.ExecutionRequest;
 import co.orquex.sagas.domain.stage.*;
@@ -46,7 +45,7 @@ class ExecutableStageTest {
   @Test
   void shouldExecuteActivityStrategyImplementation() {
     when(activityStrategy.process(anyString(), any(Activity.class), any(ExecutionRequest.class)))
-        .thenReturn(StrategyResponse.builder().outgoing("test-outgoing").build());
+        .thenReturn(StageResponse.builder().outgoing("test-outgoing").build());
 
     final var activity = readValue("stage-activity-simple.json", Activity.class);
     final var request = ExecutionRequestFixture.getExecutionRequest();
@@ -64,7 +63,7 @@ class ExecutableStageTest {
   void shouldExecuteEvaluationStrategyImplementation() {
     when(evaluationStrategy.process(
             anyString(), any(Evaluation.class), any(ExecutionRequest.class)))
-        .thenReturn(StrategyResponse.builder().outgoing("test-outgoing").build());
+        .thenReturn(StageResponse.builder().outgoing("test-outgoing").build());
 
     final var evaluation = readValue("stage-evaluation-simple.json", Evaluation.class);
     final var request = ExecutionRequestFixture.getExecutionRequest();

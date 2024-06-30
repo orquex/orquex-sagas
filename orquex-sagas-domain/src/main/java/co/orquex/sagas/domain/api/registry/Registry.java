@@ -1,4 +1,4 @@
-package co.orquex.sagas.domain.registry;
+package co.orquex.sagas.domain.api.registry;
 
 import java.util.Optional;
 

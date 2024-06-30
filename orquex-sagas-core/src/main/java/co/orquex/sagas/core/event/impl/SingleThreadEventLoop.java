@@ -100,6 +100,7 @@ public final class SingleThreadEventLoop<T> implements EventLoop<T> {
     public void run() {
       log.debug(
           "Running single thread event loop from {}", this.eventSource.getClass().getSimpleName());
+      // TODO set a thread name per virtual thread
       try (final var executorService = Executors.newVirtualThreadPerTaskExecutor()) {
         while (true) {
           // Poll the event queue for new messages and broadcast them

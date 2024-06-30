@@ -1,14 +1,14 @@
 package co.orquex.sagas.core.stage.strategy.impl;
 
 import co.orquex.sagas.core.event.WorkflowEventPublisher;
-import co.orquex.sagas.core.stage.strategy.StageProcessingStrategy;
+import co.orquex.sagas.domain.api.StageProcessingStrategy;
 import co.orquex.sagas.domain.api.TaskExecutor;
 import co.orquex.sagas.domain.exception.WorkflowException;
 import co.orquex.sagas.domain.execution.ExecutionRequest;
-import co.orquex.sagas.domain.registry.Registry;
-import co.orquex.sagas.domain.repository.TaskRepository;
+import co.orquex.sagas.domain.api.registry.Registry;
+import co.orquex.sagas.domain.api.repository.TaskRepository;
 import co.orquex.sagas.domain.stage.Stage;
-import co.orquex.sagas.domain.task.Processor;
+import co.orquex.sagas.domain.task.TaskProcessor;
 import co.orquex.sagas.domain.task.Task;
 import java.io.Serializable;
 import java.util.Map;
@@ -31,7 +31,7 @@ public abstract class AbstractStageProcessingStrategy<S extends Stage>
   }
 
   protected Map<String, Serializable> executeProcessor(
-      final String transactionId, final Processor processor, final ExecutionRequest request) {
+      final String transactionId, final TaskProcessor processor, final ExecutionRequest request) {
     return this.executeTask(
         transactionId, processor.task(), request.mergeMetadata(processor.metadata()));
   }

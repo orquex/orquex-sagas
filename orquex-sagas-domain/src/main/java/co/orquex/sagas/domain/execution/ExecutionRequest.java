@@ -12,14 +12,16 @@ import java.util.Map;
 import lombok.With;
 
 /**
+ * Represents an execution request in a workflow.
  *
+ * <p>JSON representation:
  *
  * <pre>
  * {
- *     "flowId": "",
- *     "correlationId": "",
- *     "metadata": {},
- *     "payload": {}
+ *   "flowId": "",
+ *   "correlationId": "",
+ *   "metadata": {},
+ *   "payload": {}
  * }
  * </pre>
  */

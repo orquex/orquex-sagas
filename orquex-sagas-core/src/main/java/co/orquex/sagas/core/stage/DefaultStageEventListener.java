@@ -6,7 +6,7 @@ import static java.util.Objects.isNull;
 import co.orquex.sagas.core.event.EventListener;
 import co.orquex.sagas.core.event.impl.EventMessage;
 import co.orquex.sagas.domain.api.StageExecutor;
-import co.orquex.sagas.domain.registry.Registry;
+import co.orquex.sagas.domain.api.registry.Registry;
 import co.orquex.sagas.domain.stage.StageRequest;
 import lombok.extern.slf4j.Slf4j;
 

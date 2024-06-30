@@ -1,19 +1,17 @@
 package co.orquex.sagas.core.stage.strategy.impl;
 
-import static co.orquex.sagas.domain.stage.Evaluation.EXPRESSION;
-import static co.orquex.sagas.domain.stage.Evaluation.RESULT;
-
 import co.orquex.sagas.core.event.WorkflowEventPublisher;
-import co.orquex.sagas.core.stage.strategy.StrategyResponse;
 import co.orquex.sagas.domain.api.TaskExecutor;
 import co.orquex.sagas.domain.execution.ExecutionRequest;
-import co.orquex.sagas.domain.registry.Registry;
-import co.orquex.sagas.domain.repository.TaskRepository;
+import co.orquex.sagas.domain.api.registry.Registry;
+import co.orquex.sagas.domain.api.repository.TaskRepository;
 import co.orquex.sagas.domain.stage.Condition;
 import co.orquex.sagas.domain.stage.Evaluation;
 import co.orquex.sagas.domain.stage.EvaluationTask;
 import java.io.Serializable;
 import java.util.Map;
+
+import co.orquex.sagas.domain.stage.StageResponse;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -24,6 +22,9 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 public class EvaluationProcessingStrategy extends AbstractStageProcessingStrategy<Evaluation> {
+
+  public static final String EXPRESSION = "__expression";
+  public static final String RESULT = "__result";
 
   /**
    * Constructor for the EvaluationProcessingStrategy.
@@ -56,8 +57,8 @@ public class EvaluationProcessingStrategy extends AbstractStageProcessingStrateg
    * If none of the conditions are met (i.e., none of the conditions result in a `true` value), the
    * method returns the default outgoing stage specified in the evaluation.
    *
-   * <p>The method finally returns a `StrategyResponse` object, which contains the outgoing stage
-   * and the payload from the execution request.
+   * <p>The method finally returns a `StageResponse` object, which contains the outgoing stage and
+   * the payload from the execution request.
    *
    * @param transactionId The ID of the transaction.
    * @param evaluation The evaluation stage to be processed.
@@ -65,7 +66,7 @@ public class EvaluationProcessingStrategy extends AbstractStageProcessingStrateg
    * @return The response of the strategy, containing the outgoing stage and payload.
    */
   @Override
-  public StrategyResponse process(
+  public StageResponse process(
       String transactionId, Evaluation evaluation, ExecutionRequest request) {
     log.debug("Executing evaluation stage '{}'", evaluation.getName());
     var outgoing = evaluation.getDefaultOutgoing();
@@ -86,7 +87,11 @@ public class EvaluationProcessingStrategy extends AbstractStageProcessingStrateg
     }
 
     // return the default outgoing.
-    return StrategyResponse.builder().outgoing(outgoing).payload(request.payload()).build();
+    return StageResponse.builder()
+        .transactionId(transactionId)
+        .outgoing(outgoing)
+        .payload(request.payload())
+        .build();
   }
 
   /**
