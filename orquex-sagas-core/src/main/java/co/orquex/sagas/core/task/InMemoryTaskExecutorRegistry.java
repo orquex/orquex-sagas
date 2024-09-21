@@ -27,7 +27,7 @@ public final class InMemoryTaskExecutorRegistry implements Registry<TaskExecutor
 
   @Override
   public void add(TaskExecutor taskExecutor) {
-    this.registry.put(taskExecutor.getId(), taskExecutor);
+    this.registry.put(taskExecutor.getKey(), taskExecutor);
   }
 
   @Override

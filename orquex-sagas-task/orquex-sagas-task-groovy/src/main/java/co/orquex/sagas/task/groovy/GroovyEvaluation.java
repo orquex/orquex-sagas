@@ -41,7 +41,7 @@ public final class GroovyEvaluation implements TaskImplementation {
   }
 
   @Override
-  public String getName() {
+  public String getKey() {
     return "groovy-eval";
   }
 }

@@ -8,7 +8,22 @@
       "name": "Get user stage",
       "activityTasks": [
         {
-          "task": "get-user"
+          "task": "http-get",
+          "preProcessor": {
+            "task": "default-groovy-activity",
+            "metadata": {
+              "__script": "ZGVmIHJlcXVlc3QgPSBbCiAgICB1cmw6IG1ldGFkYXRhLl9fdXJsICsgIi8iICsgcGF5bG9hZC51c2VyLmlkCl0KY29udGV4dC5wdXRBbGwocmVxdWVzdCkK"
+            }
+          },
+          "postProcessor": {
+            "task": "default-groovy-activity",
+            "metadata": {
+              "__script": "ZGVmIHJlcXVlc3QgPSBbCiAgICB1c2VyOiBwYXlsb2FkLmJvZHkKXQpjb250ZXh0LnB1dEFsbChyZXF1ZXN0KQo="
+            }
+          },
+          "metadata": {
+            "__url": "https://jsonplaceholder.typicode.com/users"
+          }
         }
       ],
       "outgoing": "check-odd-stage"
@@ -76,6 +91,15 @@
           "metadata": {
             "__script": "Y29udGV4dC5wdXQoInJlc3VsdCIsIHBheWxvYWQudXNlci5zcGxpdCgnXFxzJykpOw=="
           }
+        }
+      ]
+    },
+    "general-error-task": {
+      "type": "activity",
+      "name": "General error stage",
+      "activityTasks": [
+        {
+          "task": "general-error"
         }
       ]
     }

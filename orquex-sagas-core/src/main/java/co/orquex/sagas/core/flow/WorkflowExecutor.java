@@ -35,7 +35,7 @@ public class WorkflowExecutor extends AbstractWorkflowExecutor<ExecutionRequest>
     log.debug(
         "Executing workflow '{}' with correlation ID '{}'", flow.name(), request.correlationId());
     // Check transaction already exists by correlation id.
-    if (transactionRepository.existByFlowIdAndCorrelationId(flow.id(), request.correlationId())) {
+    if (transactionRepository.existsByFlowIdAndCorrelationId(flow.id(), request.correlationId())) {
       throw new WorkflowException(
           "Flow '%s' with correlation id '%s' has already been initiated"
               .formatted(flow.name(), request.correlationId()));

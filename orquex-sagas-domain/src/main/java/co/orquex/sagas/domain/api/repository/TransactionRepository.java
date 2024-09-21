@@ -4,6 +4,6 @@ import co.orquex.sagas.domain.transaction.Transaction;
 
 public interface TransactionRepository {
 
-  boolean existByFlowIdAndCorrelationId(String flowId, String correlationId);
+  boolean existsByFlowIdAndCorrelationId(String flowId, String correlationId);
   Transaction save(Transaction transaction);
 }

@@ -6,5 +6,5 @@ import co.orquex.sagas.domain.stage.StageResponse;
 
 public interface StageProcessingStrategy<S extends Stage> {
 
-    StageResponse process(String transactionId, S stage, ExecutionRequest request);
+  StageResponse process(String transactionId, S stage, ExecutionRequest request);
 }

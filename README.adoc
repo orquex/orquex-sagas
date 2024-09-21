@@ -30,9 +30,16 @@ mvn clean install
 * link:./samples/basic-sample[Basic Sample]
 * link:./samples/coffee-shop[Coffee Shop]
 
+== Tasks integrations
+
+* link:./orquex-sagas-task/orquex-sagas-task-groovy[orquex-sagas-task-groovy]
+* link:./orquex-sagas-task/orquex-sagas-task-okhttp[orquex-sagas-task-okhttp]
+
 == Documentation
 
-For the Saga pattern implementation, there are 2 options, orchestration or choreography, with the orchestration all the execution works in the same machine that received the request, but with choreography, the execution of one transaction is distributed between all deployed engines.
+For the Saga pattern implementation, there are two options, orchestration or choreography,
+with the orchestration of all the execution works in the same machine that received the request.
+However, with choreography, the execution of one transaction is distributed between all deployed engines.
 
 image:./docs/assets/usecases.png[usecases]
 

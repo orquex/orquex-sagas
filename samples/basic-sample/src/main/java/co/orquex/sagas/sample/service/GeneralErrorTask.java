@@ -21,7 +21,7 @@ public class GeneralErrorTask implements TaskImplementation {
   }
 
   @Override
-  public String getName() {
-    return "general-error-task";
+  public String getKey() {
+    return "general-error";
   }
 }

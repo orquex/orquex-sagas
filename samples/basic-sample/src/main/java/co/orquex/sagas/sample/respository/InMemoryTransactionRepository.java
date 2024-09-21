@@ -13,7 +13,7 @@ public class InMemoryTransactionRepository implements TransactionRepository {
   private final Map<String, Map<String, Transaction>> transactions = new ConcurrentHashMap<>();
 
   @Override
-  public boolean existByFlowIdAndCorrelationId(String flowId, String correlationId) {
+  public boolean existsByFlowIdAndCorrelationId(String flowId, String correlationId) {
     return Optional.ofNullable(transactions.get(flowId))
         .map(txMap -> txMap.containsKey(correlationId))
         .orElse(false);

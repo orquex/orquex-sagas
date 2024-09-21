@@ -6,7 +6,7 @@
     <parent>
         <groupId>co.orquex.sagas</groupId>
         <artifactId>orquex-sagas</artifactId>
-        <version>1.0-SNAPSHOT</version>
+        <version>1.0.0-SNAPSHOT</version>
     </parent>
     <artifactId>orquex-sagas-task</artifactId>
     <packaging>pom</packaging>
@@ -20,6 +20,7 @@
 
     <modules>
         <module>orquex-sagas-task-groovy</module>
+        <module>orquex-sagas-task-okhttp</module>
     </modules>
 
     <dependencyManagement>
@@ -27,6 +28,11 @@
             <dependency>
                 <groupId>co.orquex.sagas</groupId>
                 <artifactId>orquex-sagas-task-groovy</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>co.orquex.sagas</groupId>
+                <artifactId>orquex-sagas-task-okhttp</artifactId>
                 <version>${project.version}</version>
             </dependency>
         </dependencies>

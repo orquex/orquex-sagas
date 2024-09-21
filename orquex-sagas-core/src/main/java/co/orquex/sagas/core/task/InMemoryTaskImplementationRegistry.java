@@ -21,13 +21,9 @@ public class InMemoryTaskImplementationRegistry implements Registry<TaskImplemen
     return instance;
   }
 
-  public static InMemoryTaskImplementationRegistry newInstance() {
-    return new InMemoryTaskImplementationRegistry();
-  }
-
   @Override
   public void add(TaskImplementation implementation) {
-    this.registry.put(implementation.getName(), implementation);
+    this.registry.put(implementation.getKey(), implementation);
   }
 
   @Override

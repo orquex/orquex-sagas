@@ -28,7 +28,7 @@ class InMemoryTaskExecutorRegistryTest {
   void shouldAddStageToRepository() {
     // Arrange
     final var taskExecutor = mock(TaskExecutor.class);
-    when(taskExecutor.getId()).thenReturn("activity-1");
+    when(taskExecutor.getKey()).thenReturn("activity-1");
     // Act
     registry.add(taskExecutor);
     // Assert
@@ -39,9 +39,9 @@ class InMemoryTaskExecutorRegistryTest {
   void shouldNotAffectOtherStages() {
     // Arrange
     final var taskExecutor1 = mock(TaskExecutor.class);
-    when(taskExecutor1.getId()).thenReturn("activity-1");
+    when(taskExecutor1.getKey()).thenReturn("activity-1");
     final var taskExecutor2 = mock(TaskExecutor.class);
-    when(taskExecutor2.getId()).thenReturn("activity-2");
+    when(taskExecutor2.getKey()).thenReturn("activity-2");
 
     // Act
     registry.add(taskExecutor1);
@@ -68,9 +68,9 @@ class InMemoryTaskExecutorRegistryTest {
   void shouldCreateRepositoryWithGivenListStages() {
     // Arrange
     final var taskExecutor1 = mock(TaskExecutor.class);
-    when(taskExecutor1.getId()).thenReturn("activity-1");
+    when(taskExecutor1.getKey()).thenReturn("activity-1");
     final var taskExecutor2 = mock(TaskExecutor.class);
-    when(taskExecutor2.getId()).thenReturn("activity-2");
+    when(taskExecutor2.getKey()).thenReturn("activity-2");
 
     final List<TaskExecutor> taskExecutors = new ArrayList<>();
     taskExecutors.add(taskExecutor1);

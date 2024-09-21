@@ -6,7 +6,7 @@ import co.orquex.sagas.domain.transaction.Transaction;
 public class TransactionRepositoryFixture implements TransactionRepository {
 
   @Override
-  public boolean existByFlowIdAndCorrelationId(String flowId, String correlationId) {
+  public boolean existsByFlowIdAndCorrelationId(String flowId, String correlationId) {
     return false;
   }
 

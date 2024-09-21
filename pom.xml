@@ -6,8 +6,9 @@
 
     <groupId>co.orquex.sagas</groupId>
     <artifactId>orquex-sagas</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.0.0-SNAPSHOT</version>
     <packaging>pom</packaging>
+
     <modules>
         <module>orquex-sagas-domain</module>
         <module>orquex-sagas-core</module>
@@ -28,6 +29,7 @@
         <mockito.version>5.12.0</mockito.version>
         <awaitility.version>4.2.1</awaitility.version>
         <bytebuddy.version>1.14.17</bytebuddy.version>
+        <checkerframework.version>3.47.0</checkerframework.version>
     </properties>
 
     <dependencyManagement>
@@ -50,6 +52,11 @@
             <dependency>
                 <groupId>co.orquex.sagas</groupId>
                 <artifactId>orquex-sagas-task-groovy</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>co.orquex.sagas</groupId>
+                <artifactId>orquex-sagas-task-okhttp</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
@@ -87,6 +94,11 @@
                 <groupId>com.fasterxml.jackson.datatype</groupId>
                 <artifactId>jackson-datatype-jsr310</artifactId>
                 <version>${jackson.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.checkerframework</groupId>
+                <artifactId>checker-qual</artifactId>
+                <version>${checkerframework.version}</version>
             </dependency>
             <!-- Logging -->
             <dependency>

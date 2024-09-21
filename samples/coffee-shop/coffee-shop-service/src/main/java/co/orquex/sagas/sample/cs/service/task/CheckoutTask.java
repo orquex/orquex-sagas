@@ -50,7 +50,7 @@ public class CheckoutTask implements TaskImplementation {
       implements Serializable {}
 
   @Override
-  public String getName() {
+  public String getKey() {
     return "service-checkout";
   }
 }

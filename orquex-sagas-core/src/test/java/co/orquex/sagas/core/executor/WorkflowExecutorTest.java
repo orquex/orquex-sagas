@@ -40,7 +40,7 @@ class WorkflowExecutorTest {
   @BeforeEach
   void setUp() {
     // Setting default stage executor
-    when(stageExecutor.getId()).thenReturn(StageConfiguration.DEFAULT_IMPLEMENTATION);
+    when(stageExecutor.getKey()).thenReturn(StageConfiguration.DEFAULT_IMPLEMENTATION);
     final var stageExecutorRegistry = InMemoryStageExecutorRegistry.of(List.of(stageExecutor));
     // Create the event manager factory to get the StageRequest
     final var eventManagerFactory = new DefaultEventManagerFactory();
@@ -75,7 +75,7 @@ class WorkflowExecutorTest {
     final var flowId = "flow-simple";
     final var request = new ExecutionRequest(flowId, "correlation-id");
     when(flowRepository.findById(flowId)).thenReturn(Optional.of(simpleFlow));
-    when(transactionRepository.existByFlowIdAndCorrelationId(anyString(), anyString()))
+    when(transactionRepository.existsByFlowIdAndCorrelationId(anyString(), anyString()))
         .thenReturn(true);
     assertThatThrownBy(() -> executor.execute(request))
         .isInstanceOf(WorkflowException.class)
@@ -88,7 +88,7 @@ class WorkflowExecutorTest {
     final var flowId = "flow-simple";
     final var request = new ExecutionRequest(flowId, "correlation-id");
     when(flowRepository.findById(flowId)).thenReturn(Optional.of(simpleFlow));
-    when(transactionRepository.existByFlowIdAndCorrelationId(anyString(), anyString()))
+    when(transactionRepository.existsByFlowIdAndCorrelationId(anyString(), anyString()))
         .thenReturn(false);
     when(transactionRepository.save(any(Transaction.class)))
         .thenReturn(Transaction.builder().transactionId(UUID.randomUUID().toString()).build());

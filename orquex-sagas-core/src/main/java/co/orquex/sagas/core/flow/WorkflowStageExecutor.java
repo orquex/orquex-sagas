@@ -36,7 +36,7 @@ public class WorkflowStageExecutor extends AbstractWorkflowExecutor<Checkpoint> 
       return;
     }
 
-    if (!transactionRepository.existByFlowIdAndCorrelationId(
+    if (!transactionRepository.existsByFlowIdAndCorrelationId(
         checkpoint.flowId(), checkpoint.correlationId())) {
       throw new WorkflowException(
           "Transaction not found by flowId: "

@@ -25,7 +25,7 @@ public class NotificationTask implements TaskImplementation {
   }
 
   @Override
-  public String getName() {
+  public String getKey() {
     return "notification-sender";
   }
 }

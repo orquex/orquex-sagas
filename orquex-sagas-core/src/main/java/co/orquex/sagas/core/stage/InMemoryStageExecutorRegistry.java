@@ -21,13 +21,9 @@ public class InMemoryStageExecutorRegistry implements Registry<StageExecutor> {
     return instance;
   }
 
-  public static InMemoryStageExecutorRegistry newInstance() {
-    return new InMemoryStageExecutorRegistry();
-  }
-
   @Override
   public void add(StageExecutor stageExecutor) {
-    this.registry.put(stageExecutor.getId(), stageExecutor);
+    this.registry.put(stageExecutor.getKey(), stageExecutor);
   }
 
   @Override

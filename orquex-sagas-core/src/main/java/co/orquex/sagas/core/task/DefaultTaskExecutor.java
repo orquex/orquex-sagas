@@ -27,7 +27,7 @@ public class DefaultTaskExecutor implements TaskExecutor {
   }
 
   @Override
-  public String getId() {
+  public String getKey() {
     return "default";
   }
 }

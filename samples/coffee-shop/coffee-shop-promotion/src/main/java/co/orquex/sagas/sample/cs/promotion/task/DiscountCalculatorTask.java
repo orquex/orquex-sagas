@@ -37,7 +37,7 @@ public class DiscountCalculatorTask implements TaskImplementation {
   public record References(int small, int medium, int large) {}
 
   @Override
-  public String getName() {
+  public String getKey() {
     return "discount-calculator";
   }
 }

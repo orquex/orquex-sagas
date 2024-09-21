@@ -30,7 +30,7 @@ public class KafkaStageExecutor implements StageExecutor {
   }
 
   @Override
-  public String getId() {
+  public String getKey() {
     return "kafka-executor";
   }
 }

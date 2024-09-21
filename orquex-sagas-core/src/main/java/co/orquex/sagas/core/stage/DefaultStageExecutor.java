@@ -54,7 +54,7 @@ public class DefaultStageExecutor implements StageExecutor {
   }
 
   @Override
-  public String getId() {
+  public String getKey() {
     return StageConfiguration.DEFAULT_IMPLEMENTATION;
   }
 }
