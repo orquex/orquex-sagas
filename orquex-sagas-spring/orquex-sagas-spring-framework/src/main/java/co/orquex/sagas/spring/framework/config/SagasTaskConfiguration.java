@@ -1,14 +1,16 @@
 package co.orquex.sagas.spring.framework.config;
 
 import co.orquex.sagas.domain.api.TaskImplementation;
-import co.orquex.sagas.domain.api.registry.Registry;
 import co.orquex.sagas.task.groovy.GroovyActivity;
 import co.orquex.sagas.task.groovy.GroovyEvaluation;
-import co.orquex.sagas.task.okhttp.OkHttpClientProvider;
+import co.orquex.sagas.task.http.api.HttpClientProvider;
+import co.orquex.sagas.task.http.api.HttpClientProviderRegistry;
 import co.orquex.sagas.task.okhttp.OkHttpGetActivity;
-import co.orquex.sagas.task.okhttp.OkHttpInMemoryClientRegistry;
+import co.orquex.sagas.task.okhttp.OkHttpInMemoryClientProviderRegistry;
 import co.orquex.sagas.task.okhttp.OkHttpPostActivity;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.List;
+import okhttp3.OkHttpClient;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -27,18 +29,20 @@ public class SagasTaskConfiguration {
   }
 
   @Bean
-  public TaskImplementation okHttpGetActivity(Registry<OkHttpClientProvider> registry) {
-    return new OkHttpGetActivity(registry);
+  public TaskImplementation okHttpGetActivity(
+      HttpClientProviderRegistry<OkHttpClient> registry, ObjectMapper objectMapper) {
+    return new OkHttpGetActivity(registry, objectMapper);
   }
 
   @Bean
-  public TaskImplementation okHttpPostActivity(Registry<OkHttpClientProvider> registry) {
-    return new OkHttpPostActivity(registry);
+  public TaskImplementation okHttpPostActivity(
+      HttpClientProviderRegistry<OkHttpClient> registry, ObjectMapper objectMapper) {
+    return new OkHttpPostActivity(registry, objectMapper);
   }
 
   @Bean
-  public Registry<OkHttpClientProvider> okHttpInMemoryClientRegistry(
-      List<OkHttpClientProvider> okHttpProviders) {
-    return OkHttpInMemoryClientRegistry.of(okHttpProviders);
+  public HttpClientProviderRegistry<OkHttpClient> okHttpInMemoryClientRegistry(
+      List<HttpClientProvider<OkHttpClient>> okHttpClientProviders) {
+    return OkHttpInMemoryClientProviderRegistry.of(okHttpClientProviders);
   }
 }

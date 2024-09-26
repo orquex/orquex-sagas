@@ -1,7 +1,7 @@
 package co.orquex.sagas.sample.config;
 
 import co.orquex.sagas.domain.jackson.OrquexJacksonModule;
-import co.orquex.sagas.task.okhttp.OkHttpClientProvider;
+import co.orquex.sagas.task.http.api.HttpClientProvider;
 import lombok.RequiredArgsConstructor;
 import okhttp3.OkHttpClient;
 import org.springframework.boot.autoconfigure.jackson.Jackson2ObjectMapperBuilderCustomizer;
@@ -21,11 +21,11 @@ public class BasicSampleConfig {
   }
 
   @Bean
-  public OkHttpClientProvider okHttpClientBasicProvider() {
-    return new OkHttpClientProvider() {
+  public HttpClientProvider<OkHttpClient> okHttpClientBasicProvider() {
+    return new HttpClientProvider<>() {
 
       @Override
-      public OkHttpClient getOkHttpClient() {
+      public OkHttpClient getClient() {
         return new OkHttpClient.Builder().build();
       }
 

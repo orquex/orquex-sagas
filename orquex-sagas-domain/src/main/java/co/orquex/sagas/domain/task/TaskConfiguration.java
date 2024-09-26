@@ -10,7 +10,7 @@ import java.util.Map;
 import lombok.Builder;
 
 /**
- * This class is used to define and manage the configuration and behaviour of a task.
+ * This class is used to define and manage the configuration and behavior of a task.
  *
  * <p>JSON representation:
  *

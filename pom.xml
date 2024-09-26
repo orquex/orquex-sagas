@@ -44,6 +44,7 @@
                 <artifactId>orquex-sagas-core</artifactId>
                 <version>${project.version}</version>
             </dependency>
+            <!-- Orquex Sagas Task -->
             <dependency>
                 <groupId>co.orquex.sagas</groupId>
                 <artifactId>orquex-sagas-task</artifactId>
@@ -56,9 +57,15 @@
             </dependency>
             <dependency>
                 <groupId>co.orquex.sagas</groupId>
+                <artifactId>orquex-sagas-task-http-api</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>co.orquex.sagas</groupId>
                 <artifactId>orquex-sagas-task-okhttp</artifactId>
                 <version>${project.version}</version>
             </dependency>
+            <!-- Orquex Sagas Spring -->
             <dependency>
                 <groupId>co.orquex.sagas</groupId>
                 <artifactId>orquex-sagas-spring</artifactId>
