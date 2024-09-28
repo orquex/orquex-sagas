@@ -7,10 +7,8 @@ import okhttp3.OkHttpClient;
 import org.springframework.boot.autoconfigure.jackson.Jackson2ObjectMapperBuilderCustomizer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.scheduling.annotation.EnableAsync;
 
 @Configuration
-@EnableAsync // For managing async event handling
 @RequiredArgsConstructor
 public class BasicSampleConfig {
 

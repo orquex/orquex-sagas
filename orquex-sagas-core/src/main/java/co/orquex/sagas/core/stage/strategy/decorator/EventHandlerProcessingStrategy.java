@@ -1,4 +1,4 @@
-package co.orquex.sagas.core.stage.strategy.impl.decorator;
+package co.orquex.sagas.core.stage.strategy.decorator;
 
 import co.orquex.sagas.core.event.WorkflowEventPublisher;
 import co.orquex.sagas.core.event.impl.EventMessage;

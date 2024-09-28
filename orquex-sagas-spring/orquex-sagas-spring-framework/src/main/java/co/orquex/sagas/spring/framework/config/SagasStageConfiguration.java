@@ -22,11 +22,9 @@ import co.orquex.sagas.domain.stage.StageRequest;
 import java.util.List;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Import;
 
 /** Configure the required Stage beans. */
 @Configuration
-@Import({SagasTaskConfiguration.class, SagasContextRefreshedListener.class})
 public class SagasStageConfiguration {
 
   @Bean

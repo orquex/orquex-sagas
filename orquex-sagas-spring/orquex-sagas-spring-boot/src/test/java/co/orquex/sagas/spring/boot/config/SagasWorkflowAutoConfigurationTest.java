@@ -11,7 +11,12 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 @ExtendWith(SpringExtension.class)
-@ContextConfiguration(classes = { SagasWorkflowAutoConfiguration.class, MockConfiguration.class})
+@ContextConfiguration(
+    classes = {
+      SagasStageAutoConfiguration.class,
+      SagasWorkflowAutoConfiguration.class,
+      MockConfiguration.class
+    })
 @TestPropertySource(properties = {"orquex.sagas.spring.workflow.enabled=true"})
 class SagasWorkflowAutoConfigurationTest {
 

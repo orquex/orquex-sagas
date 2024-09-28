@@ -9,7 +9,6 @@ import org.springframework.context.annotation.*;
 
 /** Configure the required Workflow beans. */
 @Configuration
-@Import(SagasStageConfiguration.class)
 public class SagasWorkflowConfiguration {
 
   @Bean

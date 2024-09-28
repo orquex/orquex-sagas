@@ -9,7 +9,7 @@ import static org.mockito.Mockito.*;
 import co.orquex.sagas.core.event.WorkflowEventPublisher;
 import co.orquex.sagas.core.event.impl.EventMessage;
 import co.orquex.sagas.core.fixture.ExecutionRequestFixture;
-import co.orquex.sagas.core.stage.strategy.impl.decorator.EventHandlerProcessingStrategy;
+import co.orquex.sagas.core.stage.strategy.decorator.EventHandlerProcessingStrategy;
 import co.orquex.sagas.domain.api.StageProcessingStrategy;
 import co.orquex.sagas.domain.exception.WorkflowException;
 import co.orquex.sagas.domain.execution.ExecutionRequest;

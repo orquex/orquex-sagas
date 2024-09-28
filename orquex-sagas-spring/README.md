@@ -24,38 +24,40 @@ Or with `spring-boot`:
 </dependency>
 ```
 
-To enable the autoconfiguration add this properties to the `application.yml` or `application.properties`
+For disabling the sagas autoconfiguration;
 
-For enabling workflow autoconfiguration;
 ```yaml
 orquex:
   sagas:
     spring:
       workflow:
-        enabled: true
-```
-
-And for enabling stage autoconfiguration;
-```yaml
-orquex:
-  sagas:
-    spring:
+        enabled: false
       stage:
-        enabled: true
+        enabled: false
+      event:
+        enabled: false
 ```
 
-Then just inject the `WorkflowExecutor` and call your flows:
+### Injection and execution
 
 ```java
-private final WorkflowExecutor workflowExecutor;
-...
-workflowExecutor.execute(request);
+public class DummyService {
+
+    private final WorkflowExecutor workflowExecutor;
+    
+    public DummyService(WorkflowExecutor workflowExecutor) {
+        this.workflowExecutor = workflowExecutor;
+    }
+    
+    public void execute(ExecutionRequest request) {
+        workflowExecutor.execute(request);
+    }
+}
 ```
 
+## Beans
 
-## Beans automatically injected
-
-This library will inject all default configuration of the `Orquex Sagas framework`:
+This library injects all default configuration of the `Orquex Sagas framework`:
 
 ### Registries
 
@@ -67,11 +69,13 @@ This library will inject all default configuration of the `Orquex Sagas framewor
 
 ### Events
 
-| Interface                     | Implementation                  | Bean name                       |
-|-------------------------------|---------------------------------|---------------------------------|
-| `EventListener<StageRequest>` | `DefaultStageEventListener`     | `defaultStageEventListener`     |
-| `WorkflowEventPublisher`      | `DefaultWorkflowEventPublisher` | `defaultWorkflowEventPublisher` |
-| `EventManagerFactory`         | `DefaultEventManagerFactory`    | `defaultEventManagerFactory`    |
+| Interface                     | Implementation                          | Bean name                               |
+|-------------------------------|-----------------------------------------|-----------------------------------------|
+| `EventListener<StageRequest>` | `DefaultStageEventListener`             | `defaultStageEventListener`             |
+| `WorkflowEventPublisher`      | `DefaultWorkflowEventPublisher`         | `defaultWorkflowEventPublisher`         |
+| `EventManagerFactory`         | `DefaultEventManagerFactory`            | `defaultEventManagerFactory`            |
+| `EventListener<Checkpoint>`   | `DefaultCheckpointEventListener`        | `defaultCheckpointEventListener`        |
+| -                             | `DefaultCheckpointEventListenerHandler` | `defaultCheckpointEventListenerHandler` |
 
 ### Executors
 

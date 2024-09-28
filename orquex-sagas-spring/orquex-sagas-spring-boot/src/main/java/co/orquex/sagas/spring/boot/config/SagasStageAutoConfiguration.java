@@ -13,5 +13,9 @@ import org.springframework.context.annotation.Import;
   SagasStageConfiguration.class,
   SagasContextRefreshedListener.class
 })
-@ConditionalOnProperty(prefix = "orquex.sagas.spring.stage", name = "enabled", havingValue = "true")
+@ConditionalOnProperty(
+    prefix = "orquex.sagas.spring.stage",
+    name = "enabled",
+    havingValue = "true",
+    matchIfMissing = true)
 public class SagasStageAutoConfiguration {}

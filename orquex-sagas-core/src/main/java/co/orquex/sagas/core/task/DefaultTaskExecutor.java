@@ -2,9 +2,9 @@ package co.orquex.sagas.core.task;
 
 import co.orquex.sagas.domain.api.TaskExecutor;
 import co.orquex.sagas.domain.api.TaskImplementation;
+import co.orquex.sagas.domain.api.registry.Registry;
 import co.orquex.sagas.domain.exception.WorkflowException;
 import co.orquex.sagas.domain.execution.ExecutionRequest;
-import co.orquex.sagas.domain.api.registry.Registry;
 import co.orquex.sagas.domain.task.Task;
 import java.io.Serializable;
 import java.util.Map;
@@ -22,7 +22,10 @@ public class DefaultTaskExecutor implements TaskExecutor {
     final var implementation =
         taskRegistry
             .get(task.implementation())
-            .orElseThrow(() -> new WorkflowException("Task implementation not found"));
+            .orElseThrow(
+                () ->
+                    new WorkflowException(
+                        "Task '" + task.implementation() + "'implementation not found"));
     return implementation.execute(transactionId, request.metadata(), request.payload());
   }
 
