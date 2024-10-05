@@ -6,6 +6,7 @@ import co.orquex.sagas.domain.api.registry.Registry;
 import co.orquex.sagas.domain.exception.WorkflowException;
 import co.orquex.sagas.domain.execution.ExecutionRequest;
 import co.orquex.sagas.domain.task.Task;
+import co.orquex.sagas.domain.task.TaskRequest;
 import java.io.Serializable;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
@@ -17,7 +18,7 @@ public class DefaultTaskExecutor implements TaskExecutor {
 
   @Override
   public Map<String, Serializable> execute(
-      String transactionId, Task task, ExecutionRequest request) {
+      String transactionId, Task task, ExecutionRequest executionRequest) {
 
     final var implementation =
         taskRegistry
@@ -26,7 +27,9 @@ public class DefaultTaskExecutor implements TaskExecutor {
                 () ->
                     new WorkflowException(
                         "Task '" + task.implementation() + "'implementation not found"));
-    return implementation.execute(transactionId, request.metadata(), request.payload());
+    final var taskRequest =
+        new TaskRequest(transactionId, executionRequest.metadata(), executionRequest.payload());
+    return implementation.execute(taskRequest);
   }
 
   @Override

@@ -54,7 +54,7 @@ public class EvaluationProcessingStrategy extends AbstractStageProcessingStrateg
    * - It checks if the `RESULT` key exists in the response map and if its value is a Boolean. If the value is `true`, it means the condition is met. In this case, the method sets the outgoing stage to the one specified in the current condition and breaks the loop.
    * </pre>
    *
-   * If none of the conditions are met (i.e., none of the conditions result in a `true` value), the
+   * If none of the conditions are met (in other words, none of the conditions result in a `true` value), the
    * method returns the default outgoing stage specified in the evaluation.
    *
    * <p>The method finally returns a `StageResponse` object, which contains the outgoing stage and
@@ -68,7 +68,7 @@ public class EvaluationProcessingStrategy extends AbstractStageProcessingStrateg
   @Override
   public StageResponse process(
       String transactionId, Evaluation evaluation, ExecutionRequest request) {
-    log.debug("Executing evaluation stage '{}'", evaluation.getName());
+    log.debug("Executing evaluation stage '{}' of flow '{}' with correlation ID '{}'", evaluation.getName(), request.flowId(), request.correlationId());
     var outgoing = evaluation.getDefaultOutgoing();
 
     for (Condition condition : evaluation.getConditions()) {

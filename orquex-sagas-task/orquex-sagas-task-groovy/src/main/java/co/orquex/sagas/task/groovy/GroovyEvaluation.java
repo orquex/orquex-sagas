@@ -5,6 +5,7 @@ import static co.orquex.sagas.task.groovy.TaskConstant.PAYLOAD;
 
 import co.orquex.sagas.domain.api.TaskImplementation;
 import co.orquex.sagas.domain.exception.WorkflowException;
+import co.orquex.sagas.domain.task.TaskRequest;
 import java.io.Serializable;
 import java.util.Map;
 import javax.script.ScriptException;
@@ -21,12 +22,12 @@ public final class GroovyEvaluation implements TaskImplementation {
   public static final String RESULT = "__result";
 
   @Override
-  public Map<String, Serializable> execute(
-      final String transactionId,
-      final Map<String, Serializable> metadata,
-      final Map<String, Serializable> payload) {
+  public Map<String, Serializable> execute(TaskRequest taskRequest) {
 
     try {
+      final var metadata = taskRequest.metadata();
+      final var payload = taskRequest.payload();
+
       if (!metadata.containsKey(EXPRESSION)) throw new WorkflowException("expression not found");
 
       final var expression = metadata.get(EXPRESSION).toString();

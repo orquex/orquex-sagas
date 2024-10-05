@@ -94,8 +94,8 @@ public class ActivityProcessingStrategy extends AbstractStageProcessingStrategy<
       Activity activity, String transactionId, ExecutionRequest updatedRequest) {
     final Function<ActivityTask, Supplier<Map<String, Serializable>>> createSubtask =
         activityTask -> () -> processActivityTask(transactionId, activityTask, updatedRequest);
-    // TODO set a thread name per virtual thread
-    try (final var executor = Executors.newVirtualThreadPerTaskExecutor()) {
+    final var factory = Thread.ofVirtual().name("activity-", 0).factory();
+    try (final var executor = Executors.newThreadPerTaskExecutor(factory)) {
       @SuppressWarnings("unchecked")
       final CompletableFuture<Map<String, Serializable>>[] subtasks =
           activity.getActivityTasks().stream()
@@ -138,7 +138,7 @@ public class ActivityProcessingStrategy extends AbstractStageProcessingStrategy<
   }
 
   /**
-   * Handles the execution of an activity task in a parallel manner.
+   * Handles the execution of an activity task parallelly.
    *
    * @param allOrNothing A flag indicating whether all tasks should be executed or none.
    * @return A function that processes a future resulting from the execution of an activity task.

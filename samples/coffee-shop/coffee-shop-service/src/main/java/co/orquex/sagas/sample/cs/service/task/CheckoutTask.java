@@ -2,6 +2,7 @@ package co.orquex.sagas.sample.cs.service.task;
 
 import co.orquex.sagas.domain.api.TaskImplementation;
 import co.orquex.sagas.domain.exception.WorkflowException;
+import co.orquex.sagas.domain.task.TaskRequest;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.Serializable;
@@ -19,8 +20,9 @@ public class CheckoutTask implements TaskImplementation {
   private final ObjectMapper mapper;
 
   @Override
-  public Map<String, Serializable> execute(
-      String transactionId, Map<String, Serializable> metadata, Map<String, Serializable> payload) {
+  public Map<String, Serializable> execute(TaskRequest taskRequest) {
+    final var metadata = taskRequest.metadata();
+    final var payload = taskRequest.payload();
     final var hasProducts = metadata.containsKey("products");
     final var hasPayload = payload != null && !payload.isEmpty();
     if (hasProducts && hasPayload) {

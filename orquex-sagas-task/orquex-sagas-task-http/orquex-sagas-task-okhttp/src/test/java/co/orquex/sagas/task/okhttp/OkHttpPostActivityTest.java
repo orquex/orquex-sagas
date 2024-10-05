@@ -3,6 +3,7 @@ package co.orquex.sagas.task.okhttp;
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
+import co.orquex.sagas.domain.task.TaskRequest;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.tomakehurst.wiremock.junit5.WireMockTest;
 import java.io.Serializable;
@@ -48,9 +49,10 @@ class OkHttpPostActivityTest {
         post("/users")
             .withBasicAuth("name", "password")
             .willReturn(aResponse().withStatus(200).withBodyFile("user_response.json")));
+    final var taskRequest = new TaskRequest(UUID.randomUUID().toString(), metadata, payload);
 
     // When
-    final var result = okHttpPostActivity.execute(UUID.randomUUID().toString(), metadata, payload);
+    final var result = okHttpPostActivity.execute(taskRequest);
 
     // Then
     assertThat(result).isNotNull();
@@ -64,9 +66,10 @@ class OkHttpPostActivityTest {
     // Given
     stubFor(
         post("/users").withBasicAuth("name", "password").willReturn(aResponse().withStatus(500)));
+    final var taskRequest = new TaskRequest(UUID.randomUUID().toString(), metadata, payload);
 
     // When
-    final var result = okHttpPostActivity.execute(UUID.randomUUID().toString(), metadata, payload);
+    final var result = okHttpPostActivity.execute(taskRequest);
 
     // Then
     assertThat(result).isNotNull();

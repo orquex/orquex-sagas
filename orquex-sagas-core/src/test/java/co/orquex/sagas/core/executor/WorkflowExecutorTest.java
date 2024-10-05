@@ -1,7 +1,7 @@
 package co.orquex.sagas.core.executor;
 
 import static co.orquex.sagas.core.fixture.JacksonFixture.readValue;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
@@ -11,11 +11,11 @@ import co.orquex.sagas.core.flow.WorkflowExecutor;
 import co.orquex.sagas.core.stage.DefaultStageEventListener;
 import co.orquex.sagas.core.stage.DefaultStageExecutor;
 import co.orquex.sagas.core.stage.InMemoryStageExecutorRegistry;
+import co.orquex.sagas.domain.api.repository.FlowRepository;
+import co.orquex.sagas.domain.api.repository.TransactionRepository;
 import co.orquex.sagas.domain.exception.WorkflowException;
 import co.orquex.sagas.domain.execution.ExecutionRequest;
 import co.orquex.sagas.domain.flow.Flow;
-import co.orquex.sagas.domain.api.repository.FlowRepository;
-import co.orquex.sagas.domain.api.repository.TransactionRepository;
 import co.orquex.sagas.domain.stage.StageConfiguration;
 import co.orquex.sagas.domain.stage.StageRequest;
 import co.orquex.sagas.domain.transaction.Transaction;
@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -62,6 +63,7 @@ class WorkflowExecutorTest {
   }
 
   @Test
+  @DisplayName("Should throw exception when flow id is null")
   void shouldThrowExceptionWhenFlowNotFound() {
     final var request = new ExecutionRequest("flow-id", "correlation-id");
     when(flowRepository.findById(anyString())).thenReturn(Optional.empty());
@@ -71,6 +73,7 @@ class WorkflowExecutorTest {
   }
 
   @Test
+  @DisplayName("Should throw exception when transaction already started")
   void shouldThrowExceptionWhenTransactionAlreadyStarted() {
     final var flowId = "flow-simple";
     final var request = new ExecutionRequest(flowId, "correlation-id");
@@ -84,7 +87,8 @@ class WorkflowExecutorTest {
   }
 
   @Test
-  void shouldExecuteFlow() {
+  @DisplayName("Should execute simple flow")
+  void shouldExecuteSimpleFlow() {
     final var flowId = "flow-simple";
     final var request = new ExecutionRequest(flowId, "correlation-id");
     when(flowRepository.findById(flowId)).thenReturn(Optional.of(simpleFlow));

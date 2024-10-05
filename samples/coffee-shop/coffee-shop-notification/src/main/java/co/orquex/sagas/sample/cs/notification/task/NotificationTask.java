@@ -2,6 +2,7 @@ package co.orquex.sagas.sample.cs.notification.task;
 
 import co.orquex.sagas.domain.api.TaskImplementation;
 import co.orquex.sagas.domain.exception.WorkflowException;
+import co.orquex.sagas.domain.task.TaskRequest;
 import java.io.Serializable;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
@@ -14,13 +15,14 @@ import org.springframework.stereotype.Component;
 public class NotificationTask implements TaskImplementation {
 
   @Override
-  public Map<String, Serializable> execute(
-      String transactionId, Map<String, Serializable> metadata, Map<String, Serializable> payload) {
-    final var hasNotification = metadata.containsKey("notification");
+  public Map<String, Serializable> execute(TaskRequest taskRequest) {
+    final var hasNotification = taskRequest.metadata().containsKey("notification");
+
     if (hasNotification) {
       log.info("Notification sent successfully");
-      return payload;
+      return taskRequest.payload();
     }
+
     throw new WorkflowException("Notification checkout failed");
   }
 

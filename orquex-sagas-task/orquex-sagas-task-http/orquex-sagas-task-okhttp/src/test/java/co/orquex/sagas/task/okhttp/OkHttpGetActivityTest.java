@@ -3,6 +3,7 @@ package co.orquex.sagas.task.okhttp;
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
+import co.orquex.sagas.domain.task.TaskRequest;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.tomakehurst.wiremock.junit5.WireMockTest;
 import java.io.Serializable;
@@ -33,7 +34,8 @@ class OkHttpGetActivityTest {
             "basic-client",
             "__headers",
             headers);
-    final var registry = OkHttpInMemoryClientProviderRegistry.of(List.of(new BasicOkHttpClientProvider()));
+    final var registry =
+        OkHttpInMemoryClientProviderRegistry.of(List.of(new BasicOkHttpClientProvider()));
     okHttpGetActivity = new OkHttpGetActivity(registry, objectMapper);
   }
 
@@ -44,9 +46,10 @@ class OkHttpGetActivityTest {
         get("/users/1")
             .withBasicAuth("name", "password")
             .willReturn(aResponse().withStatus(200).withBodyFile("user_info.json")));
+    final var taskRequest = new TaskRequest(UUID.randomUUID().toString(), metadata, payload);
 
     // When
-    final var result = okHttpGetActivity.execute(UUID.randomUUID().toString(), metadata, payload);
+    final var result = okHttpGetActivity.execute(taskRequest);
 
     // Then
     assertThat(result).isNotNull();
@@ -60,9 +63,10 @@ class OkHttpGetActivityTest {
     // Given
     stubFor(
         get("/users/1").withBasicAuth("name", "password").willReturn(aResponse().withStatus(400)));
+    final var taskRequest = new TaskRequest(UUID.randomUUID().toString(), metadata, payload);
 
     // When
-    final var result = okHttpGetActivity.execute(UUID.randomUUID().toString(), metadata, payload);
+    final var result = okHttpGetActivity.execute(taskRequest);
 
     // Then
     assertThat(result).isNotNull();

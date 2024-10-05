@@ -3,6 +3,7 @@ package co.orquex.sagas.sample.respository;
 import co.orquex.sagas.domain.api.repository.TransactionRepository;
 import co.orquex.sagas.domain.transaction.Transaction;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import org.springframework.stereotype.Repository;
@@ -10,20 +11,18 @@ import org.springframework.stereotype.Repository;
 @Repository
 public class InMemoryTransactionRepository implements TransactionRepository {
 
-  private final Map<String, Map<String, Transaction>> transactions = new ConcurrentHashMap<>();
+  private final Map<Integer, Transaction> transactions = new ConcurrentHashMap<>();
 
   @Override
   public boolean existsByFlowIdAndCorrelationId(String flowId, String correlationId) {
-    return Optional.ofNullable(transactions.get(flowId))
-        .map(txMap -> txMap.containsKey(correlationId))
-        .orElse(false);
+    final var key = Objects.hash(flowId, correlationId);
+    return Optional.ofNullable(transactions.get(key)).isPresent();
   }
 
   @Override
   public Transaction save(Transaction transaction) {
-    String flowId = transaction.getFlowId();
-    String correlationId = transaction.getCorrelationId();
-    transactions.put(flowId, Map.of(correlationId, transaction));
+    final var key = Objects.hash(transaction.getFlowId(), transaction.getCorrelationId());
+    transactions.put(key, transaction);
     return transaction;
   }
 }

@@ -5,6 +5,7 @@ import static co.orquex.sagas.task.groovy.GroovyEvaluation.RESULT;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import co.orquex.sagas.domain.exception.WorkflowException;
+import co.orquex.sagas.domain.task.TaskRequest;
 import co.orquex.sagas.task.groovy.GroovyEvaluation;
 import java.io.Serializable;
 import java.util.Collections;
@@ -27,7 +28,8 @@ class GroovyEvaluationTest {
   void shouldEvaluateSimpleExpressions() {
     final Map<String, Serializable> metadata = Map.of(EXPRESSION, "payload.a == payload.b");
     final Map<String, Serializable> payload = Map.of("a", 1, "b", 1);
-    final var response = groovyEvaluation.execute(UUID.randomUUID().toString(), metadata, payload);
+    final var taskRequest = new TaskRequest(UUID.randomUUID().toString(), metadata, payload);
+    final var response = groovyEvaluation.execute(taskRequest);
     assertThat(response).hasSize(1).containsEntry(RESULT, true);
   }
 
@@ -35,8 +37,8 @@ class GroovyEvaluationTest {
   void shouldThrowExceptionWhenExpressionNotBoolean() {
     final Map<String, Serializable> metadata = Map.of(EXPRESSION, "println \"hello\"");
     final Map<String, Serializable> payload = Collections.emptyMap();
-    final var transactionId = UUID.randomUUID().toString();
-    Assertions.assertThatThrownBy(() -> groovyEvaluation.execute(transactionId, metadata, payload))
+    final var taskRequest = new TaskRequest(UUID.randomUUID().toString(), metadata, payload);
+    Assertions.assertThatThrownBy(() -> groovyEvaluation.execute(taskRequest))
         .isInstanceOf(WorkflowException.class)
         .hasMessage("expression is not boolean");
   }
@@ -45,8 +47,8 @@ class GroovyEvaluationTest {
   void shouldThrowExceptionWhenSyntaxError() {
     final Map<String, Serializable> metadata = Map.of(EXPRESSION, "foo");
     final Map<String, Serializable> payload = Collections.emptyMap();
-    final var transactionId = UUID.randomUUID().toString();
-    Assertions.assertThatThrownBy(() -> groovyEvaluation.execute(transactionId, metadata, payload))
+    final var taskRequest = new TaskRequest(UUID.randomUUID().toString(), metadata, payload);
+    Assertions.assertThatThrownBy(() -> groovyEvaluation.execute(taskRequest))
         .isInstanceOf(WorkflowException.class);
   }
 }

@@ -1,19 +1,27 @@
 package co.orquex.sagas.core.flow;
 
+import co.orquex.sagas.core.event.WorkflowEventPublisher;
 import co.orquex.sagas.domain.api.Executable;
+import co.orquex.sagas.domain.api.repository.FlowRepository;
+import co.orquex.sagas.domain.api.repository.TransactionRepository;
 import co.orquex.sagas.domain.exception.WorkflowException;
 import co.orquex.sagas.domain.execution.ExecutionRequest;
 import co.orquex.sagas.domain.flow.Flow;
-import co.orquex.sagas.domain.api.repository.FlowRepository;
-import co.orquex.sagas.domain.api.repository.TransactionRepository;
 import co.orquex.sagas.domain.stage.Stage;
 import co.orquex.sagas.domain.stage.StageRequest;
 import co.orquex.sagas.domain.transaction.Transaction;
 import lombok.RequiredArgsConstructor;
 
+/**
+ * Abstract base class for workflow executors that provides a common capability or feature for
+ * executing workflows.
+ *
+ * @param <T> the type of the input request.
+ */
 @RequiredArgsConstructor
 public abstract class AbstractWorkflowExecutor<T> implements Executable<T> {
 
+  protected final WorkflowEventPublisher workflowEventPublisher;
   protected final FlowRepository flowRepository;
   protected final TransactionRepository transactionRepository;
 

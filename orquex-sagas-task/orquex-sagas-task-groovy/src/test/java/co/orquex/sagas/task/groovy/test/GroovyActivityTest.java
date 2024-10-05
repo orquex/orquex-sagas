@@ -3,6 +3,7 @@ package co.orquex.sagas.task.groovy.test;
 import static co.orquex.sagas.task.groovy.GroovyActivity.SCRIPT;
 import static org.assertj.core.api.Assertions.assertThat;
 
+import co.orquex.sagas.domain.task.TaskRequest;
 import co.orquex.sagas.task.groovy.GroovyActivity;
 import java.io.Serializable;
 import java.util.Base64;
@@ -30,7 +31,8 @@ class GroovyActivityTest {
         """;
     final Map<String, Serializable> metadata = Map.of(SCRIPT, toBase64(expression));
     final Map<String, Serializable> payload = Map.of("a", 1);
-    final var response = groovyActivity.execute(UUID.randomUUID().toString(), metadata, payload);
+    final var taskRequest = new TaskRequest(UUID.randomUUID().toString(), metadata, payload);
+    final var response = groovyActivity.execute(taskRequest);
     assertThat(response).hasSize(1).containsEntry("b", 2);
   }
 

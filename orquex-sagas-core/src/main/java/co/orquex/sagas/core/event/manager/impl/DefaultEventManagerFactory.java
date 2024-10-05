@@ -29,7 +29,7 @@ public final class DefaultEventManagerFactory implements EventManagerFactory {
 
   /**
    * Gets or creates an event manager for a specific event type. If an event manager for the given
-   * event type does not exist, it is created and stored.
+   * event type doesn't exist, it is created and stored.
    *
    * @param <T> the type of events the event manager handles
    * @param eventType the class of the event type

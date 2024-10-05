@@ -2,6 +2,7 @@ package co.orquex.sagas.task.http.api;
 
 import co.orquex.sagas.domain.api.TaskImplementation;
 import co.orquex.sagas.domain.exception.WorkflowException;
+import co.orquex.sagas.domain.task.TaskRequest;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.Serializable;
@@ -19,13 +20,12 @@ public abstract class AbstractHttpClientTaskImplementation<C> implements TaskImp
   protected final ObjectMapper objectMapper;
 
   @Override
-  public Map<String, Serializable> execute(
-      String transactionId, Map<String, Serializable> metadata, Map<String, Serializable> payload) {
-    final var activityMetadata = convertValue(metadata, HttpActivityMetadata.class);
-    final var activityPayload = convertValue(payload, HttpActivityPayload.class);
+  public Map<String, Serializable> execute(TaskRequest taskRequest) {
+    final var activityMetadata = convertValue(taskRequest.metadata(), HttpActivityMetadata.class);
+    final var activityPayload = convertValue(taskRequest.payload(), HttpActivityPayload.class);
     final var client = getHttpClient(activityMetadata.clientProvider());
     final var activityRequest =
-        new HttpActivityRequest(transactionId, activityMetadata, activityPayload);
+        new HttpActivityRequest(taskRequest.transactionId(), activityMetadata, activityPayload);
 
     final var response = doRequest(client, activityRequest);
 

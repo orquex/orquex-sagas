@@ -7,6 +7,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import co.orquex.sagas.domain.exception.WorkflowException;
+import co.orquex.sagas.domain.task.TaskRequest;
 import co.orquex.sagas.task.http.api.TestHttpClient.TestHttpResponse;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.Serializable;
@@ -38,7 +39,8 @@ class AbstractHttpClientTaskImplementationTest {
     final var postTask = new TestHttpPostTask(registry, objectMapper);
     final Map<String, Serializable> metadata = getMetadata(HTTP_CLIENT_PROVIDER_TEST);
     final Map<String, Serializable> payload = getPayload();
-    final var response = postTask.execute(transactionId, metadata, payload);
+    final var taskRequest = new TaskRequest(transactionId, metadata, payload);
+    final var response = postTask.execute(taskRequest);
     assertThat(response).isNotEmpty().hasSize(3);
   }
 
@@ -47,7 +49,8 @@ class AbstractHttpClientTaskImplementationTest {
     final var postTask = new TestHttpPostTask(registry, objectMapper);
     final Map<String, Serializable> metadata = new HashMap<>();
     final Map<String, Serializable> payload = getPayload();
-    assertThatThrownBy(() -> postTask.execute(transactionId, metadata, payload))
+    final var taskRequest = new TaskRequest(transactionId, metadata, payload);
+    assertThatThrownBy(() -> postTask.execute(taskRequest))
         .isInstanceOf(WorkflowException.class)
         .hasMessage("HttpActivityMetadata deserialization error, check required fields");
   }
@@ -57,7 +60,8 @@ class AbstractHttpClientTaskImplementationTest {
     final var postTask = new TestHttpPostTask(registry, objectMapper);
     final Map<String, Serializable> metadata = getMetadata("invalid-client-provider");
     final Map<String, Serializable> payload = getPayload();
-    assertThatThrownBy(() -> postTask.execute(transactionId, metadata, payload))
+    final var taskRequest = new TaskRequest(transactionId, metadata, payload);
+    assertThatThrownBy(() -> postTask.execute(taskRequest))
         .isInstanceOf(WorkflowException.class)
         .hasMessage("HTTP Client provider 'invalid-client-provider' not found");
   }

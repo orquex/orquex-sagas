@@ -19,7 +19,7 @@ public class DefaultCheckpointEventListenerHandler implements CheckpointEventLis
 
   public void handle(Checkpoint checkpoint) {
     log.trace(
-        "Received checkpoint for '{}' and correlation ID '{}' at stage '{}' with status '{}'",
+        "Listener Handler received checkpoint for '{}' and correlation ID '{}' at stage '{}' with status '{}'",
         checkpoint.flowId(),
         checkpoint.correlationId(),
         checkpoint.incoming().getName(),

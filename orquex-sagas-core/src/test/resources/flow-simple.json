@@ -28,5 +28,7 @@
     }
   },
   "configuration": {},
-  "metadata": {}
+  "metadata": {
+    "persist": true
+  }
 }

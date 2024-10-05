@@ -2,6 +2,7 @@ package co.orquex.sagas.sample.cs.promotion.task;
 
 import co.orquex.sagas.domain.api.TaskImplementation;
 import co.orquex.sagas.domain.exception.WorkflowException;
+import co.orquex.sagas.domain.task.TaskRequest;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.Serializable;
 import java.util.Map;
@@ -15,8 +16,9 @@ public class DiscountCalculatorTask implements TaskImplementation {
   private final ObjectMapper mapper;
 
   @Override
-  public Map<String, Serializable> execute(
-      String transactionId, Map<String, Serializable> metadata, Map<String, Serializable> payload) {
+  public Map<String, Serializable> execute(TaskRequest taskRequest) {
+    final var metadata = taskRequest.metadata();
+    final var payload = taskRequest.payload();
     final var hasSize = payload.containsKey("size");
     final var hasReferences = metadata.containsKey("references");
     if (hasReferences && hasSize) {

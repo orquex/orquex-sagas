@@ -4,6 +4,7 @@ import static co.orquex.sagas.task.groovy.TaskConstant.*;
 
 import co.orquex.sagas.domain.api.TaskImplementation;
 import co.orquex.sagas.domain.exception.WorkflowException;
+import co.orquex.sagas.domain.task.TaskRequest;
 import java.io.Serializable;
 import java.util.Base64;
 import java.util.HashMap;
@@ -21,10 +22,12 @@ public class GroovyActivity implements TaskImplementation {
   public static final String SCRIPT = "__script";
 
   @Override
-  public Map<String, Serializable> execute(
-      String transactionId, Map<String, Serializable> metadata, Map<String, Serializable> payload) {
+  public Map<String, Serializable> execute(TaskRequest taskRequest) {
 
     try {
+      final var metadata = taskRequest.metadata();
+      final var payload = taskRequest.payload();
+
       if (!metadata.containsKey(SCRIPT)) throw new WorkflowException("script not found");
 
       final var ctx = new HashMap<String, Serializable>();

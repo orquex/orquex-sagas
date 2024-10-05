@@ -30,6 +30,7 @@ import lombok.*;
  * @see Activity
  * @see Evaluation
  */
+@ToString(of = {"type", "id", "name"})
 @Getter
 public sealed class Stage implements Serializable permits Activity, Evaluation {
 
