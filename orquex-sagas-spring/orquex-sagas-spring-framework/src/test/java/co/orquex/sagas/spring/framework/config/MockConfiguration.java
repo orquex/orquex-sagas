@@ -2,6 +2,7 @@ package co.orquex.sagas.spring.framework.config;
 
 import static org.mockito.Mockito.when;
 
+import co.orquex.sagas.domain.api.context.GlobalContext;
 import co.orquex.sagas.domain.api.repository.FlowRepository;
 import co.orquex.sagas.domain.api.repository.TaskRepository;
 import co.orquex.sagas.domain.api.repository.TransactionRepository;
@@ -42,5 +43,10 @@ public class MockConfiguration {
   @Bean
   ObjectMapper objectMapper() {
     return Mockito.mock(ObjectMapper.class);
+  }
+
+  @Bean
+  GlobalContext globalContext() {
+    return Mockito.mock(GlobalContext.class);
   }
 }

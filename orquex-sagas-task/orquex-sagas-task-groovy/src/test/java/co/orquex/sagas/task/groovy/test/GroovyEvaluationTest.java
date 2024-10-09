@@ -7,6 +7,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import co.orquex.sagas.domain.exception.WorkflowException;
 import co.orquex.sagas.domain.task.TaskRequest;
 import co.orquex.sagas.task.groovy.GroovyEvaluation;
+import co.orquex.sagas.task.groovy.test.fixture.TestGroovyGlobalContext;
 import java.io.Serializable;
 import java.util.Collections;
 import java.util.Map;
@@ -21,7 +22,8 @@ class GroovyEvaluationTest {
 
   @BeforeAll
   static void beforeAll() {
-    groovyEvaluation = new GroovyEvaluation();
+    final var globalContext = new TestGroovyGlobalContext();
+    groovyEvaluation = new GroovyEvaluation(globalContext);
   }
 
   @Test

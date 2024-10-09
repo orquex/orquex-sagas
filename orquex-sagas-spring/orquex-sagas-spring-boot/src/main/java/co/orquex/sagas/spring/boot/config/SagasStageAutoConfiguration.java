@@ -11,7 +11,8 @@ import org.springframework.context.annotation.Import;
 @Import({
   SagasTaskConfiguration.class,
   SagasStageConfiguration.class,
-  SagasContextRefreshedListener.class
+  SagasContextRefreshedListener.class,
+  SagasGlobalContextConfiguration.class
 })
 @ConditionalOnProperty(
     prefix = "orquex.sagas.spring.stage",

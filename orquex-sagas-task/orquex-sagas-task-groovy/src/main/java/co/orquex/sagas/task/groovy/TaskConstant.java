@@ -9,5 +9,5 @@ public final class TaskConstant {
   public static final String METADATA = "metadata";
   public static final String PAYLOAD = "payload";
   public static final String CONTEXT = "context";
-
+  public static final String RESPONSE = "response";
 }

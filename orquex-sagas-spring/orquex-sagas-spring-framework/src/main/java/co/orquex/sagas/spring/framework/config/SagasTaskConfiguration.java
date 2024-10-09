@@ -1,6 +1,7 @@
 package co.orquex.sagas.spring.framework.config;
 
 import co.orquex.sagas.domain.api.TaskImplementation;
+import co.orquex.sagas.domain.api.context.GlobalContext;
 import co.orquex.sagas.task.groovy.GroovyActivity;
 import co.orquex.sagas.task.groovy.GroovyEvaluation;
 import co.orquex.sagas.task.http.api.HttpClientProvider;
@@ -19,13 +20,13 @@ import org.springframework.context.annotation.Configuration;
 public class SagasTaskConfiguration {
 
   @Bean
-  public TaskImplementation groovyActivity() {
-    return new GroovyActivity();
+  public TaskImplementation groovyActivity(GlobalContext globalContext) {
+    return new GroovyActivity(globalContext);
   }
 
   @Bean
-  public TaskImplementation groovyEvaluation() {
-    return new GroovyEvaluation();
+  public TaskImplementation groovyEvaluation(GlobalContext globalContext) {
+    return new GroovyEvaluation(globalContext);
   }
 
   @Bean
