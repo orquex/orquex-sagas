@@ -53,9 +53,9 @@ public final class Evaluation extends Stage {
     this.evaluationTask =
         checkArgumentNotNull(
             evaluationTask,
-            "evaluation '%s' requires an evaluation task".formatted(super.getName()));
-    this.conditions = checkArgumentNotEmpty(conditions, "evaluation's conditions required");
+            "Evaluation '%s' requires an evaluation task".formatted(super.getName()));
+    this.conditions = checkArgumentNotEmpty(conditions, "Evaluation's conditions required");
     this.defaultOutgoing =
-        checkArgumentNotEmpty(defaultOutgoing, "evaluation's default outgoing required");
+        checkArgumentNotEmpty(defaultOutgoing, "Evaluation's default outgoing required");
   }
 }

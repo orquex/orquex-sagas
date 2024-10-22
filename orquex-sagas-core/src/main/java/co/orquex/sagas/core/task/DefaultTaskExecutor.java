@@ -26,7 +26,7 @@ public class DefaultTaskExecutor implements TaskExecutor {
             .orElseThrow(
                 () ->
                     new WorkflowException(
-                        "Task '" + task.implementation() + "'implementation not found"));
+                        "Task '%s' implementation not found".formatted(task.implementation())));
     final var taskRequest =
         new TaskRequest(transactionId, executionRequest.metadata(), executionRequest.payload());
     return implementation.execute(taskRequest);

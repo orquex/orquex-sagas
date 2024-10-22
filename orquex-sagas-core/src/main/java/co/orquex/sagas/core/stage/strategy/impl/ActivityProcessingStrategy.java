@@ -114,7 +114,7 @@ public class ActivityProcessingStrategy extends AbstractStageProcessingStrategy<
   }
 
   /**
-   * Handles the execution of an activity task in a sequential manner.
+   * Handles the execution of an activity task sequentially.
    *
    * @param allOrNothing A flag indicating whether all tasks should be executed or none.
    * @param transactionId The ID of the transaction.
