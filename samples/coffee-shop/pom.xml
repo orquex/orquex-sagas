@@ -15,7 +15,6 @@
     <packaging>pom</packaging>
 
     <modules>
-        <module>coffee-shop-stage-starter</module>
         <module>coffee-shop-api</module>
         <module>coffee-shop-promotion</module>
         <module>coffee-shop-service</module>

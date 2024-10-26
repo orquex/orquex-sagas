@@ -17,7 +17,7 @@ import org.junit.jupiter.api.Test;
 @WireMockTest(httpPort = 7001)
 class OkHttpGetActivityTest {
 
-  static ObjectMapper objectMapper = new ObjectMapper();
+  static final ObjectMapper objectMapper = new ObjectMapper();
   static Map<String, Serializable> metadata;
   static Map<String, Serializable> payload;
   static Serializable headers;

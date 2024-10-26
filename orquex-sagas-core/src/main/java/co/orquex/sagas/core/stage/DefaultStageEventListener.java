@@ -10,6 +10,10 @@ import co.orquex.sagas.domain.api.registry.Registry;
 import co.orquex.sagas.domain.stage.StageRequest;
 import lombok.extern.slf4j.Slf4j;
 
+/**
+ * Default implementation of the {@link EventListener} interface for handling stage requests and
+ * executing with the appropriate stage executor.
+ */
 @Slf4j
 public class DefaultStageEventListener implements EventListener<StageRequest> {
 

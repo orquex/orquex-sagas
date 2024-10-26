@@ -1,17 +1,15 @@
 package co.orquex.sagas.core.stage.strategy.impl;
 
-import co.orquex.sagas.core.event.WorkflowEventPublisher;
 import co.orquex.sagas.domain.api.TaskExecutor;
-import co.orquex.sagas.domain.execution.ExecutionRequest;
 import co.orquex.sagas.domain.api.registry.Registry;
 import co.orquex.sagas.domain.api.repository.TaskRepository;
+import co.orquex.sagas.domain.execution.ExecutionRequest;
 import co.orquex.sagas.domain.stage.Condition;
 import co.orquex.sagas.domain.stage.Evaluation;
 import co.orquex.sagas.domain.stage.EvaluationTask;
+import co.orquex.sagas.domain.stage.StageResponse;
 import java.io.Serializable;
 import java.util.Map;
-
-import co.orquex.sagas.domain.stage.StageResponse;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -31,13 +29,11 @@ public class EvaluationProcessingStrategy extends AbstractStageProcessingStrateg
    *
    * @param taskExecutorRegistry Registry of task executors.
    * @param taskRepository Repository for tasks.
-   * @param eventPublisher Publisher for workflow events.
    */
   public EvaluationProcessingStrategy(
       Registry<TaskExecutor> taskExecutorRegistry,
-      TaskRepository taskRepository,
-      WorkflowEventPublisher eventPublisher) {
-    super(taskExecutorRegistry, taskRepository, eventPublisher);
+      TaskRepository taskRepository) {
+    super(taskExecutorRegistry, taskRepository);
   }
 
   /**

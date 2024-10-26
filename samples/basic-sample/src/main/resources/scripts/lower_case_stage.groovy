@@ -1,1 +1,1 @@
-context.put("user", payload.user.name.toLowerCase());
+context.put("user", payload.user.name.toLowerCase())

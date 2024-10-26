@@ -23,8 +23,8 @@ class SagasWorkflowAutoConfigurationTest {
   @Autowired ApplicationContext applicationContext;
 
   @Test
-  void shouldLoadStageConfiguration() {
+  void shouldLoadWorkflowConfiguration() {
     assertThat(applicationContext.getBean("workflowExecutor")).isNotNull();
-    assertThat(applicationContext.getBean("workflowStageExecutor")).isNotNull();
+    assertThat(applicationContext.getBean("asyncWorkflowStageExecutor")).isNotNull();
   }
 }

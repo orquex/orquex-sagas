@@ -11,16 +11,24 @@ public class SagasConfigurationProperties {
 
   private WorkflowConfiguration workflow;
   private StageConfiguration stage;
+  private EventConfiguration event;
 
   @Getter
   @Setter
   static class WorkflowConfiguration {
-    private boolean enabled;
+    private boolean enabled = true;
   }
 
   @Getter
   @Setter
   static class StageConfiguration {
-    private boolean enabled;
+    private boolean enabled = true;
+  }
+
+  @Getter
+  @Setter
+  static class EventConfiguration {
+    private boolean enabled = true;
+    private boolean defaultCheckpointEventListener = true;
   }
 }

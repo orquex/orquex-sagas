@@ -8,6 +8,8 @@ spring:
     producer.value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
     consumer:
       value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      group-id: coffee-shop-promotion
+      auto-offset-reset: earliest
 logging:
   level:
     root: error
@@ -15,5 +17,7 @@ logging:
 orquex:
   sagas:
     spring:
-      stage:
-        enabled: true
+      workflow:
+        enabled: false
+      event:
+        default-checkpoint-event-listener: false

@@ -33,7 +33,7 @@ mvn clean install
 == Tasks integrations
 
 * link:./orquex-sagas-task/orquex-sagas-task-groovy[orquex-sagas-task-groovy]
-* link:./orquex-sagas-task/orquex-sagas-task-okhttp[orquex-sagas-task-okhttp]
+* link:./orquex-sagas-task/orquex-sagas-task-http/orquex-sagas-task-okhttp[orquex-sagas-task-okhttp]
 
 == Documentation
 

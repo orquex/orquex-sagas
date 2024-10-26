@@ -10,7 +10,13 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 @ExtendWith(SpringExtension.class)
-@ContextConfiguration(classes = {SagasStageConfiguration.class, MockConfiguration.class})
+@ContextConfiguration(
+    classes = {
+      SagasStageConfiguration.class,
+      SagasRegistryConfiguration.class,
+      SagasWorkflowEventPublisherConfiguration.class,
+      MockRepositoryConfiguration.class
+    })
 class SagasStageConfigurationTest {
 
   @Autowired ApplicationContext applicationContext;
@@ -18,11 +24,8 @@ class SagasStageConfigurationTest {
   @Test
   void shouldLoadStageConfiguration() {
     assertThat(applicationContext.getBean("defaultStageExecutor")).isNotNull();
-    assertThat(applicationContext.getBean("defaultTaskImplementationRegistry")).isNotNull();
     assertThat(applicationContext.getBean("defaultTaskExecutorRegistry")).isNotNull();
-    assertThat(applicationContext.getBean("defaultStageEventListener")).isNotNull();
-    assertThat(applicationContext.getBean("defaultStageExecutor")).isNotNull();
+    assertThat(applicationContext.getBean("taskRepository")).isNotNull();
     assertThat(applicationContext.getBean("defaultWorkflowEventPublisher")).isNotNull();
-    assertThat(applicationContext.getBean("defaultEventManagerFactory")).isNotNull();
   }
 }

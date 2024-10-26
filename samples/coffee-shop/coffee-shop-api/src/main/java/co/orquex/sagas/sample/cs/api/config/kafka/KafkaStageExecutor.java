@@ -2,6 +2,7 @@ package co.orquex.sagas.sample.cs.api.config.kafka;
 
 import co.orquex.sagas.domain.api.StageExecutor;
 import co.orquex.sagas.domain.stage.StageRequest;
+import co.orquex.sagas.domain.stage.StageResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.core.KafkaTemplate;
@@ -16,7 +17,7 @@ public class KafkaStageExecutor implements StageExecutor {
   private final KafkaTemplate<String, StageRequest> template;
 
   @Override
-  public void execute(StageRequest stageRequest) {
+  public StageResponse execute(StageRequest stageRequest) {
     // Assuming that values never comes null
     final var stage = stageRequest.stage();
     final var config = stage.getConfiguration();
@@ -27,6 +28,7 @@ public class KafkaStageExecutor implements StageExecutor {
           .send(topic, stageRequest.transactionId(), stageRequest)
           .thenAccept(result -> log.debug("Stage '{}' sent to topic '{}'", stage.getName(), topic));
     }
+    return new StageResponse(stageRequest.transactionId());
   }
 
   @Override

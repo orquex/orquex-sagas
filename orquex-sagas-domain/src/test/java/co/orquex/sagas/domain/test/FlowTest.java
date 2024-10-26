@@ -16,14 +16,14 @@ import java.util.HashMap;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
-public class FlowTest {
+class FlowTest {
 
-  public static final String FLOW_ID = "flow-simple";
-  public static final String FLOW_NAME = "Simple Flow";
-  public static final String INITIAL_STAGE = "evaluation-impl";
-  public static final HashMap<String, Serializable> METADATA = new HashMap<>();
-  public static final FlowConfiguration CONFIGURATION = new FlowConfiguration();
-  public static HashMap<String, Stage> stages = new HashMap<>();
+  static final String FLOW_ID = "flow-simple";
+  static final String FLOW_NAME = "Simple Flow";
+  static final String INITIAL_STAGE = "evaluation-impl";
+  static final HashMap<String, Serializable> METADATA = new HashMap<>();
+  static final FlowConfiguration CONFIGURATION = new FlowConfiguration();
+  static final HashMap<String, Stage> stages = new HashMap<>();
 
   @BeforeAll
   static void beforeAll() {
@@ -45,7 +45,9 @@ public class FlowTest {
             assertThat(flow.configuration())
                 .isNotNull()
                 .matches(flowConfiguration -> flowConfiguration.timeout().equals(DEFAULT_TIMEOUT))
-                .matches(flowConfiguration -> flowConfiguration.allOrNothing() == DEFAULT_ALL_OR_NOTHING));
+                .matches(
+                    flowConfiguration ->
+                        flowConfiguration.allOrNothing() == DEFAULT_ALL_OR_NOTHING));
   }
 
   @Test
@@ -62,7 +64,9 @@ public class FlowTest {
             assertThat(flow.configuration())
                 .isNotNull()
                 .matches(flowConfiguration -> flowConfiguration.timeout().equals(DEFAULT_TIMEOUT))
-                .matches(flowConfiguration -> flowConfiguration.allOrNothing() == DEFAULT_ALL_OR_NOTHING));
+                .matches(
+                    flowConfiguration ->
+                        flowConfiguration.allOrNothing() == DEFAULT_ALL_OR_NOTHING));
   }
 
   @Test

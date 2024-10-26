@@ -1,1 +1,1 @@
-context.put("user", payload.user.name.toUpperCase());
+context.put("user", payload.user.name.toUpperCase())

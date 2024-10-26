@@ -41,14 +41,10 @@ public class GroovyActivity implements TaskImplementation {
       final var context =
           new SimpleBindings(
               Map.of(
-                  METADATA,
-                  metadata,
-                  PAYLOAD,
-                  payload,
-                  CONTEXT,
-                  transactionContext,
-                  RESPONSE,
-                  response));
+                  METADATA, metadata,
+                  PAYLOAD, payload,
+                  CONTEXT, transactionContext,
+                  RESPONSE, response));
       groovyScriptEngine.eval(script, context);
       return response;
     } catch (IllegalArgumentException e) {

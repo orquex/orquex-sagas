@@ -2,9 +2,7 @@ package co.orquex.sagas.spring.framework.config.event;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import co.orquex.sagas.spring.framework.config.MockConfiguration;
-import co.orquex.sagas.spring.framework.config.SagasStageConfiguration;
-import co.orquex.sagas.spring.framework.config.SagasWorkflowConfiguration;
+import co.orquex.sagas.spring.framework.config.*;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,10 +13,12 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(
     classes = {
-      SagasStageConfiguration.class,
-      SagasWorkflowConfiguration.class,
+      SagasAsyncWorkflowConfiguration.class,
+      SagasAsyncStageConfiguration.class,
+      SagasWorkflowEventPublisherConfiguration.class,
+      SagasRegistryConfiguration.class,
+      MockRepositoryConfiguration.class,
       SagasEventListenerConfiguration.class,
-      MockConfiguration.class
     })
 class SagasEventListenerConfigurationTest {
 
@@ -26,7 +26,6 @@ class SagasEventListenerConfigurationTest {
 
   @Test
   void shouldLoadTaskConfiguration() {
-    assertThat(applicationContext.getBean("defaultCheckpointEventListener")).isNotNull();
-    assertThat(applicationContext.getBean("defaultCheckpointEventListenerHandler")).isNotNull();
+    assertThat(applicationContext.getBean("defaultStageEventListener")).isNotNull();
   }
 }

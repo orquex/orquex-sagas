@@ -27,11 +27,14 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class ActivityProcessingStrategy extends AbstractStageProcessingStrategy<Activity> {
 
+  protected final WorkflowEventPublisher eventPublisher;
+
   public ActivityProcessingStrategy(
       Registry<TaskExecutor> taskExecutorRegistry,
       TaskRepository taskRepository,
       WorkflowEventPublisher eventPublisher) {
-    super(taskExecutorRegistry, taskRepository, eventPublisher);
+    super(taskExecutorRegistry, taskRepository);
+    this.eventPublisher = eventPublisher;
   }
 
   /**

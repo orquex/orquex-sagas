@@ -24,10 +24,15 @@ import lombok.Builder;
  * @see StageRequest
  */
 @Builder
-public record StageResponse(String transactionId, Map<String, Serializable> payload, String outgoing) implements Serializable {
+public record StageResponse(
+    String transactionId, Map<String, Serializable> payload, String outgoing)
+    implements Serializable {
 
   public StageResponse {
     payload = checkArgumentNotNullOrElse(payload, new HashMap<>());
   }
 
+  public StageResponse(String transactionId) {
+    this(transactionId, null, null);
+  }
 }

@@ -5,6 +5,6 @@ import co.orquex.sagas.domain.task.Task;
 public final class TaskFixture {
 
     public static Task getTask(String id) {
-        return new Task(id, null, id, null, null, null);
+        return new Task(id, id, id, null, null, null);
     }
 }

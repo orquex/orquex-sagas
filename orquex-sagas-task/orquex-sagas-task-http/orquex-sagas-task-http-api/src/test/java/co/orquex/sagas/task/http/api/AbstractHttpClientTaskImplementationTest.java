@@ -23,10 +23,10 @@ import org.mockito.junit.jupiter.MockitoExtension;
 @ExtendWith(MockitoExtension.class)
 class AbstractHttpClientTaskImplementationTest {
 
-  static String transactionId = UUID.randomUUID().toString();
-  ObjectMapper objectMapper = new ObjectMapper();
+  static final String TRANSACTION_ID = UUID.randomUUID().toString();
+  static final ObjectMapper objectMapper = new ObjectMapper();
   HttpClientProviderRegistry<TestHttpClient> registry;
-  @Mock private TestHttpResponse httpResponse;
+  @Mock TestHttpResponse httpResponse;
 
   @BeforeEach
   void setUp() {
@@ -39,7 +39,7 @@ class AbstractHttpClientTaskImplementationTest {
     final var postTask = new TestHttpPostTask(registry, objectMapper);
     final Map<String, Serializable> metadata = getMetadata(HTTP_CLIENT_PROVIDER_TEST);
     final Map<String, Serializable> payload = getPayload();
-    final var taskRequest = new TaskRequest(transactionId, metadata, payload);
+    final var taskRequest = new TaskRequest(TRANSACTION_ID, metadata, payload);
     final var response = postTask.execute(taskRequest);
     assertThat(response).isNotEmpty().hasSize(3);
   }
@@ -49,7 +49,7 @@ class AbstractHttpClientTaskImplementationTest {
     final var postTask = new TestHttpPostTask(registry, objectMapper);
     final Map<String, Serializable> metadata = new HashMap<>();
     final Map<String, Serializable> payload = getPayload();
-    final var taskRequest = new TaskRequest(transactionId, metadata, payload);
+    final var taskRequest = new TaskRequest(TRANSACTION_ID, metadata, payload);
     assertThatThrownBy(() -> postTask.execute(taskRequest))
         .isInstanceOf(WorkflowException.class)
         .hasMessage("HttpActivityMetadata deserialization error, check required fields");
@@ -60,7 +60,7 @@ class AbstractHttpClientTaskImplementationTest {
     final var postTask = new TestHttpPostTask(registry, objectMapper);
     final Map<String, Serializable> metadata = getMetadata("invalid-client-provider");
     final Map<String, Serializable> payload = getPayload();
-    final var taskRequest = new TaskRequest(transactionId, metadata, payload);
+    final var taskRequest = new TaskRequest(TRANSACTION_ID, metadata, payload);
     assertThatThrownBy(() -> postTask.execute(taskRequest))
         .isInstanceOf(WorkflowException.class)
         .hasMessage("HTTP Client provider 'invalid-client-provider' not found");

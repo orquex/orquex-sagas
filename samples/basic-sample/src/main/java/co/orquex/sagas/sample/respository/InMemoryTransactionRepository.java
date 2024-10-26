@@ -16,6 +16,7 @@ public class InMemoryTransactionRepository implements TransactionRepository {
   @Override
   public boolean existsByFlowIdAndCorrelationId(String flowId, String correlationId) {
     final var key = Objects.hash(flowId, correlationId);
+
     return Optional.ofNullable(transactions.get(key)).isPresent();
   }
 

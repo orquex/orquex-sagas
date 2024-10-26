@@ -12,13 +12,13 @@
           "preProcessor": {
             "task": "default-groovy-activity",
             "metadata": {
-              "__script": "ZGVmIHJlcXVlc3QgPSBbCiAgICB1cmw6IG1ldGFkYXRhLl9fdXJsICsgIi8iICsgcGF5bG9hZC51c2VyLmlkCl0KY29udGV4dC5wdXRBbGwocmVxdWVzdCkK"
+              "__script": "ZGVmIHJlcXVlc3QgPSBbCiAgICB1cmw6IG1ldGFkYXRhLl9fdXJsICsgIi8iICsgcGF5bG9hZC51c2VyLmlkCl0KcmVzcG9uc2UucHV0QWxsKHJlcXVlc3QpCg=="
             }
           },
           "postProcessor": {
             "task": "default-groovy-activity",
             "metadata": {
-              "__script": "ZGVmIHJlcXVlc3QgPSBbCiAgICB1c2VyOiBwYXlsb2FkLmJvZHkKXQpjb250ZXh0LnB1dEFsbChyZXF1ZXN0KQo="
+              "__script": "ZGVmIHJlcXVlc3QgPSBbCiAgICB1c2VyOiBwYXlsb2FkLmJvZHkKXQpyZXNwb25zZS5wdXRBbGwocmVxdWVzdCkK"
             }
           },
           "metadata": {
@@ -63,7 +63,7 @@
         {
           "task": "default-groovy-activity",
           "metadata": {
-            "__script": "Y29udGV4dC5wdXQoInVzZXIiLCBwYXlsb2FkLnVzZXIubmFtZS50b1VwcGVyQ2FzZSgpKTs="
+            "__script": "cmVzcG9uc2UucHV0KCJ1c2VyIiwgcGF5bG9hZC51c2VyLm5hbWUudG9VcHBlckNhc2UoKSk7"
           }
         }
       ],
@@ -76,7 +76,7 @@
         {
           "task": "default-groovy-activity",
           "metadata": {
-            "__script": "Y29udGV4dC5wdXQoInVzZXIiLCBwYXlsb2FkLnVzZXIubmFtZS50b0xvd2VyQ2FzZSgpKTs="
+            "__script": "cmVzcG9uc2UucHV0KCJ1c2VyIiwgcGF5bG9hZC51c2VyLm5hbWUudG9Mb3dlckNhc2UoKSk7"
           }
         }
       ],
@@ -89,7 +89,7 @@
         {
           "task": "default-groovy-activity",
           "metadata": {
-            "__script": "Y29udGV4dC5wdXQoInJlc3VsdCIsIHBheWxvYWQudXNlci5zcGxpdCgnXFxzJykpOw=="
+            "__script": "cmVzcG9uc2UucHV0KCJyZXN1bHQiLCBwYXlsb2FkLnVzZXIuc3BsaXQoJ1xccycpKTs="
           }
         }
       ]

@@ -48,7 +48,7 @@ class ActivityProcessingStrategyTest {
 
   @BeforeEach
   void setUp() {
-    // Create an event manager factory to check if the message are published.
+    // Create an event manager factory to check if the message is published.
     final var eventManagerFactory = EventManagerFactoryFixture.getEventManagerFactory();
     compensationEventListenerFixture = new EventListenerFixture<>();
     eventManagerFactory

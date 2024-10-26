@@ -20,10 +20,10 @@ class SagasStageAutoConfigurationTest {
   @Test
   void shouldLoadStageConfiguration() {
     assertThat(applicationContext.getBean("defaultStageExecutor")).isNotNull();
+    assertThat(applicationContext.getBean("defaultAsyncStageExecutor")).isNotNull();
     assertThat(applicationContext.getBean("defaultTaskImplementationRegistry")).isNotNull();
     assertThat(applicationContext.getBean("defaultTaskExecutorRegistry")).isNotNull();
-    assertThat(applicationContext.getBean("defaultStageEventListener")).isNotNull();
-    assertThat(applicationContext.getBean("defaultStageExecutor")).isNotNull();
+    assertThat(applicationContext.getBean("defaultStageExecutorRegistry")).isNotNull();
     assertThat(applicationContext.getBean("defaultWorkflowEventPublisher")).isNotNull();
     assertThat(applicationContext.getBean("defaultEventManagerFactory")).isNotNull();
   }

@@ -1,34 +1,33 @@
 {
   "id": "flow-simple",
   "name": "Simple Flow",
-  "initialStage": "evaluation-impl",
+  "initialStage": "evaluation-stage",
   "stages": {
-    "activity-impl": {
+    "activity-stage": {
       "type": "activity",
-      "name": "Simple Activity",
       "activityTasks": [
         {
-          "task": "task-impl-id"
+          "task": "default-activity"
         }
       ],
-      "outgoing": "outgoing-test"
+      "outgoing": null
     },
-    "evaluation-impl": {
+    "evaluation-stage": {
       "type": "evaluation",
       "evaluationTask": {
-        "task": "default-groovy-evaluator"
+        "task": "default-evaluator"
       },
       "conditions": [
         {
-          "expression": "MSA9PSAxCg==",
+          "expression": "true",
           "outgoing": "activity-impl"
         }
       ],
       "defaultOutgoing": "activity-impl"
     }
   },
-  "configuration": {},
-  "metadata": {
-    "persist": true
+  "metadata": {},
+  "configuration": {
+    "timeout": "PT1S"
   }
 }

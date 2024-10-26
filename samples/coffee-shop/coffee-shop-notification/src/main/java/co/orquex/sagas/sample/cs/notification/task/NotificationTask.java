@@ -1,7 +1,6 @@
 package co.orquex.sagas.sample.cs.notification.task;
 
 import co.orquex.sagas.domain.api.TaskImplementation;
-import co.orquex.sagas.domain.exception.WorkflowException;
 import co.orquex.sagas.domain.task.TaskRequest;
 import java.io.Serializable;
 import java.util.Map;
@@ -16,14 +15,17 @@ public class NotificationTask implements TaskImplementation {
 
   @Override
   public Map<String, Serializable> execute(TaskRequest taskRequest) {
-    final var hasNotification = taskRequest.metadata().containsKey("notification");
+    final var metaNotification = taskRequest.metadata().get("notification");
 
-    if (hasNotification) {
-      log.info("Notification sent successfully");
-      return taskRequest.payload();
+    if (metaNotification instanceof Boolean notification) {
+      if (Boolean.TRUE.equals(notification)) {
+        log.info("Notification sent successfully");
+      } else {
+        log.warn("Notification not sent");
+      }
     }
 
-    throw new WorkflowException("Notification checkout failed");
+    return taskRequest.payload();
   }
 
   @Override

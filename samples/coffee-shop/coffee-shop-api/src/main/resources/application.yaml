@@ -14,5 +14,6 @@ logging:
 orquex:
   sagas:
     spring:
-      workflow:
+      event:
         enabled: true
+        default-checkpoint-event-listener: false

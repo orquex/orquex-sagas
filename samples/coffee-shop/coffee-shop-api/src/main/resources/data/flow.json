@@ -15,7 +15,10 @@
           "outgoing": "coffee-shop-promotion"
         }
       ],
-      "defaultOutgoing": "coffee-shop-service"
+      "defaultOutgoing": "coffee-shop-service",
+      "metadata": {
+        "test": "some value"
+      }
     },
     "coffee-shop-promotion": {
       "type": "activity",

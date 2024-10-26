@@ -1,6 +1,6 @@
 package co.orquex.sagas.sample.cs.api.controller;
 
-import co.orquex.sagas.core.flow.WorkflowExecutor;
+import co.orquex.sagas.core.flow.AsyncWorkflowExecutor;
 import co.orquex.sagas.domain.execution.ExecutionRequest;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class OrderController {
 
-  private final WorkflowExecutor workflowExecutor;
+  private final AsyncWorkflowExecutor workflowExecutor;
 
   @PostMapping("/orders")
   public ResponseEntity<Map<String, String>> createOrder(@RequestBody ExecutionRequest request) {

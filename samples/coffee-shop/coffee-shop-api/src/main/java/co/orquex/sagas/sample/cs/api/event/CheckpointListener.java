@@ -36,8 +36,5 @@ public class CheckpointListener implements EventListener<Checkpoint> {
         checkpoint.correlationId(),
         checkpoint.incoming().getName());
     eventPublisher.publishEvent(new CheckpointEventMessage(eventMessage));
-    // Check with circuit breaker
-    // Check retry
-    // Check timeout
   }
 }

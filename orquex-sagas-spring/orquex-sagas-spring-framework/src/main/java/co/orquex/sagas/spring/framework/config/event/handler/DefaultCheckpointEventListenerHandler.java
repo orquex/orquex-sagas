@@ -2,20 +2,21 @@ package co.orquex.sagas.spring.framework.config.event.handler;
 
 import static java.util.Objects.nonNull;
 
-import co.orquex.sagas.core.flow.WorkflowStageExecutor;
+import co.orquex.sagas.core.flow.AsyncWorkflowStageExecutor;
 import co.orquex.sagas.domain.transaction.Checkpoint;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 /**
  * Default implementation of {@link CheckpointEventListenerHandler} that handles the different
- * status of a {@link Checkpoint}.
+ * status of a {@link Checkpoint} and executes the next stage when there's an outgoing and the
+ * previous one was completed.
  */
 @Slf4j
 @RequiredArgsConstructor
 public class DefaultCheckpointEventListenerHandler implements CheckpointEventListenerHandler {
 
-  private final WorkflowStageExecutor workflowStageExecutor;
+  private final AsyncWorkflowStageExecutor workflowStageExecutor;
 
   public void handle(Checkpoint checkpoint) {
     log.trace(

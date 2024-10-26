@@ -5,4 +5,4 @@ spring:
 logging:
   level:
     root: info
-    co.orquex.sagas: info
+    co.orquex.sagas: debug

@@ -20,7 +20,7 @@ import java.time.Duration;
  * }
  * </pre>
  *
- * @param timeout the flow timeout, by default is 1 minute.
+ * @param timeout the flow timeout, by default, is 1 minute.
  * @param allOrNothing the all-or-nothing flag
  */
 public record FlowConfiguration(Duration timeout, boolean allOrNothing) implements Serializable {

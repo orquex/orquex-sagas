@@ -14,12 +14,12 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class NotificationStageExecutor {
 
-  private final StageExecutor stageExecutor;
+  private final StageExecutor defaultAsyncStageExecutor;
   private final ObjectMapper objectMapper;
 
   @KafkaListener(id = "notification-listener", topics = "coffee.shop.stage.notification")
   public void listen(String request) throws JsonProcessingException {
     final var stageRequest = objectMapper.readValue(request, StageRequest.class);
-    stageExecutor.execute(stageRequest);
+    defaultAsyncStageExecutor.execute(stageRequest);
   }
 }

@@ -4,15 +4,15 @@ import co.orquex.sagas.domain.version.OrquexSagasVersion;
 import java.io.Serial;
 import java.io.Serializable;
 import java.time.Instant;
-import lombok.Builder;
 import lombok.Getter;
+import lombok.Setter;
 
 /**
  * The Transaction encapsulates the status of a flow, including its unique identifiers, data, and
  * timestamps.
  */
 @Getter
-@Builder
+@Setter
 public class Transaction implements Serializable {
 
   @Serial private static final long serialVersionUID = OrquexSagasVersion.SERIAL_VERSION;

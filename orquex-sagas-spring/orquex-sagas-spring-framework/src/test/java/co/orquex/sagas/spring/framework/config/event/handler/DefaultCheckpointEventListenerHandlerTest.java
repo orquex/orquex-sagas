@@ -3,7 +3,7 @@ package co.orquex.sagas.spring.framework.config.event.handler;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
-import co.orquex.sagas.core.flow.WorkflowStageExecutor;
+import co.orquex.sagas.core.flow.AsyncWorkflowStageExecutor;
 import co.orquex.sagas.domain.stage.Activity;
 import co.orquex.sagas.domain.stage.ActivityTask;
 import co.orquex.sagas.domain.stage.StageConfiguration;
@@ -21,7 +21,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 @ExtendWith(MockitoExtension.class)
 class DefaultCheckpointEventListenerHandlerTest {
 
-  @Mock WorkflowStageExecutor workflowStageExecutor;
+  @Mock
+  AsyncWorkflowStageExecutor workflowStageExecutor;
 
   @InjectMocks DefaultCheckpointEventListenerHandler checkpointEventListenerHandler;
 

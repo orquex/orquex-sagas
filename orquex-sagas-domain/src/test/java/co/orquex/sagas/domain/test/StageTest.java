@@ -82,7 +82,7 @@ class StageTest {
     assertThatThrownBy(
             () -> new Evaluation(null, null, null, null, evaluationTask, null, "default-outgoing"))
         .isInstanceOf(IllegalArgumentException.class)
-        .hasMessage("evaluation's conditions required");
+        .hasMessage("Evaluation's conditions required");
   }
 
   @Test
@@ -94,7 +94,7 @@ class StageTest {
                 new Evaluation(
                     null, null, null, null, evaluationTask, conditions, "default-outgoing"))
         .isInstanceOf(IllegalArgumentException.class)
-        .hasMessage("evaluation's conditions required");
+        .hasMessage("Evaluation's conditions required");
   }
 
   @ParameterizedTest(name = "#{index} - Run test with args=''{0}''")
@@ -105,6 +105,6 @@ class StageTest {
     assertThatThrownBy(
             () -> new Evaluation(null, null, null, null, evaluationTask, null, defaultOutgoing))
         .isInstanceOf(IllegalArgumentException.class)
-        .hasMessage("evaluation's conditions required");
+        .hasMessage("Evaluation's conditions required");
   }
 }

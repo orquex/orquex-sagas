@@ -16,7 +16,7 @@ import lombok.Builder;
  * metadata, request and response data, and timestamps. It also includes the outgoing stage
  * identifier and the incoming stage.
  *
- * <p>Each execution of a stage will generate multiple checkpoints with different statuses, allowing
+ * <p>Each execution of a stage generates multiple checkpoints with different statuses, allowing
  * for tracking and auditing of the workflow.
  *
  * <p>JSON representation:
