@@ -6,6 +6,7 @@ package co.orquex.sagas.domain.transaction;
  * @see Transaction
  */
 public enum Status {
+  CREATED,
   IN_PROGRESS,
   CANCELED,
   COMPLETED,

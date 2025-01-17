@@ -4,21 +4,19 @@ import static co.orquex.sagas.core.fixture.ActivityFixture.getSimpleActivity;
 import static co.orquex.sagas.core.fixture.ActivityTaskFixture.getSimpleActivityTask;
 import static co.orquex.sagas.core.fixture.JacksonFixture.readValue;
 import static co.orquex.sagas.core.fixture.TaskFixture.getTask;
-import static co.orquex.sagas.core.fixture.WorkflowEventPublisherFixture.getWorkflowEventPublisher;
 import static co.orquex.sagas.domain.task.TaskConfiguration.DEFAULT_EXECUTOR;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import co.orquex.sagas.core.fixture.EventListenerFixture;
-import co.orquex.sagas.core.fixture.EventManagerFactoryFixture;
 import co.orquex.sagas.core.stage.strategy.impl.ActivityProcessingStrategy;
 import co.orquex.sagas.domain.api.TaskExecutor;
-import co.orquex.sagas.domain.exception.WorkflowException;
-import co.orquex.sagas.domain.execution.ExecutionRequest;
 import co.orquex.sagas.domain.api.registry.Registry;
 import co.orquex.sagas.domain.api.repository.TaskRepository;
+import co.orquex.sagas.domain.exception.WorkflowException;
+import co.orquex.sagas.domain.execution.ExecutionRequest;
 import co.orquex.sagas.domain.stage.Activity;
 import co.orquex.sagas.domain.task.Task;
 import co.orquex.sagas.domain.transaction.Compensation;
@@ -26,6 +24,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.function.Consumer;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -44,21 +43,13 @@ class ActivityProcessingStrategyTest {
   ActivityProcessingStrategy strategy;
   ExecutionRequest executionRequest;
   String transactionId;
-  EventListenerFixture<Compensation> compensationEventListenerFixture;
+
+  @Mock Consumer<Compensation> compensationConsumer;
 
   @BeforeEach
   void setUp() {
-    // Create an event manager factory to check if the message is published.
-    final var eventManagerFactory = EventManagerFactoryFixture.getEventManagerFactory();
-    compensationEventListenerFixture = new EventListenerFixture<>();
-    eventManagerFactory
-        .getEventManager(Compensation.class)
-        .addListener(compensationEventListenerFixture);
-    final var workflowEventPublisher = getWorkflowEventPublisher(eventManagerFactory);
-    // Initialize the strategy
     strategy =
-        new ActivityProcessingStrategy(
-            taskExecutorRegistry, taskRepository, workflowEventPublisher);
+        new ActivityProcessingStrategy(taskExecutorRegistry, taskRepository, compensationConsumer);
     executionRequest =
         new ExecutionRequest(UUID.randomUUID().toString(), UUID.randomUUID().toString());
     transactionId = UUID.randomUUID().toString();
@@ -87,7 +78,7 @@ class ActivityProcessingStrategyTest {
     var stageResponse = strategy.process(transactionId, activity, executionRequest);
     assertThat(stageResponse).isNotNull();
     assertThat(stageResponse.payload()).isNotNull().hasSize(1).containsEntry("post", "task");
-    assertThat(compensationEventListenerFixture.getSuccessMessages()).isNotNull().hasSize(1);
+    verify(compensationConsumer).accept(any(Compensation.class));
   }
 
   @Test
@@ -178,7 +169,7 @@ class ActivityProcessingStrategyTest {
                 getSimpleActivityTask("task-2"),
                 getSimpleActivityTask("task-3"),
                 getSimpleActivityTask("task-4")),
-                parallel,
+            parallel,
             false);
     final var stageResponse = strategy.process(transactionId, activity, executionRequest);
     assertThat(stageResponse).isNotNull();

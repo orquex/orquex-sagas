@@ -1,7 +1,5 @@
 package co.orquex.sagas.core.stage.strategy.impl;
 
-import co.orquex.sagas.core.event.WorkflowEventPublisher;
-import co.orquex.sagas.core.event.impl.EventMessage;
 import co.orquex.sagas.domain.api.TaskExecutor;
 import co.orquex.sagas.domain.api.registry.Registry;
 import co.orquex.sagas.domain.api.repository.TaskRepository;
@@ -11,11 +9,13 @@ import co.orquex.sagas.domain.stage.Activity;
 import co.orquex.sagas.domain.stage.ActivityTask;
 import co.orquex.sagas.domain.stage.StageResponse;
 import co.orquex.sagas.domain.transaction.Compensation;
+import co.orquex.sagas.domain.transaction.Status;
 import co.orquex.sagas.domain.utils.Maps;
 import java.io.Serializable;
 import java.time.Instant;
 import java.util.*;
 import java.util.concurrent.*;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import lombok.extern.slf4j.Slf4j;
@@ -27,14 +27,14 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class ActivityProcessingStrategy extends AbstractStageProcessingStrategy<Activity> {
 
-  protected final WorkflowEventPublisher eventPublisher;
+  private final Consumer<Compensation> compensationConsumer;
 
   public ActivityProcessingStrategy(
       Registry<TaskExecutor> taskExecutorRegistry,
       TaskRepository taskRepository,
-      WorkflowEventPublisher eventPublisher) {
+      Consumer<Compensation> compensationConsumer) {
     super(taskExecutorRegistry, taskRepository);
-    this.eventPublisher = eventPublisher;
+    this.compensationConsumer = compensationConsumer;
   }
 
   /**
@@ -185,7 +185,7 @@ public class ActivityProcessingStrategy extends AbstractStageProcessingStrategy<
     // Execute the task with the pre-processed payload
     final var taskResponse = executeTask(transactionId, activityTask.task(), executionRequest);
     // Publish the compensation's event once the task is executed
-    executeCompensation(transactionId, activityTask, executionRequest, taskResponse);
+    publishCompensation(transactionId, activityTask, executionRequest, taskResponse);
     // Post process the payload, generating a new one
     if (activityTask.postProcessor() != null) {
       return executeProcessor(
@@ -195,14 +195,14 @@ public class ActivityProcessingStrategy extends AbstractStageProcessingStrategy<
   }
 
   /**
-   * Executes the compensation for an activity task.
+   * Publish the compensation tasks of an executed activity.
    *
    * @param transactionId The ID of the transaction.
    * @param activityTask The activity task for which the compensation is to be executed.
    * @param executionRequest The execution request.
    * @param taskResponse The response of the task.
    */
-  private void executeCompensation(
+  private void publishCompensation(
       final String transactionId,
       final ActivityTask activityTask,
       final ExecutionRequest executionRequest,
@@ -211,15 +211,17 @@ public class ActivityProcessingStrategy extends AbstractStageProcessingStrategy<
     if (compensationProcessor != null) {
       final var metadata =
           Maps.merge(executionRequest.metadata(), compensationProcessor.metadata());
-      eventPublisher.publish(
-          new EventMessage<>(
-              new Compensation(
-                  transactionId,
-                  compensationProcessor.task(),
-                  metadata,
-                  executionRequest.payload(),
-                  taskResponse,
-                  Instant.now())));
+      compensationConsumer.accept(
+          new Compensation(
+              transactionId,
+              executionRequest.flowId(),
+              executionRequest.correlationId(),
+              compensationProcessor.task(),
+              metadata,
+              executionRequest.payload(),
+              taskResponse,
+              Status.CREATED,
+              Instant.now()));
     }
   }
 

@@ -88,13 +88,11 @@ abstract class AbstractWorkflowExecutor {
   }
 
   /**
-   * Complete the transaction by updating its status to {@code Status.COMPLETED}.
+   * Update the transaction in the repository.
    *
-   * @param transaction the transaction to be completed.
-   * @see Status#COMPLETED
+   * @param transaction the transaction to be updated.
    */
-  protected void completeTransaction(Transaction transaction) {
-    transaction.setStatus(Status.COMPLETED);
+  protected void updateTransaction(Transaction transaction) {
     transactionRepository.save(transaction);
   }
 }

@@ -51,9 +51,18 @@ public class GroovyActivity implements TaskImplementation {
       log.error(e.getMessage());
       throw new WorkflowException("Base64 script is invalid");
     } catch (ScriptException e) {
-      log.error(e.getMessage());
-      throw new WorkflowException(e.getMessage());
+      final var rootCause = getRootCause(e);
+      log.error(rootCause.getMessage());
+      throw new WorkflowException(rootCause.getMessage());
     }
+  }
+
+  public static Throwable getRootCause(Throwable throwable) {
+    Throwable rootCause = throwable;
+    while (rootCause.getCause() != null) {
+      rootCause = rootCause.getCause();
+    }
+    return rootCause;
   }
 
   @Override

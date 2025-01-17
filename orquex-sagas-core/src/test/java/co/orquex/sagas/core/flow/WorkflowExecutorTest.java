@@ -4,8 +4,10 @@ import static co.orquex.sagas.core.fixture.FlowFixture.getFlow;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import co.orquex.sagas.domain.api.CompensationExecutor;
 import co.orquex.sagas.domain.api.StageExecutor;
 import co.orquex.sagas.domain.api.repository.FlowRepository;
 import co.orquex.sagas.domain.api.repository.TransactionRepository;
@@ -37,6 +39,7 @@ class WorkflowExecutorTest {
   @Mock FlowRepository flowRepository;
   @Mock TransactionRepository transactionRepository;
   @Mock StageExecutor stageExecutor;
+  @Mock CompensationExecutor compensationExecutor;
 
   WorkflowExecutor orchestratorExecutor;
 
@@ -44,7 +47,8 @@ class WorkflowExecutorTest {
   void setUp() {
     final var executor = Executors.newSingleThreadExecutor();
     orchestratorExecutor =
-        new WorkflowExecutor(flowRepository, transactionRepository, stageExecutor, executor);
+        new WorkflowExecutor(
+            flowRepository, transactionRepository, stageExecutor, compensationExecutor, executor);
   }
 
   @Test
@@ -116,7 +120,7 @@ class WorkflowExecutorTest {
     assertThatThrownBy(() -> orchestratorExecutor.execute(executionRequest))
         .isInstanceOf(WorkflowException.class)
         .hasMessage(
-            "Flow '%s' with correlation id '%s' has already been initiated."
+            "Flow '%s' with correlation ID '%s' has already been initiated."
                 .formatted(FLOW_ID, CORRELATION_ID));
   }
 
@@ -135,6 +139,7 @@ class WorkflowExecutorTest {
     assertThatThrownBy(() -> orchestratorExecutor.execute(executionRequest))
         .isInstanceOf(WorkflowException.class)
         .hasMessage("An error occurred while executing flow '%s'.".formatted(FLOW_ID));
+    verify(compensationExecutor).execute(any());
   }
 
   @Test
@@ -153,6 +158,7 @@ class WorkflowExecutorTest {
     assertThatThrownBy(() -> orchestratorExecutor.execute(executionRequest))
         .isInstanceOf(WorkflowException.class)
         .hasMessage("Some message from an activity.");
+    verify(compensationExecutor).execute(any());
   }
 
   @Test
@@ -170,6 +176,7 @@ class WorkflowExecutorTest {
     assertThatThrownBy(() -> orchestratorExecutor.execute(executionRequest))
         .isInstanceOf(WorkflowException.class)
         .hasMessage("Flow '%s' timed out after PT1S.".formatted(FLOW_ID));
+    verify(compensationExecutor).execute(any());
   }
 
   @SuppressWarnings("java:S2925")

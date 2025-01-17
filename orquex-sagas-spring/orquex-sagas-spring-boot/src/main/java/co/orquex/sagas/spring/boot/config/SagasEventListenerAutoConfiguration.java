@@ -2,6 +2,9 @@ package co.orquex.sagas.spring.boot.config;
 
 import co.orquex.sagas.core.event.EventListener;
 import co.orquex.sagas.core.flow.AsyncWorkflowStageExecutor;
+import co.orquex.sagas.domain.api.CompensationExecutor;
+import co.orquex.sagas.domain.api.repository.FlowRepository;
+import co.orquex.sagas.domain.api.repository.TransactionRepository;
 import co.orquex.sagas.domain.transaction.Checkpoint;
 import co.orquex.sagas.spring.framework.config.event.DefaultCheckpointEventListener;
 import co.orquex.sagas.spring.framework.config.event.SagasEventListenerConfiguration;
@@ -29,9 +32,13 @@ public class SagasEventListenerAutoConfiguration {
       havingValue = "true",
       matchIfMissing = true)
   EventListener<Checkpoint> defaultCheckpointEventListener(
-      AsyncWorkflowStageExecutor workflowStageExecutor) {
+      AsyncWorkflowStageExecutor workflowStageExecutor,
+      CompensationExecutor compensationExecutor,
+      FlowRepository flowRepository,
+      TransactionRepository transactionRepository) {
     final var checkpointEventListenerHandler =
-        new DefaultCheckpointEventListenerHandler(workflowStageExecutor);
+        new DefaultCheckpointEventListenerHandler(
+            workflowStageExecutor, compensationExecutor, flowRepository, transactionRepository);
     return new DefaultCheckpointEventListener(checkpointEventListenerHandler);
   }
 }

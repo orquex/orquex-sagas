@@ -1,9 +1,12 @@
 package co.orquex.sagas.domain.api.repository;
 
 import co.orquex.sagas.domain.transaction.Transaction;
+import java.util.Optional;
 
 /** Repository for managing transactions. */
 public interface TransactionRepository {
+
+  Optional<Transaction> findById(String id);
 
   /**
    * Check if a transaction exists by flow ID and correlation ID.

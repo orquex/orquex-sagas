@@ -6,9 +6,11 @@ import co.orquex.sagas.task.groovy.GroovyActivity;
 import co.orquex.sagas.task.groovy.GroovyEvaluation;
 import co.orquex.sagas.task.http.api.HttpClientProvider;
 import co.orquex.sagas.task.http.api.HttpClientProviderRegistry;
+import co.orquex.sagas.task.okhttp.OkHttpDeleteActivity;
 import co.orquex.sagas.task.okhttp.OkHttpGetActivity;
 import co.orquex.sagas.task.okhttp.OkHttpInMemoryClientProviderRegistry;
 import co.orquex.sagas.task.okhttp.OkHttpPostActivity;
+import co.orquex.sagas.task.okhttp.OkHttpPutActivity;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.List;
 import okhttp3.OkHttpClient;
@@ -39,6 +41,18 @@ public class SagasTaskConfiguration {
   public TaskImplementation okHttpPostActivity(
       HttpClientProviderRegistry<OkHttpClient> registry, ObjectMapper objectMapper) {
     return new OkHttpPostActivity(registry, objectMapper);
+  }
+
+  @Bean
+  public TaskImplementation okHttpDeleteActivity(
+          HttpClientProviderRegistry<OkHttpClient> registry, ObjectMapper objectMapper) {
+    return new OkHttpDeleteActivity(registry, objectMapper);
+  }
+
+  @Bean
+  public TaskImplementation okHttpPutActivity(
+          HttpClientProviderRegistry<OkHttpClient> registry, ObjectMapper objectMapper) {
+    return new OkHttpPutActivity(registry, objectMapper);
   }
 
   @Bean

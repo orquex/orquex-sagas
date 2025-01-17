@@ -43,6 +43,6 @@ public final class InMemoryEventSource<T> implements EventSource<T> {
   public void broadcast(final EventMessage<T> message) {
     log.trace("Broadcasting message {} to {} listeners", message, listeners.size());
     if (message.hasError()) this.listeners.forEach(listener -> listener.onError(message));
-    this.listeners.forEach(listener -> listener.onMessage(message));
+    else this.listeners.forEach(listener -> listener.onMessage(message));
   }
 }

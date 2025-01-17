@@ -7,13 +7,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/name/async")
+@RequestMapping("/api/v1/async")
 @RequiredArgsConstructor
 public class AsyncFlowController {
 
     private final AsyncWorkflowExecutor workflowExecutor;
 
-    @PostMapping("/customizer")
+    @PostMapping
     public ResponseEntity<Void> upperCase(@RequestBody ExecutionRequest request) {
         workflowExecutor.execute(request);
         return ResponseEntity.ok().build();

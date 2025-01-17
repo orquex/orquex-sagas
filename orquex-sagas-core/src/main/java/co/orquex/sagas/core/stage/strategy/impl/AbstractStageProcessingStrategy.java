@@ -24,8 +24,7 @@ public abstract class AbstractStageProcessingStrategy<S extends Stage>
       String transactionId, String taskId, ExecutionRequest request) {
     final var task = getTask(taskId);
     final var taskExecutor = getTaskExecutor(task);
-    // merge the task metadata with the current metadata
-    return taskExecutor.execute(transactionId, task, request.mergeMetadata(task.metadata()));
+    return taskExecutor.execute(transactionId, task, request);
   }
 
   protected Map<String, Serializable> executeProcessor(

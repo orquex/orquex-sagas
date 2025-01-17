@@ -28,7 +28,7 @@ Then call the service that starts and executes the workflow.
 ### Async Execution
 
 ```shell
-curl --location 'http://localhost:8080/api/name/async/customizer' \
+curl --location 'http://localhost:8080/api/v1/async' \
 --header 'Content-Type: application/json' \
 --data '{
   "flowId": "basic-sample-flow",
@@ -45,7 +45,7 @@ curl --location 'http://localhost:8080/api/name/async/customizer' \
 ### Sync Execution
 
 ```shell
-curl --location 'http://localhost:8080/api/name/sync/customizer' \
+curl --location 'http://localhost:8080/api/v1/sync' \
 --header 'Content-Type: application/json' \
 --data '{
   "flowId": "basic-sample-flow-sync",
@@ -54,6 +54,25 @@ curl --location 'http://localhost:8080/api/name/sync/customizer' \
   "payload": {
     "user": {
       "id": 9
+    }
+  }
+}'
+```
+
+### Compensation
+
+```shell
+curl --location 'http://localhost:8080/api/v1/sync' \
+--header 'Content-Type: application/json' \
+--data '{
+  "flowId": "basic-sample-flow-compensation",
+  "correlationId": "680bc800-1233-4eff-a6ed-aa51e4cb550c",
+  "metadata": {
+    "language": "es-ES"
+  },
+  "payload": {
+    "user": {
+      "id": 7
     }
   }
 }'

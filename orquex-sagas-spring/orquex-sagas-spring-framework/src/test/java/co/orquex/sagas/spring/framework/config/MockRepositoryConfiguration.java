@@ -1,6 +1,6 @@
 package co.orquex.sagas.spring.framework.config;
 
-
+import co.orquex.sagas.domain.api.repository.CompensationRepository;
 import co.orquex.sagas.domain.api.repository.FlowRepository;
 import co.orquex.sagas.domain.api.repository.TaskRepository;
 import co.orquex.sagas.domain.api.repository.TransactionRepository;
@@ -25,5 +25,10 @@ public class MockRepositoryConfiguration {
   @Bean
   TaskRepository taskRepository() {
     return Mockito.mock(TaskRepository.class);
+  }
+
+  @Bean
+  CompensationRepository compensationRepository() {
+    return Mockito.mock(CompensationRepository.class);
   }
 }

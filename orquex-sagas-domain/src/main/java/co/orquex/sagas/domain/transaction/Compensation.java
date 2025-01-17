@@ -20,10 +20,13 @@ import java.util.Map;
  * <pre>
  * {
  *   "transactionId": "transaction-id",
+ *   "flowId": "flow-id",
+ *   "correlationId": "correlation-id",
  *   "task": "task-name",
  *   "metadata": {},
  *   "request": {},
  *   "response": {},
+ *   "status": "status",
  *   "createdAt": "timestamp"
  * }
  * </pre>
@@ -33,10 +36,13 @@ import java.util.Map;
  */
 public record Compensation(
     String transactionId,
+    String flowId,
+    String correlationId,
     String task,
     Map<String, Serializable> metadata,
     Map<String, Serializable> request,
     Map<String, Serializable> response,
+    Status status,
     Instant createdAt)
     implements Serializable {
 

@@ -8,6 +8,22 @@
     }
   },
   {
+    "id": "http-post",
+    "name": "General HTTP POST Task",
+    "implementation": "okhttp-post",
+    "metadata": {
+      "__client_provider": "basic-provider"
+    }
+  },
+  {
+    "id": "http-delete",
+    "name": "General HTTP DELETE Task",
+    "implementation": "okhttp-delete",
+    "metadata": {
+      "__client_provider": "basic-provider"
+    }
+  },
+  {
     "id": "default-groovy-activity",
     "name": "Default Groovy Activity",
     "implementation": "groovy"

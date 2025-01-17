@@ -27,5 +27,6 @@ class SagasEventListenerConfigurationTest {
   @Test
   void shouldLoadTaskConfiguration() {
     assertThat(applicationContext.getBean("defaultStageEventListener")).isNotNull();
+    assertThat(applicationContext.containsBean("defaultCompensationEventListener")).isFalse();
   }
 }

@@ -3,6 +3,7 @@ package co.orquex.sagas.core.flow;
 import static co.orquex.sagas.domain.utils.Maps.merge;
 import static java.util.Objects.nonNull;
 
+import co.orquex.sagas.domain.api.CompensationExecutor;
 import co.orquex.sagas.domain.api.Executable;
 import co.orquex.sagas.domain.api.StageExecutor;
 import co.orquex.sagas.domain.api.repository.FlowRepository;
@@ -12,6 +13,7 @@ import co.orquex.sagas.domain.execution.ExecutionRequest;
 import co.orquex.sagas.domain.flow.Flow;
 import co.orquex.sagas.domain.stage.Stage;
 import co.orquex.sagas.domain.stage.StageResponse;
+import co.orquex.sagas.domain.transaction.Status;
 import co.orquex.sagas.domain.transaction.Transaction;
 import java.io.Serializable;
 import java.util.HashMap;
@@ -26,15 +28,18 @@ public class WorkflowExecutor extends AbstractWorkflowExecutor
 
   private final StageExecutor stageExecutor;
   private final ExecutorService executor;
+  private final CompensationExecutor compensationExecutor;
 
   public WorkflowExecutor(
       final FlowRepository flowRepository,
       final TransactionRepository transactionRepository,
       final StageExecutor stageExecutor,
+      final CompensationExecutor compensationExecutor,
       final ExecutorService executor) {
     super(flowRepository, transactionRepository);
     this.stageExecutor = stageExecutor;
     this.executor = executor;
+    this.compensationExecutor = compensationExecutor;
   }
 
   /**
@@ -54,7 +59,7 @@ public class WorkflowExecutor extends AbstractWorkflowExecutor
     if (transactionRepository.existsByFlowIdAndCorrelationId(
         flow.id(), executionRequest.correlationId())) {
       throw new WorkflowException(
-          "Flow '%s' with correlation id '%s' has already been initiated."
+          "Flow '%s' with correlation ID '%s' has already been initiated."
               .formatted(executionRequest.flowId(), executionRequest.correlationId()));
     }
 
@@ -82,11 +87,13 @@ public class WorkflowExecutor extends AbstractWorkflowExecutor
     try {
       return future.get(timeout.toMillis(), TimeUnit.MILLISECONDS);
     } catch (InterruptedException e) {
+      transaction.setStatus(Status.ERROR);
       log.error(e.getMessage(), e);
       Thread.currentThread().interrupt();
       throw new WorkflowException(
           "An error occurred while executing flow '%s'.".formatted(flow.id()));
     } catch (ExecutionException e) {
+      transaction.setStatus(Status.ERROR);
       if (e.getCause() instanceof WorkflowException we) {
         throw we;
       }
@@ -94,10 +101,16 @@ public class WorkflowExecutor extends AbstractWorkflowExecutor
       throw new WorkflowException(
           "An error occurred while executing flow '%s'.".formatted(flow.id()));
     } catch (TimeoutException e) {
+      transaction.setStatus(Status.ERROR);
       throw new WorkflowException(
           "Flow '%s' timed out after %s.".formatted(flow.id(), timeout.toString()));
     } finally {
-      completeTransaction(transaction);
+      // Execute compensation if the transaction isn't completed
+      if (transaction.getStatus().equals(Status.ERROR)) {
+        compensationExecutor.execute(transaction.getTransactionId());
+      }
+      // Update the transaction status
+      updateTransaction(transaction);
     }
   }
 

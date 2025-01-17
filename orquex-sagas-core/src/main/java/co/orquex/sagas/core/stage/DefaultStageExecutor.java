@@ -4,22 +4,17 @@ import co.orquex.sagas.domain.api.StageExecutor;
 import co.orquex.sagas.domain.api.StageProcessingStrategy;
 import co.orquex.sagas.domain.exception.WorkflowException;
 import co.orquex.sagas.domain.stage.*;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 /** Default implementation of the {@link StageExecutor}. */
 @Slf4j
+@RequiredArgsConstructor
 public class DefaultStageExecutor implements StageExecutor {
 
   public static final String DEFAULT_SYNC_STAGE_EXECUTOR_KEY = "default-sync";
   private final StageProcessingStrategy<Activity> activityStrategy;
   private final StageProcessingStrategy<Evaluation> evaluationStrategy;
-
-  public DefaultStageExecutor(
-      final StageProcessingStrategy<Activity> activityStrategy,
-      final StageProcessingStrategy<Evaluation> evaluationStrategy) {
-    this.activityStrategy = activityStrategy;
-    this.evaluationStrategy = evaluationStrategy;
-  }
 
   @Override
   public StageResponse execute(StageRequest stageRequest) {

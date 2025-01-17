@@ -13,12 +13,16 @@ public interface EventListener<T> {
    *
    * @param message the message that contains the event.
    */
-  void onMessage(EventMessage<T> message);
+  default void onMessage(EventMessage<T> message) {
+    throw new UnsupportedOperationException();
+  }
 
   /**
    * Method that is called when an error occurs while processing the event.
    *
    * @param message the message that contains the event.
    */
-  void onError(EventMessage<T> message);
+  default void onError(EventMessage<T> message) {
+    throw new UnsupportedOperationException();
+  }
 }

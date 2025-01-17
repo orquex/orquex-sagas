@@ -27,5 +27,7 @@ class SagasStageConfigurationTest {
     assertThat(applicationContext.getBean("defaultTaskExecutorRegistry")).isNotNull();
     assertThat(applicationContext.getBean("taskRepository")).isNotNull();
     assertThat(applicationContext.getBean("defaultWorkflowEventPublisher")).isNotNull();
+    assertThat(applicationContext.getBean("compensationRepository")).isNotNull();
+    assertThat(applicationContext.getBean("defaultCompensationHandler")).isNotNull();
   }
 }
