@@ -85,6 +85,15 @@ public class DefaultCheckpointEventListenerHandler implements CheckpointEventLis
 
   private void handleCheckpointCanceled(Checkpoint checkpoint) {
     log.trace(getCheckpointStatus(checkpoint));
+    final var transaction = getTransaction(checkpoint.transactionId());
+    transaction.setStatus(Status.CANCELED);
+    transactionRepository.save(transaction);
+    log.info(
+            "Flow '{}' with correlation ID '{}' has been cancelled by stage '{}'",
+            checkpoint.flowId(),
+            checkpoint.correlationId(),
+            checkpoint.incoming().getName());
+    compensationExecutor.execute(checkpoint.transactionId());
   }
 
   private void handleCheckpointInProgress(Checkpoint checkpoint) {

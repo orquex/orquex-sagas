@@ -50,21 +50,29 @@ public class DefaultCompensationExecutor implements CompensationExecutor {
                       new WorkflowException(
                           "Task executor '%s' not found when trying to perform compensation"
                               .formatted(executorId)));
-      final var executionRequest =
-          new ExecutionRequest(
-              compensation.flowId(),
-              compensation.correlationId(),
-              compensation.metadata(),
-              compensation.request());
-      final var compensationResponse = taskExecutor.execute(transactionId, task, executionRequest);
+      try {
+        final var executionRequest =
+            new ExecutionRequest(
+                compensation.flowId(),
+                compensation.correlationId(),
+                compensation.metadata(),
+                compensation.request());
+        final var compensationResponse =
+            taskExecutor.execute(transactionId, task, executionRequest);
 
-      log.debug(
-          "Compensation executed for transaction '{}' and task '{}'", transactionId, task.id());
-      log.trace(
-          "Compensation response for transaction '{}' and task '{}': {}",
-          transactionId,
-          task.id(),
-          compensationResponse);
+        log.debug(
+            "Compensation executed for transaction '{}' and task '{}'", transactionId, task.id());
+        log.trace(
+            "Compensation response for transaction '{}' and task '{}': {}",
+            transactionId,
+            task.id(),
+            compensationResponse);
+      } catch (WorkflowException e) {
+        log.error(
+            "Compensation execution failed for transaction '{}' and task '{}'",
+            transactionId,
+            task.id());
+      }
     }
   }
 }

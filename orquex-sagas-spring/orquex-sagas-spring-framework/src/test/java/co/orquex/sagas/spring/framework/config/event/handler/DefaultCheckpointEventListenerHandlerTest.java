@@ -110,7 +110,11 @@ class DefaultCheckpointEventListenerHandlerTest {
   @Test
   void testHandleCheckpointCanceled() {
     final var checkpoint = getCheckpoint(Status.CANCELED);
+    final var transaction = Mockito.mock(Transaction.class);
+    when(transactionRepository.findById(anyString())).thenReturn(Optional.of(transaction));
     checkpointEventListenerHandler.handle(checkpoint);
+    verify(transactionRepository).save(transaction);
+    verify(compensationExecutor).execute(anyString());
     verify(workflowStageExecutor, never()).execute(checkpoint);
   }
 

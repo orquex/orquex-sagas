@@ -33,7 +33,9 @@ class DefaultCompensationExecutorTest {
   @Mock CompensationRepository compensationRepository;
 
   @Mock TaskExecutor taskExecutor;
-  @Mock(answer = Answers.RETURNS_DEEP_STUBS) Task task;
+
+  @Mock(answer = Answers.RETURNS_DEEP_STUBS)
+  Task task;
 
   @InjectMocks DefaultCompensationExecutor defaultCompensationExecutor;
 
@@ -62,7 +64,8 @@ class DefaultCompensationExecutorTest {
 
     assertThatThrownBy(() -> defaultCompensationExecutor.execute(TRANSACTION_ID))
         .isInstanceOf(WorkflowException.class)
-        .hasMessageContaining("Task executor 'task-executor' not found when trying to perform compensation");
+        .hasMessageContaining(
+            "Task executor 'task-executor' not found when trying to perform compensation");
   }
 
   @Test
@@ -74,5 +77,22 @@ class DefaultCompensationExecutorTest {
     assertThatThrownBy(() -> defaultCompensationExecutor.execute(TRANSACTION_ID))
         .isInstanceOf(WorkflowException.class)
         .hasMessageContaining("Task 'simple-task-0' not found when trying to perform compensation");
+  }
+
+  @Test
+  void shouldExecuteCompensationEvenIfOtherFails() {
+    when(compensationRepository.findByTransactionId(TRANSACTION_ID))
+        .thenReturn(CompensationFixture.getCompensations(TRANSACTION_ID, 3));
+    when(taskExecutorRegistry.get(anyString())).thenReturn(Optional.of(taskExecutor));
+    when(taskRepository.findById(anyString())).thenReturn(Optional.of(task));
+    when(task.configuration().executor()).thenReturn("task-executor");
+    when(taskExecutor.execute(anyString(), any(Task.class), any(ExecutionRequest.class)))
+        .thenReturn(Collections.emptyMap())
+        .thenThrow(WorkflowException.class)
+        .thenReturn(Collections.emptyMap());
+
+    defaultCompensationExecutor.execute(TRANSACTION_ID);
+    verify(taskExecutor, times(3))
+        .execute(anyString(), any(Task.class), any(ExecutionRequest.class));
   }
 }
