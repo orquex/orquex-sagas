@@ -21,8 +21,8 @@ public class DefaultStageExecutor implements StageExecutor {
     final var request = stageRequest.executionRequest();
     final var stage = stageRequest.stage();
     log.trace(
-        "Executing default stage '{}' for flow '{}' and correlation ID '{}'",
-        stage.getId(),
+        "Processing stage '{}' for flow '{}' and correlation ID '{}'",
+        stage.getName(),
         request.flowId(),
         request.correlationId());
     return switch (stage) {

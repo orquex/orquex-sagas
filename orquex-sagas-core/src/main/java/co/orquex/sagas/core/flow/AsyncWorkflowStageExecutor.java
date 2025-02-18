@@ -1,6 +1,5 @@
 package co.orquex.sagas.core.flow;
 
-import static co.orquex.sagas.domain.utils.Maps.merge;
 import static java.util.Objects.isNull;
 
 import co.orquex.sagas.core.event.WorkflowEventPublisher;
@@ -72,7 +71,7 @@ public class AsyncWorkflowStageExecutor extends AbstractAsyncExecutable<Checkpoi
           new ExecutionRequest(
               checkpoint.flowId(),
               checkpoint.correlationId(),
-              merge(checkpoint.metadata(), flow.metadata()),
+              flow.metadata(),
               checkpoint.response());
       final var stageRequest = getStageRequest(checkpoint.transactionId(), stage, executionRequest);
       log.debug(

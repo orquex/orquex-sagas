@@ -16,6 +16,7 @@ import co.orquex.sagas.domain.stage.StageResponse;
 import co.orquex.sagas.domain.transaction.Status;
 import co.orquex.sagas.domain.transaction.Transaction;
 import java.io.Serializable;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.*;
@@ -105,7 +106,7 @@ public class WorkflowExecutor extends AbstractWorkflowExecutor
       throw new WorkflowException(
           "Flow '%s' timed out after %s.".formatted(flow.id(), timeout.toString()));
     } finally {
-      // Execute compensation if the transaction isn't completed
+      // Execute compensation if the transaction is not completed
       if (transaction.getStatus().equals(Status.ERROR)) {
         compensationExecutor.execute(transaction.getTransactionId());
       }
@@ -127,6 +128,7 @@ public class WorkflowExecutor extends AbstractWorkflowExecutor
       final var callStack = new HashMap<String, String>();
       final var flowId = executionRequest.flowId();
       final var correlationId = executionRequest.correlationId();
+      var metadata = executionRequest.metadata();
       var payload = executionRequest.payload();
       var nextStageId = flow.initialStage();
       // Iterate over stages to execute each one.
@@ -139,14 +141,16 @@ public class WorkflowExecutor extends AbstractWorkflowExecutor
         }
         // Get the next stage
         final var stage = getStage(flow, nextStageId);
-        // Prepare execution request
-        final var stageMetadata = merge(flow.metadata(), stage.getMetadata());
+        // Prepare the stage metadata merging the request metadata with the flow and stage metadata
+        final var stageMetadata =
+            merge(metadata, flow.metadata(), stage.getMetadata());
         final var stageExecutionRequest =
             new ExecutionRequest(flowId, correlationId, stageMetadata, payload);
         // Execute stage
         final var stageResponse = executeStage(transaction, stage, stageExecutionRequest);
         payload = stageResponse.payload();
         nextStageId = stageResponse.outgoing();
+        metadata = Collections.emptyMap(); // Reset metadata to avoid leaking sensitive information
       }
       return payload;
     };

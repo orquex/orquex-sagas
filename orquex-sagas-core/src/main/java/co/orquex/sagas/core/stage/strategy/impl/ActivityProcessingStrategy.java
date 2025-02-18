@@ -42,21 +42,24 @@ public class ActivityProcessingStrategy extends AbstractStageProcessingStrategy<
    *
    * @param transactionId The ID of the transaction.
    * @param activity The activity to be processed.
-   * @param request The execution request.
+   * @param executionRequest The stage execution request.
    * @return The merged response of the executed tasks.
    */
   @Override
-  public StageResponse process(String transactionId, Activity activity, ExecutionRequest request) {
-    log.debug("Executing activity stage '{}'", activity.getName());
-    // Merge metadata
-    final var updatedRequest = request.mergeMetadata(activity.getMetadata());
+  public StageResponse process(
+      String transactionId, Activity activity, ExecutionRequest executionRequest) {
+    log.debug(
+        "Executing activity stage '{}' for flow '{}' and correlation ID '{}'",
+        activity.getName(),
+        executionRequest.flowId(),
+        executionRequest.correlationId());
     // Define the payload to be returned on the StageResponse
     Optional<Map<String, Serializable>> payload;
     // Check if not a parallel execution
     if (!activity.isParallel()) {
-      payload = executeSequentially(activity, transactionId, updatedRequest);
+      payload = executeSequentially(activity, transactionId, executionRequest);
     } else {
-      payload = executeInParallel(activity, transactionId, updatedRequest);
+      payload = executeInParallel(activity, transactionId, executionRequest);
     }
 
     return StageResponse.builder()
@@ -174,22 +177,33 @@ public class ActivityProcessingStrategy extends AbstractStageProcessingStrategy<
    */
   private Map<String, Serializable> processActivityTask(
       String transactionId, ActivityTask activityTask, ExecutionRequest executionRequest) {
-    // Merge payload of the activity task with the current executionRequest
+    // Merge metadata of the activity task with the current executionRequest
     executionRequest = executionRequest.mergeMetadata(activityTask.metadata());
     // Pre-process the payload with a task
     if (activityTask.preProcessor() != null) {
-      var preProcessorPayload =
-          executeProcessor(transactionId, activityTask.preProcessor(), executionRequest);
+      final var preProcessor = activityTask.preProcessor();
+      log.debug(
+          "Executing pre-processor '{}' for task '{}'", preProcessor.task(), activityTask.task());
+      final var preProcessorPayload =
+          executeProcessor(transactionId, preProcessor, executionRequest);
       executionRequest = executionRequest.withPayload(preProcessorPayload);
     }
+    log.debug(
+        "Executing task '{}' at flow '{}' with correlation ID '{}'",
+        activityTask.task(),
+        executionRequest.flowId(),
+        executionRequest.correlationId());
     // Execute the task with the pre-processed payload
     final var taskResponse = executeTask(transactionId, activityTask.task(), executionRequest);
     // Publish the compensation's event once the task is executed
     publishCompensation(transactionId, activityTask, executionRequest, taskResponse);
     // Post process the payload, generating a new one
     if (activityTask.postProcessor() != null) {
+      final var postProcessor = activityTask.postProcessor();
+      log.debug(
+          "Executing post-processor '{}' for task '{}'", postProcessor.task(), activityTask.task());
       return executeProcessor(
-          transactionId, activityTask.postProcessor(), executionRequest.withPayload(taskResponse));
+          transactionId, postProcessor, executionRequest.withPayload(taskResponse));
     }
     return taskResponse;
   }
@@ -209,6 +223,7 @@ public class ActivityProcessingStrategy extends AbstractStageProcessingStrategy<
       final Map<String, Serializable> taskResponse) {
     final var compensationProcessor = activityTask.compensation();
     if (compensationProcessor != null) {
+      log.debug("Publishing compensation for task '{}'", activityTask.task());
       final var metadata =
           Maps.merge(executionRequest.metadata(), compensationProcessor.metadata());
       compensationConsumer.accept(
@@ -229,8 +244,8 @@ public class ActivityProcessingStrategy extends AbstractStageProcessingStrategy<
    * Handles a WorkflowException.
    *
    * <p>This method checks if the cause of the provided Throwable is a WorkflowException. If it is,
-   * it returns the cause directly. If it's not, it creates a new WorkflowException with the message
-   * of the provided Throwable and returns it.
+   * it returns the cause directly. If it is not, it creates a new WorkflowException with the
+   * message of the provided Throwable and returns it.
    *
    * @param throwable The Throwable to be handled.
    * @return A WorkflowException derived from the provided Throwable.

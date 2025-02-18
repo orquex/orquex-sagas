@@ -44,8 +44,8 @@ public class EvaluationProcessingStrategy extends AbstractStageProcessingStrateg
    *
    * <pre>
    * It then iterates over each condition in the evaluation stage. For each condition:
-   * - It merges the metadata of the evaluation stage with the execution request.
-   * - It adds the condition's expression to the metadata of the execution request.
+   * - It merges the metadata of the evaluation stage with the execution executionRequest.
+   * - It adds the condition's expression to the metadata of the execution executionRequest.
    * - It calls the `processEvaluationTask` method to execute the evaluation task associated with the current condition.
    * - It checks if the `RESULT` key exists in the response map and if its value is a Boolean. If the value is `true`, it means the condition is met. In this case, the method sets the outgoing stage to the one specified in the current condition and breaks the loop.
    * </pre>
@@ -54,29 +54,29 @@ public class EvaluationProcessingStrategy extends AbstractStageProcessingStrateg
    * value), the method returns the default outgoing stage specified in the evaluation.
    *
    * <p>The method finally returns a `StageResponse` object, which contains the outgoing stage and
-   * the payload from the execution request.
+   * the payload from the execution executionRequest.
    *
    * @param transactionId The ID of the transaction.
    * @param evaluation The evaluation stage to be processed.
-   * @param request The execution request.
+   * @param executionRequest The execution executionRequest.
    * @return The response of the strategy, containing the outgoing stage and payload.
    */
   @Override
   public StageResponse process(
-      String transactionId, Evaluation evaluation, ExecutionRequest request) {
+      String transactionId, Evaluation evaluation, ExecutionRequest executionRequest) {
     log.debug(
         "Executing evaluation stage '{}' of flow '{}' with correlation ID '{}'",
         evaluation.getName(),
-        request.flowId(),
-        request.correlationId());
+        executionRequest.flowId(),
+        executionRequest.correlationId());
     var outgoing = evaluation.getDefaultOutgoing();
 
     for (Condition condition : evaluation.getConditions()) {
       // add the condition expression to the metadata
-      request = request.mergeMetadata(evaluation.getMetadata());
-      request.metadata().put(EXPRESSION, condition.expression());
+      executionRequest = executionRequest.mergeMetadata(evaluation.getMetadata());
+      executionRequest.metadata().put(EXPRESSION, condition.expression());
       // Call task
-      var response = processEvaluationTask(transactionId, evaluation.getEvaluationTask(), request);
+      var response = processEvaluationTask(transactionId, evaluation.getEvaluationTask(), executionRequest);
       // get the evaluation result
       if (response.containsKey(RESULT)
           && response.get(RESULT) instanceof Boolean result
@@ -90,7 +90,7 @@ public class EvaluationProcessingStrategy extends AbstractStageProcessingStrateg
     return StageResponse.builder()
         .transactionId(transactionId)
         .outgoing(outgoing)
-        .payload(request.payload())
+        .payload(executionRequest.payload())
         .build();
   }
 

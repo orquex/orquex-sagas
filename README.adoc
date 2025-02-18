@@ -351,3 +351,10 @@ This is sent via an event for further processing.
 |created_at |timestamp |Date time when the compensation is created.
 
 |===
+
+[#metadata]
+== Metadata
+
+The metadata is a dictionary or map that contains additional information for a flow, stage, task, or checkpoint, and is shared between the stack execution.
+
+With the First workflow execution will start from `Execution Request` to the `Task` e.g. `Execution Request → Flow → Stage → Activity Task → Task`, and the subsequent workflow execution will start from the `Flow` to the `Task` e.g. `Flow → Stage → Activity Task → Task`.

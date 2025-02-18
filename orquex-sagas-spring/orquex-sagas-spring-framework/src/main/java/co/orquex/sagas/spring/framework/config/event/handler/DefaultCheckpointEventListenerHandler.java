@@ -66,7 +66,7 @@ public class DefaultCheckpointEventListenerHandler implements CheckpointEventLis
     final var flow = getFlow(checkpoint.flowId());
     final var allOrNothing = flow.configuration().allOrNothing();
     if (allOrNothing || isNull(checkpoint.outgoing())) {
-      // If it's all or nothing or there isn't outgoing then executes the compensation
+      // If it is all or nothing or there is not outgoing then executes the compensation
       // Also updates the transaction status
       final var transaction = getTransaction(checkpoint.transactionId());
       transaction.setStatus(Status.ERROR);
@@ -78,7 +78,7 @@ public class DefaultCheckpointEventListenerHandler implements CheckpointEventLis
           checkpoint.incoming().getName());
       compensationExecutor.execute(checkpoint.transactionId());
     } else {
-      // If it's not all or nothing and there's outgoing, then it'll be executed by the next stage
+      // If it is not all or nothing and there is outgoing, then it will be executed by the next stage
       workflowStageExecutor.execute(checkpoint);
     }
   }

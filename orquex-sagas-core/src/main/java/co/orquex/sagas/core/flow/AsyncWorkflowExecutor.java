@@ -1,6 +1,5 @@
 package co.orquex.sagas.core.flow;
 
-import static co.orquex.sagas.domain.utils.Maps.merge;
 
 import co.orquex.sagas.core.event.WorkflowEventPublisher;
 import co.orquex.sagas.core.event.impl.EventMessage;
@@ -44,8 +43,8 @@ public class AsyncWorkflowExecutor extends AbstractAsyncExecutable<ExecutionRequ
     }
     // Get initial stage from stages.
     final var stage = getStage(flow, flow.initialStage());
-    // Merge request, flow and stage metadata.
-    request = request.mergeMetadata(merge(flow.metadata(), stage.getMetadata()));
+    // Merge request and flow metadata.
+    request = request.mergeMetadata(flow.metadata());
     // Register the transaction.
     final var transaction = initializeTransaction(flow, request);
     // Start execution of the workflow.

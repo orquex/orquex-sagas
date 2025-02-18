@@ -39,6 +39,7 @@ public record Task(
   @Serial private static final long serialVersionUID = OrquexSagasVersion.SERIAL_VERSION;
 
   public Task {
+    name = checkArgumentNotNullOrElse(name, id);
     implementation = checkArgumentNotEmpty(implementation, "Task`s implementation required");
     metadata = checkArgumentNotNullOrElse(metadata, new HashMap<>());
     configuration = checkArgumentNotNullOrElse(configuration, TaskConfiguration.builder().build());
