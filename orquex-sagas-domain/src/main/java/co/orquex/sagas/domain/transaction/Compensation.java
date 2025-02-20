@@ -1,5 +1,6 @@
 package co.orquex.sagas.domain.transaction;
 
+import co.orquex.sagas.domain.task.TaskProcessor;
 import co.orquex.sagas.domain.version.OrquexSagasVersion;
 import java.io.Serial;
 import java.io.Serializable;
@@ -42,6 +43,8 @@ public record Compensation(
     Map<String, Serializable> metadata,
     Map<String, Serializable> request,
     Map<String, Serializable> response,
+    TaskProcessor preProcessor,
+    TaskProcessor postProcessor,
     Status status,
     Instant createdAt)
     implements Serializable {

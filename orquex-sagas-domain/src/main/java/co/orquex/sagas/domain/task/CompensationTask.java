@@ -1,10 +1,9 @@
-package co.orquex.sagas.domain.stage;
+package co.orquex.sagas.domain.task;
 
 import static co.orquex.sagas.domain.utils.Preconditions.checkArgumentNotEmpty;
 import static co.orquex.sagas.domain.utils.Preconditions.checkArgumentNotNullOrElse;
 
-import co.orquex.sagas.domain.task.CompensationTask;
-import co.orquex.sagas.domain.task.TaskProcessor;
+import co.orquex.sagas.domain.stage.ActivityTask;
 import co.orquex.sagas.domain.version.OrquexSagasVersion;
 import java.io.Serial;
 import java.io.Serializable;
@@ -12,8 +11,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * The activity task contains the information necessary to pre-process the input request of a task,
- * then execute it and finally post-process its response, while recording its compensation.
+ * The compensation task contains the information necessary to pre-process the input request of a
+ * task, then execute it and finally post-process its response.
  *
  * <p>JSON representation:
  *
@@ -22,29 +21,24 @@ import java.util.Map;
  *   "task": "task-name",
  *   "preProcessor": {},
  *   "postProcessor": {},
- *   "compensation": {},
  *   "metadata": {}
  * }
  * </pre>
  *
- * @see Activity
+ * @see ActivityTask
  */
-public record ActivityTask(
+public record CompensationTask(
     String task,
     TaskProcessor preProcessor,
     TaskProcessor postProcessor,
-    CompensationTask compensation,
     Map<String, Serializable> metadata)
     implements Serializable {
 
   @Serial private static final long serialVersionUID = OrquexSagasVersion.SERIAL_VERSION;
 
-  public ActivityTask {
-    task = checkArgumentNotEmpty(task, "activity's task required");
+  public CompensationTask {
+    task = checkArgumentNotEmpty(task, "compensation's task required");
     metadata = checkArgumentNotNullOrElse(metadata, new HashMap<>());
   }
 
-  public ActivityTask(String task) {
-    this(task, null, null, null, null);
-  }
 }

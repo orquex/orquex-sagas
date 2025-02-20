@@ -180,8 +180,8 @@ public class ActivityProcessingStrategy extends AbstractStageProcessingStrategy<
     // Merge metadata of the activity task with the current executionRequest
     executionRequest = executionRequest.mergeMetadata(activityTask.metadata());
     // Pre-process the payload with a task
-    if (activityTask.preProcessor() != null) {
-      final var preProcessor = activityTask.preProcessor();
+    final var preProcessor = activityTask.preProcessor();
+    if (preProcessor != null) {
       log.debug(
           "Executing pre-processor '{}' for task '{}'", preProcessor.task(), activityTask.task());
       final var preProcessorPayload =
@@ -198,8 +198,8 @@ public class ActivityProcessingStrategy extends AbstractStageProcessingStrategy<
     // Publish the compensation's event once the task is executed
     publishCompensation(transactionId, activityTask, executionRequest, taskResponse);
     // Post process the payload, generating a new one
-    if (activityTask.postProcessor() != null) {
-      final var postProcessor = activityTask.postProcessor();
+    final var postProcessor = activityTask.postProcessor();
+    if (postProcessor != null) {
       log.debug(
           "Executing post-processor '{}' for task '{}'", postProcessor.task(), activityTask.task());
       return executeProcessor(
@@ -235,6 +235,8 @@ public class ActivityProcessingStrategy extends AbstractStageProcessingStrategy<
               metadata,
               executionRequest.payload(),
               taskResponse,
+              compensationProcessor.preProcessor(),
+              compensationProcessor.postProcessor(),
               Status.CREATED,
               Instant.now()));
     }

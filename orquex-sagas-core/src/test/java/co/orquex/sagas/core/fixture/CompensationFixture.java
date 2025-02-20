@@ -1,5 +1,6 @@
 package co.orquex.sagas.core.fixture;
 
+import co.orquex.sagas.domain.task.TaskProcessor;
 import co.orquex.sagas.domain.transaction.Compensation;
 import co.orquex.sagas.domain.transaction.Status;
 import java.time.Instant;
@@ -17,6 +18,11 @@ public class CompensationFixture {
   public static final String TASK = "simple-task-%s";
 
   public static Compensation getCompensation(String transactionId, String task) {
+    return getCompensation(transactionId, task, null, null);
+  }
+
+  public static Compensation getCompensation(
+      String transactionId, String task, TaskProcessor preProcessor, TaskProcessor postProcessor) {
     return new Compensation(
         transactionId,
         FLOW_ID,
@@ -25,6 +31,8 @@ public class CompensationFixture {
         Collections.emptyMap(),
         Collections.emptyMap(),
         Collections.emptyMap(),
+        preProcessor,
+        postProcessor,
         Status.CREATED,
         Instant.now());
   }

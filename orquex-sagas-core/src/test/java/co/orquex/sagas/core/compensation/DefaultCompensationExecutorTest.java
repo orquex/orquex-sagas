@@ -1,6 +1,7 @@
 package co.orquex.sagas.core.compensation;
 
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static co.orquex.sagas.core.fixture.TaskProcessorFixture.getTaskProcessor;
+import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
@@ -14,6 +15,7 @@ import co.orquex.sagas.domain.exception.WorkflowException;
 import co.orquex.sagas.domain.execution.ExecutionRequest;
 import co.orquex.sagas.domain.task.Task;
 import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
@@ -55,28 +57,29 @@ class DefaultCompensationExecutorTest {
   }
 
   @Test
-  void shouldThrowExceptionWhenTaskExecutorNotFound() {
+  void shouldContinueExceptionWhenTaskExecutorNotFound() {
     when(compensationRepository.findByTransactionId(TRANSACTION_ID))
         .thenReturn(CompensationFixture.getCompensations(TRANSACTION_ID, 3));
     when(taskRepository.findById(anyString())).thenReturn(Optional.of(task));
     when(task.configuration().executor()).thenReturn("task-executor");
     when(taskExecutorRegistry.get(anyString())).thenReturn(Optional.empty());
 
-    assertThatThrownBy(() -> defaultCompensationExecutor.execute(TRANSACTION_ID))
-        .isInstanceOf(WorkflowException.class)
-        .hasMessageContaining(
-            "Task executor 'task-executor' not found when trying to perform compensation");
+    assertThatCode(() -> defaultCompensationExecutor.execute(TRANSACTION_ID))
+        .doesNotThrowAnyException();
+    verify(taskExecutorRegistry, times(3)).get(anyString());
+    verify(taskRepository, times(3)).findById(anyString());
   }
 
   @Test
-  void shouldThrowExceptionWhenTaskNotFound() {
+  void shouldContinueWithTheExecutionWhenTaskNotFound() {
     when(compensationRepository.findByTransactionId(TRANSACTION_ID))
         .thenReturn(CompensationFixture.getCompensations(TRANSACTION_ID, 3));
     when(taskRepository.findById(anyString())).thenReturn(Optional.empty());
 
-    assertThatThrownBy(() -> defaultCompensationExecutor.execute(TRANSACTION_ID))
-        .isInstanceOf(WorkflowException.class)
-        .hasMessageContaining("Task 'simple-task-0' not found when trying to perform compensation");
+    assertThatCode(() -> defaultCompensationExecutor.execute(TRANSACTION_ID))
+        .doesNotThrowAnyException();
+    verify(taskExecutorRegistry, never()).get(anyString());
+    verify(taskRepository, times(3)).findById(anyString());
   }
 
   @Test
@@ -94,5 +97,29 @@ class DefaultCompensationExecutorTest {
     defaultCompensationExecutor.execute(TRANSACTION_ID);
     verify(taskExecutor, times(3))
         .execute(anyString(), any(Task.class), any(ExecutionRequest.class));
+  }
+
+  @Test
+  void shouldExecuteProcessorsBeforeAndAfterCompensation() {
+    final var compensations =
+        List.of(
+            CompensationFixture.getCompensation(
+                TRANSACTION_ID,
+                "task",
+                getTaskProcessor("task-pre-processor"),
+                getTaskProcessor("task-post-processor")));
+    when(compensationRepository.findByTransactionId(TRANSACTION_ID)).thenReturn(compensations);
+    when(taskExecutorRegistry.get(anyString())).thenReturn(Optional.of(taskExecutor));
+    when(taskRepository.findById(anyString())).thenReturn(Optional.of(task));
+    when(task.configuration().executor()).thenReturn("task-executor");
+    when(taskExecutor.execute(anyString(), any(Task.class), any(ExecutionRequest.class)))
+        .thenReturn(Collections.emptyMap());
+
+    defaultCompensationExecutor.execute(TRANSACTION_ID);
+
+    verify(taskExecutor, times(3))
+        .execute(anyString(), any(Task.class), any(ExecutionRequest.class));
+    verify(taskExecutorRegistry, times(3)).get(anyString());
+    verify(taskRepository, times(3)).findById(anyString());
   }
 }

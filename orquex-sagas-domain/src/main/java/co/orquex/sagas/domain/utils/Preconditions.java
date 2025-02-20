@@ -21,7 +21,7 @@ public final class Preconditions {
   }
 
   public static String checkArgumentNotEmpty(String input, String message) {
-    if (input == null || input.isEmpty() || input.isBlank())
+    if (input == null || input.isBlank())
       throw new IllegalArgumentException(message);
     return input;
   }

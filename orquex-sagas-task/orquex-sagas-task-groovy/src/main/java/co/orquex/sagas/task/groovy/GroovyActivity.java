@@ -7,6 +7,7 @@ import co.orquex.sagas.domain.api.context.GlobalContext;
 import co.orquex.sagas.domain.exception.WorkflowException;
 import co.orquex.sagas.domain.task.TaskRequest;
 import java.io.Serializable;
+import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
@@ -37,7 +38,8 @@ public class GroovyActivity implements TaskImplementation {
       if (!metadata.containsKey(SCRIPT)) throw new WorkflowException("script not found");
 
       final var response = new HashMap<String, Serializable>();
-      final var script = new String(Base64.getDecoder().decode(metadata.get(SCRIPT).toString()));
+      final var decode = Base64.getDecoder().decode(metadata.get(SCRIPT).toString());
+      final var script = new String(decode, StandardCharsets.UTF_8);
       final var context =
           new SimpleBindings(
               Map.of(
