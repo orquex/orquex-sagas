@@ -27,7 +27,8 @@ public final class SingleThreadEventLoop<T> implements EventLoop<T> {
    */
   private SingleThreadEventLoop(EventSource<T> eventSource) {
     this.eventQueue = new LinkedBlockingQueue<>();
-    this.eventLoopThread = new Thread(new EventLoopExecutor<>(eventSource, this.eventQueue));
+    this.eventLoopThread =
+        new Thread(new EventLoopExecutor<>(eventSource, this.eventQueue), "event-loop");
     // Add a shutdown hook to interrupt the event loop thread when the JVM is shutting down
     Runtime.getRuntime().addShutdownHook(new Thread(eventLoopThread::interrupt));
   }
@@ -96,18 +97,19 @@ public final class SingleThreadEventLoop<T> implements EventLoop<T> {
       EventSource<T> eventSource, BlockingQueue<EventMessage<T>> eventQueue) implements Runnable {
 
     @Override
-    @SuppressWarnings("InfiniteLoopStatement")
     public void run() {
       log.debug(
           "Running single thread event loop from {}", this.eventSource.getClass().getSimpleName());
       final var factory = Thread.ofVirtual().name("single-loop-", 0).factory();
       try (final var executorService = Executors.newThreadPerTaskExecutor(factory)) {
-        while (true) {
+        while (!Thread.currentThread().isInterrupted()) {
           try {
-            // Poll the event queue for new messages and broadcast them
-            final var message = eventQueue.poll();
-            if (message == null) continue;
+            // Take a message from the event queue or wait until one is available
+            final var message = eventQueue.take();
+            // Broadcast the message to all listeners once it is available
             executorService.submit(() -> eventSource.broadcast(message));
+          } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
           } catch (Exception e) {
             log.error("Error while processing event", e);
           }

@@ -2,7 +2,9 @@ package co.orquex.sagas.sample.config;
 
 import co.orquex.sagas.domain.jackson.OrquexJacksonModule;
 import co.orquex.sagas.task.http.api.HttpClientProvider;
+import java.time.Duration;
 import lombok.RequiredArgsConstructor;
+import okhttp3.Dispatcher;
 import okhttp3.OkHttpClient;
 import org.springframework.boot.autoconfigure.jackson.Jackson2ObjectMapperBuilderCustomizer;
 import org.springframework.context.annotation.Bean;
@@ -21,10 +23,18 @@ public class BasicSampleConfig {
   @Bean
   public HttpClientProvider<OkHttpClient> okHttpClientBasicProvider() {
     return new HttpClientProvider<>() {
-
       @Override
       public OkHttpClient getClient() {
-        return new OkHttpClient.Builder().build();
+        final var dispatcher = new Dispatcher();
+        dispatcher.setMaxRequests(10); // Total concurrent requests
+        dispatcher.setMaxRequestsPerHost(2); // Per host
+
+        return new OkHttpClient.Builder()
+            .readTimeout(Duration.ofSeconds(30))
+            .connectTimeout(Duration.ofSeconds(30))
+            .retryOnConnectionFailure(false)
+            .dispatcher(dispatcher)
+            .build();
       }
 
       @Override

@@ -1,12 +1,15 @@
 package co.orquex.sagas.core.context;
 
+
 import co.orquex.sagas.domain.api.context.GlobalContext;
 import co.orquex.sagas.domain.api.context.TransactionContext;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import lombok.extern.slf4j.Slf4j;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /** Default in-memory implementation of {@link GlobalContext}. */
+@Slf4j
 public class DefaultGlobalContext implements GlobalContext {
 
   private final Map<String, TransactionContext> globalContextMap;
@@ -24,6 +27,7 @@ public class DefaultGlobalContext implements GlobalContext {
 
   @Override
   public void remove(@NonNull String transactionId) {
-    globalContextMap.remove(transactionId);
+    final var transactionContext = globalContextMap.remove(transactionId);
+    log.debug("Transaction '{}' context removed: {}", transactionId, transactionContext != null);
   }
 }

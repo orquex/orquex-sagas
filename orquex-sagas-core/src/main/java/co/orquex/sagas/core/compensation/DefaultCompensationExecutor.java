@@ -2,6 +2,7 @@ package co.orquex.sagas.core.compensation;
 
 import co.orquex.sagas.domain.api.CompensationExecutor;
 import co.orquex.sagas.domain.api.TaskExecutor;
+import co.orquex.sagas.domain.api.context.GlobalContext;
 import co.orquex.sagas.domain.api.registry.Registry;
 import co.orquex.sagas.domain.api.repository.CompensationRepository;
 import co.orquex.sagas.domain.api.repository.TaskRepository;
@@ -15,7 +16,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * Default implementation of the CompensationExecutor interface. It's responsible for executing
+ * Default implementation of the CompensationExecutor interface. It is responsible for executing
  * compensations for a given task sequentially and synchronously.
  */
 @Slf4j
@@ -25,6 +26,7 @@ public class DefaultCompensationExecutor implements CompensationExecutor {
   private final Registry<TaskExecutor> taskExecutorRegistry;
   private final TaskRepository taskRepository;
   private final CompensationRepository compensationRepository;
+  private final GlobalContext globalContext;
 
   /**
    * Executes the compensations for the given transaction ID.
@@ -34,63 +36,68 @@ public class DefaultCompensationExecutor implements CompensationExecutor {
    */
   @Override
   public void execute(String transactionId) {
-    final var compensations = compensationRepository.findByTransactionId(transactionId);
-
-    for (final var compensation : compensations) {
-      try {
-        var executionRequest =
-            new ExecutionRequest(
-                compensation.flowId(),
-                compensation.correlationId(),
-                compensation.metadata(),
-                compensation.request());
-        // Pre-process the payload with a task
-        final var preProcessor = compensation.preProcessor();
-        if (preProcessor != null) {
-          log.debug(
-              "Executing compensation pre-processor '{}' for task '{}'",
-              preProcessor.task(),
-              compensation.task());
-          final var preProcessorPayload =
-              executeProcessor(transactionId, preProcessor, executionRequest);
-          executionRequest = executionRequest.withPayload(preProcessorPayload);
-        }
-
-        // Execute the task with the pre-processed payload if any or the original payload
-        log.debug(
-            "Executing compensation task '{}' at flow '{}' with correlation ID '{}'",
-            compensation.task(),
-            executionRequest.flowId(),
-            executionRequest.correlationId());
-        var compensationResponse =
-            executeTask(transactionId, compensation.task(), executionRequest);
-
-        // Post-process the response with a task if any and update the response
-        final var postProcessor = compensation.postProcessor();
-        if (postProcessor != null) {
-          log.debug(
-              "Executing compensation post-processor '{}' for task '{}'",
-              postProcessor.task(),
-              compensation.task());
-          compensationResponse =
-              executeProcessor(
-                  transactionId, postProcessor, executionRequest.withPayload(compensationResponse));
-        }
-        log.trace(
-            "Compensation response for transaction '{}' and task '{}': {}",
-            transactionId,
-            compensation.task(),
-            compensationResponse);
-        log.debug(
-                "Compensation executed for transaction '{}' and task '{}'",
-                transactionId,
+    try {
+      final var compensations = compensationRepository.findByTransactionId(transactionId);
+      for (final var compensation : compensations) {
+        try {
+          var executionRequest =
+              new ExecutionRequest(
+                  compensation.flowId(),
+                  compensation.correlationId(),
+                  compensation.metadata(),
+                  compensation.request());
+          // Pre-process the payload with a task
+          final var preProcessor = compensation.preProcessor();
+          if (preProcessor != null) {
+            log.debug(
+                "Executing compensation pre-processor '{}' for task '{}'",
+                preProcessor.task(),
                 compensation.task());
-      } catch (WorkflowException e) {
-        log.error(
-            "Compensation execution failed for transaction '{}' and task '{}'",
-            transactionId,
-            compensation.task());
+            final var preProcessorPayload =
+                executeProcessor(transactionId, preProcessor, executionRequest);
+            executionRequest = executionRequest.withPayload(preProcessorPayload);
+          }
+
+          // Execute the task with the pre-processed payload if any or the original payload
+          log.debug(
+              "Executing compensation task '{}' at flow '{}' with correlation ID '{}'",
+              compensation.task(),
+              executionRequest.flowId(),
+              executionRequest.correlationId());
+          var compensationResponse =
+              executeTask(transactionId, compensation.task(), executionRequest);
+
+          // Post-process the response with a task if any and update the response
+          final var postProcessor = compensation.postProcessor();
+          if (postProcessor != null) {
+            log.debug(
+                "Executing compensation post-processor '{}' for task '{}'",
+                postProcessor.task(),
+                compensation.task());
+            compensationResponse =
+                executeProcessor(
+                    transactionId,
+                    postProcessor,
+                    executionRequest.withPayload(compensationResponse));
+          }
+          log.trace(
+              "Compensation response for transaction '{}' and task '{}': {}",
+              transactionId,
+              compensation.task(),
+              compensationResponse);
+          log.debug(
+              "Compensation executed for transaction '{}' and task '{}'",
+              transactionId,
+              compensation.task());
+        } catch (WorkflowException e) {
+          log.error(
+              "Compensation execution failed for transaction '{}' and task '{}'",
+              transactionId,
+              compensation.task());
+        }
       }
+    } finally {
+      globalContext.remove(transactionId);
     }
   }
 

@@ -6,6 +6,7 @@ import static java.util.Objects.nonNull;
 import co.orquex.sagas.domain.api.CompensationExecutor;
 import co.orquex.sagas.domain.api.Executable;
 import co.orquex.sagas.domain.api.StageExecutor;
+import co.orquex.sagas.domain.api.context.GlobalContext;
 import co.orquex.sagas.domain.api.repository.FlowRepository;
 import co.orquex.sagas.domain.api.repository.TransactionRepository;
 import co.orquex.sagas.domain.exception.WorkflowException;
@@ -30,17 +31,20 @@ public class WorkflowExecutor extends AbstractWorkflowExecutor
   private final StageExecutor stageExecutor;
   private final ExecutorService executor;
   private final CompensationExecutor compensationExecutor;
+  private final GlobalContext globalContext;
 
   public WorkflowExecutor(
       final FlowRepository flowRepository,
       final TransactionRepository transactionRepository,
       final StageExecutor stageExecutor,
       final CompensationExecutor compensationExecutor,
-      final ExecutorService executor) {
+      final ExecutorService executor,
+      final GlobalContext globalContext) {
     super(flowRepository, transactionRepository);
     this.stageExecutor = stageExecutor;
     this.executor = executor;
     this.compensationExecutor = compensationExecutor;
+    this.globalContext = globalContext;
   }
 
   /**
@@ -109,6 +113,9 @@ public class WorkflowExecutor extends AbstractWorkflowExecutor
       // Execute compensation if the transaction is not completed
       if (transaction.getStatus().equals(Status.ERROR)) {
         compensationExecutor.execute(transaction.getTransactionId());
+      } else {
+        // Clean up the context if the transaction is not in error
+        globalContext.remove(transaction.getTransactionId());
       }
       // Update the transaction status
       updateTransaction(transaction);
@@ -142,8 +149,7 @@ public class WorkflowExecutor extends AbstractWorkflowExecutor
         // Get the next stage
         final var stage = getStage(flow, nextStageId);
         // Prepare the stage metadata merging the request metadata with the flow and stage metadata
-        final var stageMetadata =
-            merge(metadata, flow.metadata(), stage.getMetadata());
+        final var stageMetadata = merge(metadata, flow.metadata(), stage.getMetadata());
         final var stageExecutionRequest =
             new ExecutionRequest(flowId, correlationId, stageMetadata, payload);
         // Execute stage

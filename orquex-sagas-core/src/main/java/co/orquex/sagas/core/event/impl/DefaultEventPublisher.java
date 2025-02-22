@@ -2,7 +2,7 @@ package co.orquex.sagas.core.event.impl;
 
 import co.orquex.sagas.core.event.EventLoop;
 import co.orquex.sagas.core.event.EventPublisher;
-import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Default implementation of the {@link EventPublisher} interface. This class is responsible for
@@ -10,11 +10,16 @@ import lombok.RequiredArgsConstructor;
  *
  * @param <T> the type of the event message
  */
-@RequiredArgsConstructor
+@Slf4j
 public class DefaultEventPublisher<T> implements EventPublisher<T> {
 
   /** The event loop where events are published. */
   private final EventLoop<T> eventLoop;
+
+  public DefaultEventPublisher(EventLoop<T> eventLoop) {
+    log.debug("Creating a new DefaultEventPublisher instance with event loop {}", eventLoop.getClass().getSimpleName());
+    this.eventLoop = eventLoop;
+  }
 
   /**
    * Publishes an event message to the event loop.

@@ -4,11 +4,12 @@ import static co.orquex.sagas.core.fixture.FlowFixture.getFlow;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.*;
 
 import co.orquex.sagas.domain.api.CompensationExecutor;
 import co.orquex.sagas.domain.api.StageExecutor;
+import co.orquex.sagas.domain.api.context.GlobalContext;
 import co.orquex.sagas.domain.api.repository.FlowRepository;
 import co.orquex.sagas.domain.api.repository.TransactionRepository;
 import co.orquex.sagas.domain.exception.WorkflowException;
@@ -40,6 +41,7 @@ class WorkflowExecutorTest {
   @Mock TransactionRepository transactionRepository;
   @Mock StageExecutor stageExecutor;
   @Mock CompensationExecutor compensationExecutor;
+  @Mock GlobalContext globalContext;
 
   WorkflowExecutor orchestratorExecutor;
 
@@ -48,7 +50,12 @@ class WorkflowExecutorTest {
     final var executor = Executors.newSingleThreadExecutor();
     orchestratorExecutor =
         new WorkflowExecutor(
-            flowRepository, transactionRepository, stageExecutor, compensationExecutor, executor);
+            flowRepository,
+            transactionRepository,
+            stageExecutor,
+            compensationExecutor,
+            executor,
+            globalContext);
   }
 
   @Test
@@ -68,6 +75,7 @@ class WorkflowExecutorTest {
     final var executionRequest = new ExecutionRequest(FLOW_ID, CORRELATION_ID);
     final var response = orchestratorExecutor.execute(executionRequest);
     assertThat(response).isNotNull();
+    verify(globalContext).remove(anyString());
   }
 
   @Test
@@ -91,6 +99,7 @@ class WorkflowExecutorTest {
         .hasMessage(
             "Circular execution detected in flow '%s' at stage '%s'."
                 .formatted(FLOW_ID, circularStage));
+    verify(globalContext, never()).remove(anyString());
   }
 
   @Test
@@ -140,6 +149,7 @@ class WorkflowExecutorTest {
         .isInstanceOf(WorkflowException.class)
         .hasMessage("An error occurred while executing flow '%s'.".formatted(FLOW_ID));
     verify(compensationExecutor).execute(any());
+    verify(globalContext, never()).remove(anyString());
   }
 
   @Test
@@ -159,6 +169,7 @@ class WorkflowExecutorTest {
         .isInstanceOf(WorkflowException.class)
         .hasMessage("Some message from an activity.");
     verify(compensationExecutor).execute(any());
+    verify(globalContext, never()).remove(anyString());
   }
 
   @Test
@@ -177,6 +188,7 @@ class WorkflowExecutorTest {
         .isInstanceOf(WorkflowException.class)
         .hasMessage("Flow '%s' timed out after PT1S.".formatted(FLOW_ID));
     verify(compensationExecutor).execute(any());
+    verify(globalContext, never()).remove(anyString());
   }
 
   @SuppressWarnings("java:S2925")

@@ -29,6 +29,7 @@ public final class DefaultEventManager<T> implements EventManager<T> {
 
   /** Default constructor that initializes the event source, event loop, and event publisher. */
   public DefaultEventManager() {
+    log.debug("Creating a new DefaultEventManager instance");
     this.eventSource = new InMemoryEventSource<>();
     this.eventLoop = SingleThreadEventLoop.of(eventSource).start();
     eventLoop.start();

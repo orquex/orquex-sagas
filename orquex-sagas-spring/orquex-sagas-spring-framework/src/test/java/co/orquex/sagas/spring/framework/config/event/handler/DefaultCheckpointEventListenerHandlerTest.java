@@ -5,6 +5,7 @@ import static org.mockito.Mockito.*;
 
 import co.orquex.sagas.core.flow.AsyncWorkflowStageExecutor;
 import co.orquex.sagas.domain.api.CompensationExecutor;
+import co.orquex.sagas.domain.api.context.GlobalContext;
 import co.orquex.sagas.domain.api.repository.FlowRepository;
 import co.orquex.sagas.domain.api.repository.TransactionRepository;
 import co.orquex.sagas.domain.exception.WorkflowException;
@@ -31,6 +32,7 @@ class DefaultCheckpointEventListenerHandlerTest {
   @Mock CompensationExecutor compensationExecutor;
   @Mock FlowRepository flowRepository;
   @Mock TransactionRepository transactionRepository;
+  @Mock GlobalContext globalContext;
 
   @InjectMocks DefaultCheckpointEventListenerHandler checkpointEventListenerHandler;
 
@@ -39,6 +41,7 @@ class DefaultCheckpointEventListenerHandlerTest {
     final var checkpoint = getCheckpoint(Status.COMPLETED, "outgoing");
     checkpointEventListenerHandler.handle(checkpoint);
     verify(workflowStageExecutor).execute(checkpoint);
+    verify(globalContext, never()).remove(anyString());
   }
 
   @Test
@@ -49,6 +52,7 @@ class DefaultCheckpointEventListenerHandlerTest {
     checkpointEventListenerHandler.handle(checkpoint);
     verify(workflowStageExecutor, never()).execute(checkpoint);
     verify(transactionRepository).save(transaction);
+    verify(globalContext).remove(anyString());
   }
 
   @Test
@@ -62,6 +66,7 @@ class DefaultCheckpointEventListenerHandlerTest {
     checkpointEventListenerHandler.handle(checkpoint);
     verify(compensationExecutor).execute(anyString());
     verify(workflowStageExecutor, never()).execute(checkpoint);
+    verify(globalContext, never()).remove(anyString());
   }
 
   @Test
@@ -75,6 +80,7 @@ class DefaultCheckpointEventListenerHandlerTest {
     verify(transactionRepository).save(transaction);
     verify(compensationExecutor).execute(anyString());
     verify(workflowStageExecutor, never()).execute(checkpoint);
+    verify(globalContext, never()).remove(anyString());
   }
 
   @Test
@@ -86,6 +92,7 @@ class DefaultCheckpointEventListenerHandlerTest {
     assertThatThrownBy(() -> checkpointEventListenerHandler.handle(checkpoint))
         .isInstanceOf(WorkflowException.class)
         .hasMessage("Transaction '%s' not found.".formatted(checkpoint.transactionId()));
+    verify(globalContext, never()).remove(anyString());
   }
 
   @Test
@@ -96,6 +103,7 @@ class DefaultCheckpointEventListenerHandlerTest {
     checkpointEventListenerHandler.handle(checkpoint);
     verify(workflowStageExecutor).execute(checkpoint);
     verify(compensationExecutor, never()).execute(anyString());
+    verify(globalContext, never()).remove(anyString());
   }
 
   @Test
@@ -105,6 +113,7 @@ class DefaultCheckpointEventListenerHandlerTest {
     assertThatThrownBy(() -> checkpointEventListenerHandler.handle(checkpoint))
         .isInstanceOf(WorkflowException.class)
         .hasMessage("Flow '%s' not found.".formatted(checkpoint.flowId()));
+    verify(globalContext, never()).remove(anyString());
   }
 
   @Test
@@ -116,6 +125,7 @@ class DefaultCheckpointEventListenerHandlerTest {
     verify(transactionRepository).save(transaction);
     verify(compensationExecutor).execute(anyString());
     verify(workflowStageExecutor, never()).execute(checkpoint);
+    verify(globalContext, never()).remove(anyString());
   }
 
   @Test

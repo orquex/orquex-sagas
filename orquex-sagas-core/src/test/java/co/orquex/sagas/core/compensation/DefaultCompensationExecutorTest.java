@@ -8,6 +8,7 @@ import static org.mockito.Mockito.*;
 
 import co.orquex.sagas.core.fixture.CompensationFixture;
 import co.orquex.sagas.domain.api.TaskExecutor;
+import co.orquex.sagas.domain.api.context.GlobalContext;
 import co.orquex.sagas.domain.api.registry.Registry;
 import co.orquex.sagas.domain.api.repository.CompensationRepository;
 import co.orquex.sagas.domain.api.repository.TaskRepository;
@@ -33,6 +34,7 @@ class DefaultCompensationExecutorTest {
   @Mock Registry<TaskExecutor> taskExecutorRegistry;
   @Mock TaskRepository taskRepository;
   @Mock CompensationRepository compensationRepository;
+  @Mock GlobalContext globalContext;
 
   @Mock TaskExecutor taskExecutor;
 
@@ -54,6 +56,7 @@ class DefaultCompensationExecutorTest {
     defaultCompensationExecutor.execute(TRANSACTION_ID);
     verify(taskExecutor, times(3))
         .execute(anyString(), any(Task.class), any(ExecutionRequest.class));
+    verify(globalContext).remove(TRANSACTION_ID);
   }
 
   @Test
@@ -68,6 +71,7 @@ class DefaultCompensationExecutorTest {
         .doesNotThrowAnyException();
     verify(taskExecutorRegistry, times(3)).get(anyString());
     verify(taskRepository, times(3)).findById(anyString());
+    verify(globalContext).remove(TRANSACTION_ID);
   }
 
   @Test
@@ -80,6 +84,7 @@ class DefaultCompensationExecutorTest {
         .doesNotThrowAnyException();
     verify(taskExecutorRegistry, never()).get(anyString());
     verify(taskRepository, times(3)).findById(anyString());
+    verify(globalContext).remove(TRANSACTION_ID);
   }
 
   @Test
@@ -97,6 +102,7 @@ class DefaultCompensationExecutorTest {
     defaultCompensationExecutor.execute(TRANSACTION_ID);
     verify(taskExecutor, times(3))
         .execute(anyString(), any(Task.class), any(ExecutionRequest.class));
+    verify(globalContext).remove(TRANSACTION_ID);
   }
 
   @Test
@@ -121,5 +127,6 @@ class DefaultCompensationExecutorTest {
         .execute(anyString(), any(Task.class), any(ExecutionRequest.class));
     verify(taskExecutorRegistry, times(3)).get(anyString());
     verify(taskRepository, times(3)).findById(anyString());
+    verify(globalContext).remove(TRANSACTION_ID);
   }
 }

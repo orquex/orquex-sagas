@@ -13,6 +13,6 @@ import org.springframework.context.annotation.Conditional;
 @Conditional(value = ConditionOnMissingBean.class)
 public @interface ConditionalOnMissingBean {
 
-  /** The name of the bean to check if it's missing. */
+  /** The name of the bean to check if it is missing. */
   String[] name() default {};
 }

@@ -5,6 +5,7 @@ import co.orquex.sagas.core.flow.WorkflowExecutor;
 import co.orquex.sagas.domain.api.CompensationExecutor;
 import co.orquex.sagas.domain.api.StageExecutor;
 import co.orquex.sagas.domain.api.TaskExecutor;
+import co.orquex.sagas.domain.api.context.GlobalContext;
 import co.orquex.sagas.domain.api.registry.Registry;
 import co.orquex.sagas.domain.api.repository.CompensationRepository;
 import co.orquex.sagas.domain.api.repository.FlowRepository;
@@ -27,22 +28,25 @@ public class SagasWorkflowConfiguration {
       final TransactionRepository transactionRepository,
       @Qualifier("defaultStageExecutor") final StageExecutor defaultStageExecutor,
       final CompensationExecutor compensationExecutor,
-      final ExecutorService workflowExecutorService) {
+      final ExecutorService workflowExecutorService,
+      final GlobalContext globalContext) {
     return new WorkflowExecutor(
         flowRepository,
         transactionRepository,
         defaultStageExecutor,
         compensationExecutor,
-        workflowExecutorService);
+        workflowExecutorService,
+        globalContext);
   }
 
   @Bean
   public CompensationExecutor defaultCompensationExecutor(
       final Registry<TaskExecutor> taskExecutorRegistry,
       final TaskRepository taskRepository,
-      final CompensationRepository compensationRepository) {
+      final CompensationRepository compensationRepository,
+      final GlobalContext globalContext) {
     return new DefaultCompensationExecutor(
-        taskExecutorRegistry, taskRepository, compensationRepository);
+        taskExecutorRegistry, taskRepository, compensationRepository, globalContext);
   }
 
   @Bean

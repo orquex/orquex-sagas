@@ -5,6 +5,7 @@ import static java.util.Objects.nonNull;
 
 import co.orquex.sagas.core.flow.AsyncWorkflowStageExecutor;
 import co.orquex.sagas.domain.api.CompensationExecutor;
+import co.orquex.sagas.domain.api.context.GlobalContext;
 import co.orquex.sagas.domain.api.repository.FlowRepository;
 import co.orquex.sagas.domain.api.repository.TransactionRepository;
 import co.orquex.sagas.domain.exception.WorkflowException;
@@ -17,7 +18,7 @@ import lombok.extern.slf4j.Slf4j;
 
 /**
  * Default implementation of {@link CheckpointEventListenerHandler} that handles the different
- * status of a {@link Checkpoint} and executes the next stage when there's an outgoing and the
+ * status of a {@link Checkpoint} and executes the next stage when there is an outgoing and the
  * previous one was completed.
  */
 @Slf4j
@@ -28,6 +29,7 @@ public class DefaultCheckpointEventListenerHandler implements CheckpointEventLis
   private final CompensationExecutor compensationExecutor;
   private final FlowRepository flowRepository;
   private final TransactionRepository transactionRepository;
+  private final GlobalContext globalContext;
 
   public void handle(Checkpoint checkpoint) {
     log.trace(
@@ -58,6 +60,7 @@ public class DefaultCheckpointEventListenerHandler implements CheckpointEventLis
           "Flow '{}' with correlation id '{}' has been completed",
           checkpoint.flowId(),
           checkpoint.correlationId());
+      globalContext.remove(checkpoint.transactionId());
     }
   }
 
@@ -78,7 +81,7 @@ public class DefaultCheckpointEventListenerHandler implements CheckpointEventLis
           checkpoint.incoming().getName());
       compensationExecutor.execute(checkpoint.transactionId());
     } else {
-      // If it is not all or nothing and there is outgoing, then it will be executed by the next stage
+      /* If it is not all or nothing and there is outgoing, then it will be executed by the next stage */
       workflowStageExecutor.execute(checkpoint);
     }
   }
@@ -89,10 +92,10 @@ public class DefaultCheckpointEventListenerHandler implements CheckpointEventLis
     transaction.setStatus(Status.CANCELED);
     transactionRepository.save(transaction);
     log.info(
-            "Flow '{}' with correlation ID '{}' has been cancelled by stage '{}'",
-            checkpoint.flowId(),
-            checkpoint.correlationId(),
-            checkpoint.incoming().getName());
+        "Flow '{}' with correlation ID '{}' has been cancelled by stage '{}'",
+        checkpoint.flowId(),
+        checkpoint.correlationId(),
+        checkpoint.incoming().getName());
     compensationExecutor.execute(checkpoint.transactionId());
   }
 
