@@ -35,7 +35,11 @@
             <groupId>co.orquex.sagas</groupId>
             <artifactId>orquex-sagas-task-okhttp</artifactId>
         </dependency>
-        <!--  -->
+        <dependency>
+            <groupId>co.orquex.sagas</groupId>
+            <artifactId>orquex-sagas-task-jsonata</artifactId>
+        </dependency>
+        <!-- Others -->
         <dependency>
             <groupId>jakarta.annotation</groupId>
             <artifactId>jakarta.annotation-api</artifactId>

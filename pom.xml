@@ -65,6 +65,11 @@
                 <artifactId>orquex-sagas-task-okhttp</artifactId>
                 <version>${project.version}</version>
             </dependency>
+            <dependency>
+                <groupId>co.orquex.sagas</groupId>
+                <artifactId>orquex-sagas-task-jsonata</artifactId>
+                <version>${project.version}</version>
+            </dependency>
             <!-- Orquex Sagas Spring -->
             <dependency>
                 <groupId>co.orquex.sagas</groupId>
