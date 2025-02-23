@@ -46,7 +46,7 @@ public abstract class AbstractHttpClientTaskImplementation<C> implements TaskImp
   }
 
   @NonNull
-  protected <T> T convertValue(@NonNull Map<String, Serializable> object, @NonNull Class<T> clazz) {
+  protected <T> T convertValue(@NonNull Map<String, ? extends Serializable> object, @NonNull Class<T> clazz) {
     try {
       return objectMapper.convertValue(object, clazz);
     } catch (IllegalArgumentException e) {

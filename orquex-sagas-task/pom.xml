@@ -20,6 +20,7 @@
     <modules>
         <module>orquex-sagas-task-groovy</module>
         <module>orquex-sagas-task-http</module>
+        <module>orquex-sagas-task-jsonata</module>
     </modules>
 
     <dependencyManagement>
@@ -32,6 +33,11 @@
             <dependency>
                 <groupId>co.orquex.sagas</groupId>
                 <artifactId>orquex-sagas-task-http</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>co.orquex.sagas</groupId>
+                <artifactId>orquex-sagas-task-jsonata</artifactId>
                 <version>${project.version}</version>
             </dependency>
         </dependencies>

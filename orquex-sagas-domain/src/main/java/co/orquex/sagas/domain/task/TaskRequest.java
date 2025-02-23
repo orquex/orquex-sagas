@@ -5,5 +5,5 @@ import java.util.Map;
 
 public record TaskRequest(
     String transactionId,
-    Map<String, Serializable> metadata,
-    Map<String, Serializable> payload) {}
+    Map<String, ? extends Serializable> metadata,
+    Map<String, ? extends Serializable> payload) {}

@@ -35,7 +35,9 @@ public class GroovyActivity implements TaskImplementation {
       final var metadata = taskRequest.metadata();
       final var payload = taskRequest.payload();
 
-      if (!metadata.containsKey(SCRIPT)) throw new WorkflowException("script not found");
+      if (!metadata.containsKey(SCRIPT)) {
+        throw new WorkflowException("script not found");
+      }
 
       final var response = new HashMap<String, Serializable>();
       final var decode = Base64.getDecoder().decode(metadata.get(SCRIPT).toString());
