@@ -4,5 +4,11 @@ spring:
 
 logging:
   level:
-    root: error
-    co.orquex.sagas: debug
+    root: info
+    co.orquex.sagas: trace
+
+orquex:
+  sagas:
+    spring:
+      compensation:
+        enabled: true # Enable compensation

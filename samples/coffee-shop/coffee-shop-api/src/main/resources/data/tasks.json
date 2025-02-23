@@ -1,0 +1,12 @@
+[
+  {
+    "id": "default-groovy-activity",
+    "name": "Default Groovy Activity",
+    "implementation": "groovy"
+  },
+  {
+    "id": "default-groovy-evaluator",
+    "name": "Default Groovy Evaluator",
+    "implementation": "groovy-eval"
+  }
+]

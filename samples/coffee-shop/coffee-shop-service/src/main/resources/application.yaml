@@ -1,0 +1,23 @@
+server:
+  port: 7072
+spring:
+  application:
+    name: coffee-shop-promotion
+  kafka:
+    bootstrap-servers: 127.0.0.1:19092
+    producer.value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+    consumer:
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      group-id: coffee-shop-promotion
+      auto-offset-reset: earliest
+logging:
+  level:
+    root: error
+    co.orquex.sagas: debug
+orquex:
+  sagas:
+    spring:
+      workflow:
+        enabled: false
+      event:
+        default-checkpoint-event-listener: false

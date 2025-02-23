@@ -6,24 +6,39 @@
     <parent>
         <groupId>co.orquex.sagas</groupId>
         <artifactId>orquex-sagas</artifactId>
-        <version>1.0-SNAPSHOT</version>
+        <version>1.0.0-SNAPSHOT</version>
     </parent>
-    <packaging>pom</packaging>
     <artifactId>orquex-sagas-task</artifactId>
+    <packaging>pom</packaging>
 
     <properties>
         <maven.compiler.source>21</maven.compiler.source>
         <maven.compiler.target>21</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <orquex-sagas.version>1.0-SNAPSHOT</orquex-sagas.version>
     </properties>
+
+    <modules>
+        <module>orquex-sagas-task-groovy</module>
+        <module>orquex-sagas-task-http</module>
+        <module>orquex-sagas-task-jsonata</module>
+    </modules>
 
     <dependencyManagement>
         <dependencies>
             <dependency>
                 <groupId>co.orquex.sagas</groupId>
-                <artifactId>orquex-sagas-domain</artifactId>
-                <version>${orquex-sagas.version}</version>
+                <artifactId>orquex-sagas-task-groovy</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>co.orquex.sagas</groupId>
+                <artifactId>orquex-sagas-task-http</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>co.orquex.sagas</groupId>
+                <artifactId>orquex-sagas-task-jsonata</artifactId>
+                <version>${project.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

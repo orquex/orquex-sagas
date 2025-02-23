@@ -1,6 +1,6 @@
 package co.orquex.sagas.domain.api;
 
-public interface Executable<R> {
+public interface Executable<I, O> {
 
-  void execute(R request);
+  O execute(I request);
 }

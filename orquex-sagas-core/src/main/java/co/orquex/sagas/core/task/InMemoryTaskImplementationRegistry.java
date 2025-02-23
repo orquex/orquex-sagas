@@ -1,7 +1,7 @@
 package co.orquex.sagas.core.task;
 
 import co.orquex.sagas.domain.api.TaskImplementation;
-import co.orquex.sagas.domain.registry.Registry;
+import co.orquex.sagas.domain.api.registry.Registry;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -21,13 +21,9 @@ public class InMemoryTaskImplementationRegistry implements Registry<TaskImplemen
     return instance;
   }
 
-  public static InMemoryTaskImplementationRegistry newInstance() {
-    return new InMemoryTaskImplementationRegistry();
-  }
-
   @Override
   public void add(TaskImplementation implementation) {
-    this.registry.put(implementation.getName(), implementation);
+    this.registry.put(implementation.getKey(), implementation);
   }
 
   @Override

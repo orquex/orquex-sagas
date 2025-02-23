@@ -1,0 +1,7 @@
+[
+  {
+    "id": "notification-sender",
+    "name": "Notification sender",
+    "implementation": "notification-sender"
+  }
+]

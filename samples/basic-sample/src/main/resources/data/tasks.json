@@ -1,10 +1,26 @@
 [
   {
-    "id": "get-user",
-    "name": "Get user from JSON place holder",
-    "implementation": "get-user",
+    "id": "http-get",
+    "name": "General HTTP GET Task",
+    "implementation": "okhttp-get",
     "metadata": {
-      "host": "https://jsonplaceholder.typicode.com/users"
+      "__client_provider": "basic-provider"
+    }
+  },
+  {
+    "id": "http-post",
+    "name": "General HTTP POST Task",
+    "implementation": "okhttp-post",
+    "metadata": {
+      "__client_provider": "basic-provider"
+    }
+  },
+  {
+    "id": "http-delete",
+    "name": "General HTTP DELETE Task",
+    "implementation": "okhttp-delete",
+    "metadata": {
+      "__client_provider": "basic-provider"
     }
   },
   {

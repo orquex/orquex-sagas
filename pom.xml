@@ -6,13 +6,14 @@
 
     <groupId>co.orquex.sagas</groupId>
     <artifactId>orquex-sagas</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.0.0-SNAPSHOT</version>
     <packaging>pom</packaging>
+
     <modules>
         <module>orquex-sagas-domain</module>
         <module>orquex-sagas-core</module>
         <module>orquex-sagas-task</module>
-        <module>orquex-sagas-task/orquex-sagas-task-groovy</module>
+        <module>orquex-sagas-spring</module>
     </modules>
 
     <properties>
@@ -20,14 +21,15 @@
         <maven.compiler.target>21</maven.compiler.target>
         <maven.compiler.release>21</maven.compiler.release>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <lombok.version>1.18.30</lombok.version>
-        <jackson.version>2.15.3</jackson.version>
-        <slf4j.version>2.0.9</slf4j.version>
-        <junit-jupiter.version>5.10.0</junit-jupiter.version>
-        <assertj.version>3.24.2</assertj.version>
-        <mockito.version>5.8.0</mockito.version>
-        <awaitility.version>4.2.0</awaitility.version>
-        <bytebuddy.version>1.14.10</bytebuddy.version>
+        <lombok.version>1.18.32</lombok.version>
+        <jackson.version>2.17.1</jackson.version>
+        <slf4j.version>2.0.13</slf4j.version>
+        <junit-jupiter.version>5.10.2</junit-jupiter.version>
+        <assertj.version>3.26.0</assertj.version>
+        <mockito.version>5.12.0</mockito.version>
+        <awaitility.version>4.2.1</awaitility.version>
+        <bytebuddy.version>1.14.17</bytebuddy.version>
+        <checkerframework.version>3.47.0</checkerframework.version>
     </properties>
 
     <dependencyManagement>
@@ -39,9 +41,10 @@
             </dependency>
             <dependency>
                 <groupId>co.orquex.sagas</groupId>
-                <artifactId>orquex-sagas-stage</artifactId>
+                <artifactId>orquex-sagas-core</artifactId>
                 <version>${project.version}</version>
             </dependency>
+            <!-- Orquex Sagas Task -->
             <dependency>
                 <groupId>co.orquex.sagas</groupId>
                 <artifactId>orquex-sagas-task</artifactId>
@@ -49,7 +52,33 @@
             </dependency>
             <dependency>
                 <groupId>co.orquex.sagas</groupId>
-                <artifactId>orquex-sagas-core</artifactId>
+                <artifactId>orquex-sagas-task-groovy</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>co.orquex.sagas</groupId>
+                <artifactId>orquex-sagas-task-http-api</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>co.orquex.sagas</groupId>
+                <artifactId>orquex-sagas-task-okhttp</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <!-- Orquex Sagas Spring -->
+            <dependency>
+                <groupId>co.orquex.sagas</groupId>
+                <artifactId>orquex-sagas-spring</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>co.orquex.sagas</groupId>
+                <artifactId>orquex-sagas-spring-framework</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>co.orquex.sagas</groupId>
+                <artifactId>orquex-sagas-spring-boot</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <!-- Libraries -->
@@ -73,6 +102,11 @@
                 <artifactId>jackson-datatype-jsr310</artifactId>
                 <version>${jackson.version}</version>
             </dependency>
+            <dependency>
+                <groupId>org.checkerframework</groupId>
+                <artifactId>checker-qual</artifactId>
+                <version>${checkerframework.version}</version>
+            </dependency>
             <!-- Logging -->
             <dependency>
                 <groupId>org.slf4j</groupId>
@@ -93,20 +127,9 @@
                 <scope>test</scope>
             </dependency>
             <dependency>
-                <groupId>net.bytebuddy</groupId>
-                <artifactId>byte-buddy</artifactId>
-                <version>${bytebuddy.version}</version>
-            </dependency>
-            <dependency>
                 <groupId>org.assertj</groupId>
                 <artifactId>assertj-core</artifactId>
                 <version>${assertj.version}</version>
-                <scope>test</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.mockito</groupId>
-                <artifactId>mockito-core</artifactId>
-                <version>${mockito.version}</version>
                 <scope>test</scope>
             </dependency>
             <dependency>
@@ -129,5 +152,20 @@
             </dependency>
         </dependencies>
     </dependencyManagement>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>3.2.5</version>
+                <configuration>
+                    <argLine>
+                        -javaagent:${settings.localRepository}/net/bytebuddy/byte-buddy-agent/${bytebuddy.version}/byte-buddy-agent-${bytebuddy.version}.jar
+                    </argLine>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 
 </project>

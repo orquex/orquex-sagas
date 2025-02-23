@@ -7,7 +7,23 @@ import java.io.Serial;
 import java.io.Serializable;
 import java.time.Duration;
 
-public record FlowConfiguration(Duration timeout, boolean aon) implements Serializable {
+/**
+ * The flow configuration contains the flow timeout and the all-or-nothing flag required to handle
+ * the flow behaviour.
+ *
+ * <p>JSON representation:
+ *
+ * <pre>
+ * {
+ *   "timeout": "PT1M",
+ *   "allOrNothing": false
+ * }
+ * </pre>
+ *
+ * @param timeout the flow timeout, by default, is 1 minute.
+ * @param allOrNothing the all-or-nothing flag
+ */
+public record FlowConfiguration(Duration timeout, boolean allOrNothing) implements Serializable {
 
   @Serial private static final long serialVersionUID = OrquexSagasVersion.SERIAL_VERSION;
   public static final Duration DEFAULT_TIMEOUT = Duration.ofMinutes(1);

@@ -10,6 +10,30 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * The flow is the sagas' definition, every flow is unique and contains all the stages required to
+ * execute it.
+ *
+ * <p>JSON representation:
+ *
+ * <pre>
+ * {
+ *   "id": "flow-id",
+ *   "name": "flow-name",
+ *   "initialStage": "stage-id",
+ *   "stages": {},
+ *   "metadata": {},
+ *   "configuration": {}
+ * }
+ * </pre>
+ *
+ * @param id a required unique identifier for the flow
+ * @param name a human-readable name for the flow
+ * @param initialStage the required initial stage to start the flow
+ * @param stages a required map containing all the stages required to execute the flow
+ * @param metadata a map containing additional information about the flow
+ * @param configuration the flow's configuration
+ */
 public record Flow(
     String id,
     String name,

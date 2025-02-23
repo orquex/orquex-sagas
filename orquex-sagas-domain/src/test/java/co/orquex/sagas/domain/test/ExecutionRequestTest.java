@@ -6,7 +6,6 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import co.orquex.sagas.domain.execution.ExecutionRequest;
 import java.io.Serializable;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
@@ -19,7 +18,7 @@ public class ExecutionRequestTest {
   public static final Map<String, Serializable> METADATA = Map.of("metadata-key", "metadata-value");
 
   @Test
-  public void shouldInitializeWithNonNullValues() {
+  void shouldInitializeWithNonNullValues() {
     final var request = new ExecutionRequest(FLOW_ID, CORRELATION_ID, METADATA, PAYLOAD);
     assertThat(request).isNotNull();
     assertThat(request.flowId()).isEqualTo(FLOW_ID);
@@ -35,21 +34,21 @@ public class ExecutionRequestTest {
   }
 
   @Test
-  public void shouldThrowExceptionWithNullFlowId() {
+  void shouldThrowExceptionWithNullFlowId() {
     assertThatThrownBy(() -> new ExecutionRequest(null, CORRELATION_ID, null, null))
         .isInstanceOf(IllegalArgumentException.class)
         .hasMessage("execution request's flow id is required");
   }
 
   @Test
-  public void shouldThrowExceptionWithNullCorrelationId() {
-    assertThatThrownBy(() -> new ExecutionRequest(FLOW_ID, null, new HashMap<>(), new HashMap<>()))
+  void shouldThrowExceptionWithNullCorrelationId() {
+    assertThatThrownBy(() -> new ExecutionRequest(FLOW_ID, null, null, null))
         .isInstanceOf(IllegalArgumentException.class)
         .hasMessage("execution request's correlation id is required");
   }
 
   @Test
-  public void shouldCreateWithNonNullDefaultMetadataAndPayload() {
+  void shouldCreateWithNonNullDefaultMetadataAndPayload() {
     ExecutionRequest request = new ExecutionRequest(FLOW_ID, CORRELATION_ID, null, null);
     assertThat(request).isNotNull();
     assertThat(request.flowId()).isEqualTo(FLOW_ID);

@@ -1,0 +1,1 @@
+context.put("user", payload.user.name.toUpperCase())

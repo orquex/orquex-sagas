@@ -11,12 +11,13 @@ import java.util.Map;
 @JsonIgnoreProperties(ignoreUnknown = true)
 abstract class ActivityMixin {
 
-  public ActivityMixin(
+  protected ActivityMixin(
           @JsonProperty("id") String id,
           @JsonProperty("name") String name,
           @JsonProperty("metadata") Map<String, Serializable> metadata,
           @JsonProperty("configuration") StageConfiguration configuration,
           @JsonProperty("activityTasks") List<ActivityTask> tasks,
           @JsonProperty("sync") boolean sync,
-          @JsonProperty("outgoing") String outgoing) {}
+          @JsonProperty("outgoing") String outgoing,
+          @JsonProperty("allOrNothing") Boolean allOrNothing) {}
 }

@@ -8,11 +8,30 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * This class is used to define and manage the details of a specific task in a workflow.
+ *
+ * <p>JSON representation:
+ *
+ * <pre>
+ * {
+ *   "id": "task-id",
+ *   "name": "task-name",
+ *   "implementation": "task-implementation",
+ *   "compensation": {},
+ *   "metadata": {},
+ *   "configuration": {}
+ * }
+ * </pre>
+ *
+ * @see TaskProcessor
+ * @see TaskConfiguration
+ */
 public record Task(
     String id,
     String name,
     String implementation,
-    Processor compensation,
+    TaskProcessor compensation,
     Map<String, Serializable> metadata,
     TaskConfiguration configuration)
     implements Serializable {
@@ -20,7 +39,8 @@ public record Task(
   @Serial private static final long serialVersionUID = OrquexSagasVersion.SERIAL_VERSION;
 
   public Task {
-    implementation = checkArgumentNotEmpty(implementation, "task`s implementation required");
+    name = checkArgumentNotNullOrElse(name, id);
+    implementation = checkArgumentNotEmpty(implementation, "Task`s implementation required");
     metadata = checkArgumentNotNullOrElse(metadata, new HashMap<>());
     configuration = checkArgumentNotNullOrElse(configuration, TaskConfiguration.builder().build());
   }
