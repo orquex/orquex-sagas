@@ -1,5 +1,7 @@
 = SAGA Framework
 
+link:https://deepwiki.com/orquex/orquex-sagas[image:https://deepwiki.com/badge.svg[Ask DeepWiki]]
+
 SAGA (Software Automation, Generation, and Administration) is a known pattern to manage long-live transactions in distributed environments.
 Long Live Transactions (LLT), is a transaction that takes significant time to be completed and requires synchronization between multiple transactions.
 
