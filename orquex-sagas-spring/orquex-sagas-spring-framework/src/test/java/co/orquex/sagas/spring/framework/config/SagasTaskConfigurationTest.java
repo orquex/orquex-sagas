@@ -21,5 +21,6 @@ class SagasTaskConfigurationTest {
     assertThat(applicationContext.getBean("groovyEvaluation")).isNotNull();
     assertThat(applicationContext.getBean("okHttpGetActivity")).isNotNull();
     assertThat(applicationContext.getBean("okHttpPostActivity")).isNotNull();
+    assertThat(applicationContext.getBean("jSONata4JActivity")).isNotNull();
   }
 }

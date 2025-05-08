@@ -6,6 +6,7 @@ import co.orquex.sagas.task.groovy.GroovyActivity;
 import co.orquex.sagas.task.groovy.GroovyEvaluation;
 import co.orquex.sagas.task.http.api.HttpClientProvider;
 import co.orquex.sagas.task.http.api.HttpClientProviderRegistry;
+import co.orquex.sagas.task.jsonata.JSONata4JActivity;
 import co.orquex.sagas.task.okhttp.OkHttpDeleteActivity;
 import co.orquex.sagas.task.okhttp.OkHttpGetActivity;
 import co.orquex.sagas.task.okhttp.OkHttpInMemoryClientProviderRegistry;
@@ -45,13 +46,13 @@ public class SagasTaskConfiguration {
 
   @Bean
   public TaskImplementation okHttpDeleteActivity(
-          HttpClientProviderRegistry<OkHttpClient> registry, ObjectMapper objectMapper) {
+      HttpClientProviderRegistry<OkHttpClient> registry, ObjectMapper objectMapper) {
     return new OkHttpDeleteActivity(registry, objectMapper);
   }
 
   @Bean
   public TaskImplementation okHttpPutActivity(
-          HttpClientProviderRegistry<OkHttpClient> registry, ObjectMapper objectMapper) {
+      HttpClientProviderRegistry<OkHttpClient> registry, ObjectMapper objectMapper) {
     return new OkHttpPutActivity(registry, objectMapper);
   }
 
@@ -59,5 +60,11 @@ public class SagasTaskConfiguration {
   public HttpClientProviderRegistry<OkHttpClient> okHttpInMemoryClientRegistry(
       List<HttpClientProvider<OkHttpClient>> okHttpClientProviders) {
     return OkHttpInMemoryClientProviderRegistry.of(okHttpClientProviders);
+  }
+
+  @Bean
+  public TaskImplementation jSONata4JActivity(
+      GlobalContext globalContext, ObjectMapper objectMapper) {
+    return new JSONata4JActivity(globalContext, objectMapper);
   }
 }
