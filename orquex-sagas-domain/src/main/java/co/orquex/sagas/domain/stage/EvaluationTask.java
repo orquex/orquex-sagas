@@ -9,6 +9,7 @@ import java.io.Serial;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 /**
  * Represents an evaluation task within an Evaluation stage in a workflow.
@@ -21,6 +22,8 @@ import java.util.Map;
  *
  * <pre>
  * {
+ *   "id": "",
+ *   "name": "Task name"
  *   "task": "task-id",
  *   "preProcessor": {},
  *   "metadata": {}
@@ -30,17 +33,23 @@ import java.util.Map;
  * @see Evaluation
  */
 public record EvaluationTask(
-    String task, TaskProcessor preProcessor, Map<String, Serializable> metadata)
+    String id,
+    String name,
+    String task,
+    TaskProcessor preProcessor,
+    Map<String, Serializable> metadata)
     implements Serializable {
 
   @Serial private static final long serialVersionUID = OrquexSagasVersion.SERIAL_VERSION;
 
   public EvaluationTask {
+    id = checkArgumentNotNullOrElse(id, UUID.randomUUID().toString());
     task = checkArgumentNotEmpty(task, "evaluation's task required");
+    name = checkArgumentNotNullOrElse(name, task);
     metadata = checkArgumentNotNullOrElse(metadata, new HashMap<>());
   }
 
-  public EvaluationTask(String taskId) {
-    this(taskId, null, null);
+  public EvaluationTask(String task) {
+    this(UUID.randomUUID().toString(), task, task, null, null);
   }
 }

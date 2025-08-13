@@ -8,6 +8,6 @@ import lombok.NoArgsConstructor;
 public final class ActivityTaskFixture {
 
   public static ActivityTask getSimpleActivityTask(String id) {
-    return new ActivityTask(id, null, null, null, null);
+    return new ActivityTask(id);
   }
 }
