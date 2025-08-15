@@ -1,6 +1,5 @@
 package co.orquex.sagas.core.context;
 
-
 import co.orquex.sagas.domain.api.context.GlobalContext;
 import co.orquex.sagas.domain.api.context.TransactionContext;
 import java.util.Map;

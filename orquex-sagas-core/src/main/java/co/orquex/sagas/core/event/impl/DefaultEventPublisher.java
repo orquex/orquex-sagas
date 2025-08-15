@@ -17,7 +17,9 @@ public class DefaultEventPublisher<T> implements EventPublisher<T> {
   private final EventLoop<T> eventLoop;
 
   public DefaultEventPublisher(EventLoop<T> eventLoop) {
-    log.debug("Creating a new DefaultEventPublisher instance with event loop {}", eventLoop.getClass().getSimpleName());
+    log.debug(
+        "Creating a new DefaultEventPublisher instance with event loop {}",
+        eventLoop.getClass().getSimpleName());
     this.eventLoop = eventLoop;
   }
 

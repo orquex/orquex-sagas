@@ -4,13 +4,19 @@ import static co.orquex.sagas.core.fixture.ActivityFixture.getSimpleActivity;
 import static co.orquex.sagas.core.fixture.ActivityTaskFixture.getSimpleActivityTask;
 import static co.orquex.sagas.core.fixture.JacksonFixture.readValue;
 import static co.orquex.sagas.core.fixture.TaskFixture.getTask;
+import static co.orquex.sagas.core.fixture.TaskFixture.getTaskWithBothResilienceConfigs;
+import static co.orquex.sagas.core.fixture.TaskFixture.getTaskWithCircuitBreakerConfig;
+import static co.orquex.sagas.core.fixture.TaskFixture.getTaskWithRetryConfig;
 import static co.orquex.sagas.domain.task.TaskConfiguration.DEFAULT_EXECUTOR;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import co.orquex.sagas.core.resilience.CircuitBreakerStateManager;
+import co.orquex.sagas.core.resilience.RetryStateManager;
 import co.orquex.sagas.core.stage.strategy.impl.ActivityProcessingStrategy;
 import co.orquex.sagas.domain.api.TaskExecutor;
 import co.orquex.sagas.domain.api.registry.Registry;
@@ -20,6 +26,7 @@ import co.orquex.sagas.domain.execution.ExecutionRequest;
 import co.orquex.sagas.domain.stage.Activity;
 import co.orquex.sagas.domain.task.Task;
 import co.orquex.sagas.domain.transaction.Compensation;
+import java.time.Duration;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -39,17 +46,23 @@ class ActivityProcessingStrategyTest {
   @Mock Registry<TaskExecutor> taskExecutorRegistry;
   @Mock TaskRepository taskRepository;
   @Mock TaskExecutor taskExecutor;
+  @Mock RetryStateManager retryStateManager;
+  @Mock CircuitBreakerStateManager circuitBreakerStateManager;
+  @Mock Consumer<Compensation> compensationConsumer;
 
   ActivityProcessingStrategy strategy;
   ExecutionRequest executionRequest;
   String transactionId;
 
-  @Mock Consumer<Compensation> compensationConsumer;
-
   @BeforeEach
   void setUp() {
     strategy =
-        new ActivityProcessingStrategy(taskExecutorRegistry, taskRepository, compensationConsumer);
+        new ActivityProcessingStrategy(
+            taskExecutorRegistry,
+            taskRepository,
+            retryStateManager,
+            circuitBreakerStateManager,
+            compensationConsumer);
     executionRequest =
         new ExecutionRequest(UUID.randomUUID().toString(), UUID.randomUUID().toString());
     transactionId = UUID.randomUUID().toString();
@@ -60,7 +73,7 @@ class ActivityProcessingStrategyTest {
     final var simpleTask = getTask("simple-task");
     final var preTask = getTask("pre-impl-id");
     final var postTask = getTask("post-impl-id");
-    // Task executor registry
+    // Task executor stateManager
     when(taskExecutorRegistry.get(DEFAULT_EXECUTOR)).thenReturn(Optional.of(taskExecutor));
     // Task repository
     when(taskRepository.findById("simple-task")).thenReturn(Optional.of(simpleTask));
@@ -92,7 +105,7 @@ class ActivityProcessingStrategyTest {
 
   @Test
   void shouldThrowExceptionWhenActivityTaskExecutorNotFound() {
-    // Task executor registry
+    // Task executor stateManager
     when(taskExecutorRegistry.get(DEFAULT_EXECUTOR)).thenReturn(Optional.empty());
     when(taskRepository.findById("single-task")).thenReturn(Optional.of(getTask("single-task")));
     final var activity = readValue("stage-activity-single-task.json", Activity.class);
@@ -103,7 +116,7 @@ class ActivityProcessingStrategyTest {
 
   @Test
   void shouldProcessActivityParallelTasks() {
-    // Task executor registry
+    // Task executor stateManager
     when(taskExecutorRegistry.get(DEFAULT_EXECUTOR)).thenReturn(Optional.of(taskExecutor));
     // Task repository
     when(taskRepository.findById(anyString()))
@@ -130,7 +143,7 @@ class ActivityProcessingStrategyTest {
 
   @Test
   void shouldThrowExceptionWhenActivityParallelTaskExecutorNotFound() {
-    // Task executor registry
+    // Task executor stateManager
     when(taskExecutorRegistry.get(DEFAULT_EXECUTOR))
         .thenReturn(Optional.of(taskExecutor))
         .thenReturn(Optional.empty());
@@ -146,7 +159,7 @@ class ActivityProcessingStrategyTest {
   @ParameterizedTest
   @ValueSource(booleans = {true, false})
   void shouldContinueActivityTaskExecutionWhenAllOrNothingIsFalse(boolean parallel) {
-    // Task executor registry
+    // Task executor stateManager
     when(taskExecutorRegistry.get(DEFAULT_EXECUTOR)).thenReturn(Optional.of(taskExecutor));
     // Task repository
     when(taskRepository.findById(anyString()))
@@ -179,5 +192,175 @@ class ActivityProcessingStrategyTest {
         .containsEntry("task-1", "1")
         .containsEntry("task-2", "2")
         .containsEntry("task-4", "4");
+  }
+
+  @Test
+  void shouldExecuteTaskWithRetryConfiguration() {
+    // Given - Task with retry configuration
+    final var taskWithRetry = getTaskWithRetryConfig("retry-task", 3, Duration.ofSeconds(1));
+
+    // Mock dependencies
+    when(taskExecutorRegistry.get(DEFAULT_EXECUTOR)).thenReturn(Optional.of(taskExecutor));
+    when(taskRepository.findById("retry-task")).thenReturn(Optional.of(taskWithRetry));
+
+    // Mock successful execution after retry logic
+    when(taskExecutor.execute(anyString(), eq(taskWithRetry), any(ExecutionRequest.class)))
+        .thenReturn(Map.of("retry-task", "success"));
+
+    // Create activity with retry task
+    final var activity =
+        getSimpleActivity(
+            "retry-activity", List.of(getSimpleActivityTask("retry-task")), false, true);
+
+    // When
+    var stageResponse = strategy.process(transactionId, activity, executionRequest);
+
+    // Then
+    assertThat(stageResponse).isNotNull();
+    assertThat(stageResponse.payload())
+        .isNotNull()
+        .hasSize(1)
+        .containsEntry("retry-task", "success");
+
+    // Verify task executor was called
+    verify(taskExecutor).execute(anyString(), eq(taskWithRetry), any(ExecutionRequest.class));
+  }
+
+  @Test
+  void shouldExecuteTaskWithCircuitBreakerConfiguration() {
+    // Given - Task with circuit breaker configuration
+    final var taskWithCB = getTaskWithCircuitBreakerConfig("cb-task", 2, Duration.ofSeconds(10), 1);
+
+    // Mock dependencies
+    when(taskExecutorRegistry.get(DEFAULT_EXECUTOR)).thenReturn(Optional.of(taskExecutor));
+    when(taskRepository.findById("cb-task")).thenReturn(Optional.of(taskWithCB));
+
+    // Mock successful execution
+    when(taskExecutor.execute(anyString(), eq(taskWithCB), any(ExecutionRequest.class)))
+        .thenReturn(Map.of("cb-task", "success"));
+
+    // Create activity with circuit breaker task
+    final var activity =
+        getSimpleActivity("cb-activity", List.of(getSimpleActivityTask("cb-task")), false, true);
+
+    // When
+    var stageResponse = strategy.process(transactionId, activity, executionRequest);
+
+    // Then
+    assertThat(stageResponse).isNotNull();
+    assertThat(stageResponse.payload()).isNotNull().hasSize(1).containsEntry("cb-task", "success");
+
+    // Verify task executor was called
+    verify(taskExecutor).execute(anyString(), eq(taskWithCB), any(ExecutionRequest.class));
+  }
+
+  @Test
+  void shouldExecuteTaskWithBothRetryAndCircuitBreakerConfiguration() {
+    // Given - Task with both retry and circuit breaker configurations
+    final var taskWithBoth =
+        getTaskWithBothResilienceConfigs(
+            "resilient-task", 3, Duration.ofSeconds(1), 2, Duration.ofSeconds(10), 1);
+
+    // Mock dependencies
+    when(taskExecutorRegistry.get(DEFAULT_EXECUTOR)).thenReturn(Optional.of(taskExecutor));
+    when(taskRepository.findById("resilient-task")).thenReturn(Optional.of(taskWithBoth));
+
+    // Mock successful execution
+    when(taskExecutor.execute(anyString(), eq(taskWithBoth), any(ExecutionRequest.class)))
+        .thenReturn(Map.of("resilient-task", "success"));
+
+    // Create activity with resilient task
+    final var activity =
+        getSimpleActivity(
+            "resilient-activity", List.of(getSimpleActivityTask("resilient-task")), false, true);
+
+    // When
+    var stageResponse = strategy.process(transactionId, activity, executionRequest);
+
+    // Then
+    assertThat(stageResponse).isNotNull();
+    assertThat(stageResponse.payload())
+        .isNotNull()
+        .hasSize(1)
+        .containsEntry("resilient-task", "success");
+
+    // Verify task executor was called
+    verify(taskExecutor).execute(anyString(), eq(taskWithBoth), any(ExecutionRequest.class));
+  }
+
+  @Test
+  void shouldFailWhenRetryAttemptsExhausted() {
+    // Given - Task with retry configuration
+    final var taskWithRetry = getTaskWithRetryConfig("failing-task", 2, Duration.ofSeconds(1));
+
+    // Mock dependencies
+    when(taskExecutorRegistry.get(DEFAULT_EXECUTOR)).thenReturn(Optional.of(taskExecutor));
+    when(taskRepository.findById("failing-task")).thenReturn(Optional.of(taskWithRetry));
+
+    // Mock persistent failure
+    when(taskExecutor.execute(anyString(), eq(taskWithRetry), any(ExecutionRequest.class)))
+        .thenThrow(new RuntimeException("Persistent failure"));
+
+    // Create activity with failing task
+    final var activity =
+        getSimpleActivity(
+            "failing-activity", List.of(getSimpleActivityTask("failing-task")), false, true);
+
+    // When & Then
+    assertThatThrownBy(() -> strategy.process(transactionId, activity, executionRequest))
+        .isInstanceOf(RuntimeException.class)
+        .hasMessage("Persistent failure");
+
+    // Verify task executor was called
+    verify(taskExecutor).execute(anyString(), eq(taskWithRetry), any(ExecutionRequest.class));
+  }
+
+  @Test
+  void shouldExecuteFallbackWhenCircuitBreakerIsOpen() {
+    // Given - Task with circuit breaker configuration and fallback
+    final var taskWithCBAndFallback =
+        getTaskWithCircuitBreakerConfig("cb-fallback-task", 2, Duration.ofSeconds(15), 1);
+    final var fallbackTask = getTask("fallback-task-id");
+
+    // Mock dependencies
+    when(taskExecutorRegistry.get(DEFAULT_EXECUTOR)).thenReturn(Optional.of(taskExecutor));
+    when(taskRepository.findById("cb-fallback-task"))
+        .thenReturn(Optional.of(taskWithCBAndFallback));
+    when(taskRepository.findById("fallback-task-id")).thenReturn(Optional.of(fallbackTask));
+
+    // Set circuit breaker state to OPEN to trigger fallback execution
+    when(circuitBreakerStateManager.getState("cb-fallback-task"))
+        .thenReturn(co.orquex.sagas.core.resilience.CircuitBreakerState.State.OPEN);
+    // Mock opened timestamp to be recent so wait duration hasn't expired (circuit stays OPEN)
+    when(circuitBreakerStateManager.getOpenedTimestamp("cb-fallback-task"))
+        .thenReturn(
+            java.time.Instant.now()
+                .minusSeconds(5)); // Opened 5 seconds ago, break duration is 15 seconds
+    // Mock fallback execution
+    when(taskExecutor.execute(anyString(), eq(fallbackTask), any(ExecutionRequest.class)))
+        .thenReturn(Map.of("result", "fallback-result"));
+
+    // Create activity with circuit breaker task
+    final var activity =
+        getSimpleActivity(
+            "cb-fallback-activity",
+            List.of(getSimpleActivityTask("cb-fallback-task")),
+            false,
+            true);
+
+    // When
+    var stageResponse = strategy.process(transactionId, activity, executionRequest);
+
+    // Then
+    assertThat(stageResponse).isNotNull();
+    assertThat(stageResponse.payload())
+        .isNotNull()
+        .hasSize(1)
+        .containsEntry("result", "fallback-result");
+
+    // Verify fallback task was executed instead of the original task
+    verify(taskExecutor).execute(anyString(), eq(fallbackTask), any(ExecutionRequest.class));
+    verify(taskExecutor, never())
+        .execute(anyString(), eq(taskWithCBAndFallback), any(ExecutionRequest.class));
   }
 }

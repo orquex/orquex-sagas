@@ -43,7 +43,7 @@ mvn clean install
 - [Basic Sample](./orquex-sagas-spring/samples/basic-sample)
 - [Coffee Shop](./orquex-sagas-spring/samples/coffee-shop)
 
-## Tasks integrations
+## Built-in tasks integrations
 
 - [orquex-sagas-task-groovy](./orquex-sagas-task/orquex-sagas-task-groovy)
 - [orquex-sagas-task-http-api](./orquex-sagas-task/orquex-sagas-task-http/orquex-sagas-task-http-api)
@@ -230,17 +230,26 @@ Represents the configuration for resilience in a task. It includes timeout, retr
 
 ###### RetryConfiguration
 
-TODO
+Defines retry behavior parameters for handling transient failures with configurable attempts and delays.
 
-| Attribute | Type | Required | Description |
-|-----------|------|----------|-------------|
+| Attribute                | Type    | Required | Description                                                                                                    |
+|--------------------------|---------|----------|----------------------------------------------------------------------------------------------------------------|
+| maxAttempts              | number  | true     | Maximum number of execution attempts (including initial attempt). Must be positive.                           |
+| waitDuration             | string  | true     | Duration to wait between retry attempts (ISO-8601 format, e.g., "PT1S"). Must be positive.                   |
+| retryWorkflowException   | boolean | false    | Whether to retry when WorkflowException is thrown. Default: false.                                            |
+| successPolicyTask        | object  | false    | Optional task processor that validates if a result represents success. [TaskProcessor](#taskprocessor)        |
 
 ###### CircuitBreakerConfiguration
 
-TODO
+Defines circuit breaker behavior parameters for protecting against cascading failures with configurable thresholds and recovery.
 
-| Attribute | Type | Required | Description |
-|-----------|------|----------|-------------|
+| Attribute                | Type    | Required | Description                                                                                                    |
+|--------------------------|---------|----------|----------------------------------------------------------------------------------------------------------------|
+| failureThreshold         | number  | true     | Number of consecutive failures to transition from CLOSED to OPEN state. Must be positive.                     |
+| waitDurationInOpenState  | string  | true     | Duration to remain in OPEN state before transitioning to HALF_OPEN (ISO-8601 format, e.g., "PT1M").          |
+| successThreshold         | number  | true     | Number of consecutive successes in HALF_OPEN state to transition back to CLOSED. Must be positive.            |
+| successPolicyTask        | object  | false    | Optional task processor that validates if a result represents success. [TaskProcessor](#taskprocessor)        |
+| fallbackTask             | object  | false    | Optional fallback task processor executed when circuit is open. [TaskProcessor](#taskprocessor)               |
 
 ### Flow States
 

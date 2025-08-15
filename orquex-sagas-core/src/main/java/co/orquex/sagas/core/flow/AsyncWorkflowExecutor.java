@@ -1,6 +1,5 @@
 package co.orquex.sagas.core.flow;
 
-
 import co.orquex.sagas.core.event.WorkflowEventPublisher;
 import co.orquex.sagas.core.event.impl.EventMessage;
 import co.orquex.sagas.domain.api.repository.FlowRepository;

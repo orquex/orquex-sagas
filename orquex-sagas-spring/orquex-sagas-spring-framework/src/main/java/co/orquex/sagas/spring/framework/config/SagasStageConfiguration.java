@@ -1,5 +1,7 @@
 package co.orquex.sagas.spring.framework.config;
 
+import co.orquex.sagas.core.resilience.CircuitBreakerStateManager;
+import co.orquex.sagas.core.resilience.RetryStateManager;
 import co.orquex.sagas.core.stage.DefaultStageExecutor;
 import co.orquex.sagas.core.stage.strategy.impl.ActivityProcessingStrategy;
 import co.orquex.sagas.core.stage.strategy.impl.EvaluationProcessingStrategy;
@@ -25,11 +27,19 @@ public class SagasStageConfiguration {
   public StageExecutor defaultStageExecutor(
       Registry<TaskExecutor> taskExecutorRegistry,
       TaskRepository taskRepository,
-      CompensationHandler compensationHandler) {
+      CompensationHandler compensationHandler,
+      RetryStateManager retryStateManager,
+      CircuitBreakerStateManager circuitBreakerStateManager) {
     final var activityStrategy =
-        new ActivityProcessingStrategy(taskExecutorRegistry, taskRepository, compensationHandler);
+        new ActivityProcessingStrategy(
+            taskExecutorRegistry,
+            taskRepository,
+            retryStateManager,
+            circuitBreakerStateManager,
+            compensationHandler);
     final var evaluationStrategy =
-        new EvaluationProcessingStrategy(taskExecutorRegistry, taskRepository);
+        new EvaluationProcessingStrategy(
+            taskExecutorRegistry, taskRepository, retryStateManager, circuitBreakerStateManager);
 
     return new DefaultStageExecutor(activityStrategy, evaluationStrategy);
   }

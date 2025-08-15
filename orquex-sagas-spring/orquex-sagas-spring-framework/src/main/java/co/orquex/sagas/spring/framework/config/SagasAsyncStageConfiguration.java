@@ -2,6 +2,8 @@ package co.orquex.sagas.spring.framework.config;
 
 import co.orquex.sagas.core.event.WorkflowEventPublisher;
 import co.orquex.sagas.core.event.impl.EventMessage;
+import co.orquex.sagas.core.resilience.CircuitBreakerStateManager;
+import co.orquex.sagas.core.resilience.RetryStateManager;
 import co.orquex.sagas.core.stage.DefaultAsyncStageExecutor;
 import co.orquex.sagas.core.stage.strategy.impl.ActivityProcessingStrategy;
 import co.orquex.sagas.core.stage.strategy.impl.EvaluationProcessingStrategy;
@@ -25,13 +27,20 @@ public class SagasAsyncStageConfiguration {
       Registry<TaskExecutor> taskExecutorRegistry,
       TaskRepository taskRepository,
       WorkflowEventPublisher workflowEventPublisher,
-      AsyncCompensationHandler asyncCompensationHandler) {
+      AsyncCompensationHandler asyncCompensationHandler,
+      RetryStateManager retryStateManager,
+      CircuitBreakerStateManager circuitBreakerStateManager) {
     // Decorate the strategies' implementations with an event handler
     final var activityStrategy =
         new ActivityProcessingStrategy(
-            taskExecutorRegistry, taskRepository, asyncCompensationHandler);
+            taskExecutorRegistry,
+            taskRepository,
+            retryStateManager,
+            circuitBreakerStateManager,
+            asyncCompensationHandler);
     final var evaluationStrategy =
-        new EvaluationProcessingStrategy(taskExecutorRegistry, taskRepository);
+        new EvaluationProcessingStrategy(
+            taskExecutorRegistry, taskRepository, retryStateManager, circuitBreakerStateManager);
 
     return new DefaultAsyncStageExecutor(
         activityStrategy, evaluationStrategy, workflowEventPublisher);

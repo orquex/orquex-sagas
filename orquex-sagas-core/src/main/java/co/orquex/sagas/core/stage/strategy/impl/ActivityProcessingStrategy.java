@@ -1,5 +1,7 @@
 package co.orquex.sagas.core.stage.strategy.impl;
 
+import co.orquex.sagas.core.resilience.CircuitBreakerStateManager;
+import co.orquex.sagas.core.resilience.RetryStateManager;
 import co.orquex.sagas.domain.api.TaskExecutor;
 import co.orquex.sagas.domain.api.registry.Registry;
 import co.orquex.sagas.domain.api.repository.TaskRepository;
@@ -30,10 +32,12 @@ public class ActivityProcessingStrategy extends AbstractStageProcessingStrategy<
   private final Consumer<Compensation> compensationConsumer;
 
   public ActivityProcessingStrategy(
-      Registry<TaskExecutor> taskExecutorRegistry,
-      TaskRepository taskRepository,
-      Consumer<Compensation> compensationConsumer) {
-    super(taskExecutorRegistry, taskRepository);
+      final Registry<TaskExecutor> taskExecutorRegistry,
+      final TaskRepository taskRepository,
+      final RetryStateManager retryStateManager,
+      final CircuitBreakerStateManager circuitBreakerStateManager,
+      final Consumer<Compensation> compensationConsumer) {
+    super(taskExecutorRegistry, taskRepository, retryStateManager, circuitBreakerStateManager);
     this.compensationConsumer = compensationConsumer;
   }
 

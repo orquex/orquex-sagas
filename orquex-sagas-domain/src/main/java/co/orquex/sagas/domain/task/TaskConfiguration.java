@@ -2,6 +2,7 @@ package co.orquex.sagas.domain.task;
 
 import static co.orquex.sagas.domain.utils.Preconditions.checkArgumentNotNullOrElse;
 
+import co.orquex.sagas.domain.task.resilience.TaskResilienceConfiguration;
 import co.orquex.sagas.domain.version.OrquexSagasVersion;
 import java.io.Serial;
 import java.io.Serializable;
@@ -22,11 +23,11 @@ import lombok.Builder;
  * }
  * </pre>
  *
- * @see ResilienceConfiguration
+ * @see TaskResilienceConfiguration
  */
 @Builder
 public record TaskConfiguration(
-    String executor, ResilienceConfiguration resilience, Map<String, Serializable> parameters)
+        String executor, TaskResilienceConfiguration resilience, Map<String, Serializable> parameters)
     implements Serializable {
 
   @Serial private static final long serialVersionUID = OrquexSagasVersion.SERIAL_VERSION;

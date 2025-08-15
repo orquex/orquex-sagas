@@ -26,5 +26,9 @@ class SagasStageAutoConfigurationTest {
     assertThat(applicationContext.getBean("defaultStageExecutorRegistry")).isNotNull();
     assertThat(applicationContext.getBean("defaultWorkflowEventPublisher")).isNotNull();
     assertThat(applicationContext.getBean("defaultEventManagerFactory")).isNotNull();
+    assertThat(applicationContext.getBean("defaultCompensationHandler")).isNotNull();
+    assertThat(applicationContext.getBean("defaultAsyncCompensationHandler")).isNotNull();
+    assertThat(applicationContext.getBean("defaultRetryStateManager")).isNotNull();
+    assertThat(applicationContext.getBean("defaultCircuitBreakerStateManager")).isNotNull();
   }
 }

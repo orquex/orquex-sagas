@@ -8,19 +8,23 @@ import java.util.Map;
 import org.springframework.stereotype.Service;
 
 @Service
-public class GeneralErrorTask implements TaskImplementation {
+public class GeneralMessageTask implements TaskImplementation {
 
   @Override
   public Map<String, Serializable> execute(TaskRequest taskRequest) {
-    final Map<String, Serializable> errors = new HashMap<>();
-    errors.put("code", "0001");
-    errors.put("message", "General error");
+    final var metadata = taskRequest.metadata();
+    final var code = metadata.getOrDefault("code", "0000");
+    final var message = metadata.getOrDefault("message", "No message provided");
+
+    final var errors = new HashMap<String, Serializable>();
+    errors.put("code", code);
+    errors.put("message", message);
 
     return errors;
   }
 
   @Override
   public String getKey() {
-    return "general-error";
+    return "general-message";
   }
 }

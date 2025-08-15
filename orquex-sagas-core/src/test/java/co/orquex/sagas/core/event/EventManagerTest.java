@@ -13,8 +13,7 @@ class EventManagerTest {
   @Test
   void shouldListenStringMessages() {
     final var listener = new EventListenerFixture<String>();
-    final var eventManager = new DefaultEventManager<String>()
-            .addListener(listener);
+    final var eventManager = new DefaultEventManager<String>().addListener(listener);
     final var message = new EventMessage<>("Hello world!");
     eventManager.getEventPublisher().publish(message);
     with()

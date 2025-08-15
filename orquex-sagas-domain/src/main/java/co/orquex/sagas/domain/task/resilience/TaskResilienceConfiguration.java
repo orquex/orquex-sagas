@@ -1,4 +1,4 @@
-package co.orquex.sagas.domain.task;
+package co.orquex.sagas.domain.task.resilience;
 
 import static co.orquex.sagas.domain.utils.Preconditions.checkArgumentNotNullOrElse;
 
@@ -21,17 +21,17 @@ import java.time.Duration;
  * }
  * </pre>
  *
- * @see RetryConfiguration
- * @see CircuitBreakerConfiguration
+ * @see TaskRetryConfiguration
+ * @see TaskCircuitBreakerConfiguration
  */
-public record ResilienceConfiguration(
-    Duration timeout, RetryConfiguration retry, CircuitBreakerConfiguration circuitBreaker)
+public record TaskResilienceConfiguration(
+        Duration timeout, TaskRetryConfiguration retry, TaskCircuitBreakerConfiguration circuitBreaker)
     implements Serializable {
 
   @Serial private static final long serialVersionUID = OrquexSagasVersion.SERIAL_VERSION;
   public static final Duration DEFAULT_TIMEOUT = Duration.ofMinutes(1);
 
-  public ResilienceConfiguration {
+  public TaskResilienceConfiguration {
     timeout = checkArgumentNotNullOrElse(timeout, DEFAULT_TIMEOUT);
   }
 }

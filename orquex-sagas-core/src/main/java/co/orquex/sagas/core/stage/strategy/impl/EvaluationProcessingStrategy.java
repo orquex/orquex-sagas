@@ -1,5 +1,7 @@
 package co.orquex.sagas.core.stage.strategy.impl;
 
+import co.orquex.sagas.core.resilience.CircuitBreakerStateManager;
+import co.orquex.sagas.core.resilience.RetryStateManager;
 import co.orquex.sagas.domain.api.TaskExecutor;
 import co.orquex.sagas.domain.api.registry.Registry;
 import co.orquex.sagas.domain.api.repository.TaskRepository;
@@ -31,9 +33,11 @@ public class EvaluationProcessingStrategy extends AbstractStageProcessingStrateg
    * @param taskRepository Repository for tasks.
    */
   public EvaluationProcessingStrategy(
-      Registry<TaskExecutor> taskExecutorRegistry,
-      TaskRepository taskRepository) {
-    super(taskExecutorRegistry, taskRepository);
+      final Registry<TaskExecutor> taskExecutorRegistry,
+      final TaskRepository taskRepository,
+      final RetryStateManager retryStateManager,
+      final CircuitBreakerStateManager circuitBreakerStateManager) {
+    super(taskExecutorRegistry, taskRepository, retryStateManager, circuitBreakerStateManager);
   }
 
   /**
@@ -76,7 +80,8 @@ public class EvaluationProcessingStrategy extends AbstractStageProcessingStrateg
       executionRequest = executionRequest.mergeMetadata(evaluation.getMetadata());
       executionRequest.metadata().put(EXPRESSION, condition.expression());
       // Call task
-      var response = processEvaluationTask(transactionId, evaluation.getEvaluationTask(), executionRequest);
+      var response =
+          processEvaluationTask(transactionId, evaluation.getEvaluationTask(), executionRequest);
       // get the evaluation result
       if (response.containsKey(RESULT)
           && response.get(RESULT) instanceof Boolean result
