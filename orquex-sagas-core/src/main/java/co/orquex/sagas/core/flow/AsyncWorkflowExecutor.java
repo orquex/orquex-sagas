@@ -74,7 +74,7 @@ public class AsyncWorkflowExecutor extends AbstractAsyncExecutable<ExecutionRequ
     if (optTransaction.isPresent()) {
       final var transaction = optTransaction.get();
       // If resume from failure is enabled, check if execution can resume from a previous failure.
-      if (isExecutionResume(flow, flowId, correlationId, transaction)) return;
+      if (isExecutionResume(flow, correlationId, transaction)) return;
       // Otherwise, throw exception.
       throw new WorkflowException(
           "Flow '%s' with correlation id '%s' has already been initiated."
@@ -97,15 +97,13 @@ public class AsyncWorkflowExecutor extends AbstractAsyncExecutable<ExecutionRequ
    * corresponding stage event to continue execution.
    *
    * @param flow the workflow flow definition
-   * @param flowId the unique identifier of the flow
    * @param correlationId the correlation identifier for the transaction
    * @param transaction the existing transaction to potentially resume
    * @return true if the execution is resumed from a checkpoint, false if no resume is needed
    * @throws WorkflowException if resume is configured but checkpoint repository is not available,
    *     or if no checkpoint is found for the transaction
    */
-  private boolean isExecutionResume(
-      Flow flow, String flowId, String correlationId, Transaction transaction) {
+  private boolean isExecutionResume(Flow flow, String correlationId, Transaction transaction) {
     // If already exists check if is resume from failure.
     final var resumeFromFailure = flow.configuration().resumeFromFailure();
 
@@ -113,6 +111,8 @@ public class AsyncWorkflowExecutor extends AbstractAsyncExecutable<ExecutionRequ
     if (!resumeFromFailure) {
       return false;
     }
+
+    final var flowId = flow.id();
 
     if (checkpointRepository == null) {
       throw new WorkflowException(
