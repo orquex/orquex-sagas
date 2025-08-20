@@ -299,7 +299,7 @@ class RetryTest {
 
       // When: Interrupt the thread during execution
       Thread currentThread = Thread.currentThread();
-      try (final var scheduler = Executors.newSingleThreadScheduledExecutor(); ) {
+      try (final var scheduler = Executors.newSingleThreadScheduledExecutor() ) {
         scheduler.schedule(
             currentThread::interrupt, 50, java.util.concurrent.TimeUnit.MILLISECONDS);
 

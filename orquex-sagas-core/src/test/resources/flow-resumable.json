@@ -1,0 +1,32 @@
+{
+  "id": "resumable-flow",
+  "name": "Resumable Flow",
+  "initialStage": "stage-1",
+  "stages": {
+    "stage-1": {
+      "type": "activity",
+      "activityTasks": [
+        {
+          "task": "default-activity"
+        }
+      ],
+      "outgoing": "stage-2"
+    },
+    "stage-2": {
+      "type": "activity",
+      "activityTasks": [
+        {
+          "task": "default-activity"
+        }
+      ],
+      "outgoing": null
+    }
+  },
+  "metadata": {},
+  "configuration": {
+    "timeout": "PT30S",
+    "allOrNothing": false,
+    "resumeFromFailure": true
+  }
+}
+

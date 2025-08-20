@@ -1,6 +1,7 @@
 package co.orquex.sagas.core.flow;
 
 import co.orquex.sagas.domain.api.AsyncExecutable;
+import co.orquex.sagas.domain.api.repository.CheckpointRepository;
 import co.orquex.sagas.domain.api.repository.FlowRepository;
 import co.orquex.sagas.domain.api.repository.TransactionRepository;
 
@@ -12,6 +13,13 @@ import co.orquex.sagas.domain.api.repository.TransactionRepository;
  */
 abstract class AbstractAsyncExecutable<T> extends AbstractWorkflowExecutor
     implements AsyncExecutable<T> {
+
+  protected AbstractAsyncExecutable(
+      FlowRepository flowRepository,
+      TransactionRepository transactionRepository,
+      CheckpointRepository checkpointRepository) {
+    super(flowRepository, transactionRepository, checkpointRepository);
+  }
 
   protected AbstractAsyncExecutable(
       FlowRepository flowRepository, TransactionRepository transactionRepository) {
