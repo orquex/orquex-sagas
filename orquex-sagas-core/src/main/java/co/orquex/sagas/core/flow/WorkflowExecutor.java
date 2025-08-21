@@ -106,7 +106,7 @@ public class WorkflowExecutor extends AbstractWorkflowExecutor
     if (optTransaction.isPresent()) {
       final var transaction = optTransaction.get();
       final var resumeFromFailure = flow.configuration().resumeFromFailure();
-      if (resumeFromFailure) {
+      if (resumeFromFailure && transaction.getStatus().equals(Status.ERROR)) {
         return resumeFlow(flow, correlationId, transaction);
       } else {
         // Otherwise, throw exception.

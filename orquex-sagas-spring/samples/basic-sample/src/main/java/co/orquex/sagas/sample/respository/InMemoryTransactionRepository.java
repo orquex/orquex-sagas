@@ -27,6 +27,16 @@ public class InMemoryTransactionRepository implements TransactionRepository {
   }
 
   @Override
+  public Optional<Transaction> findByFlowIdAndCorrelationId(String flowId, String correlationId) {
+    return transactions.values().stream()
+        .filter(
+            transaction ->
+                transaction.getFlowId().equals(flowId)
+                    && transaction.getCorrelationId().equals(correlationId))
+        .findFirst();
+  }
+
+  @Override
   public Transaction save(Transaction transaction) {
     transactions.put(transaction.getTransactionId(), transaction);
     return transaction;

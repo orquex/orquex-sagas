@@ -103,4 +103,20 @@ class FlowTest {
         .hasMessage(
             "flow 'flow-simple' does not contains the initial stage 'invalid-initial-stage'");
   }
+
+  @Test
+  void shouldThrowExceptionWhenStageMapKeyDoesNotMatchStageId() {
+    // Create a stage with a specific ID
+    var stageEvaluationSimple = readValue("stage-evaluation-simple.json", Evaluation.class);
+    var stagesWithMismatchedKey = new HashMap<String, Stage>();
+
+    // Put the stage in the map with a different key than its ID
+    stagesWithMismatchedKey.put("wrong-key", stageEvaluationSimple);
+
+    assertThatThrownBy(
+            () -> new Flow(
+                FLOW_ID, FLOW_NAME, "wrong-key", stagesWithMismatchedKey, METADATA, CONFIGURATION))
+        .isInstanceOf(IllegalArgumentException.class)
+        .hasMessageContaining("flow 'Simple Flow': stage map key 'wrong-key' does not match stage id");
+  }
 }

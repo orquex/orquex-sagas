@@ -4,6 +4,7 @@
   "initialStage": "get-http-status",
   "stages": {
     "get-http-status": {
+      "id": "get-http-status",
       "type": "activity",
       "name": "Get HTTP status",
       "activityTasks": [

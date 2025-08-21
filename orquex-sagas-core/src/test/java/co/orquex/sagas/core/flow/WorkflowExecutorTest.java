@@ -3,6 +3,7 @@ package co.orquex.sagas.core.flow;
 import static co.orquex.sagas.core.fixture.FlowFixture.getFlow;
 import static co.orquex.sagas.core.fixture.JacksonFixture.readValue;
 import static co.orquex.sagas.core.fixture.TransactionFixture.getTransaction;
+import static co.orquex.sagas.domain.transaction.Status.ERROR;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
@@ -21,6 +22,7 @@ import co.orquex.sagas.domain.flow.Flow;
 import co.orquex.sagas.domain.stage.StageRequest;
 import co.orquex.sagas.domain.stage.StageResponse;
 import co.orquex.sagas.domain.transaction.Checkpoint;
+import co.orquex.sagas.domain.transaction.Status;
 import co.orquex.sagas.domain.transaction.Transaction;
 import java.io.Serializable;
 import java.util.Collections;
@@ -235,13 +237,34 @@ class WorkflowExecutorTest {
   }
 
   @Test
+  @DisplayName("Should not resume when transaction is not in ERROR status")
+  void shouldNotResumeWhenTransactionNotInErrorStatus() {
+    final var flowId = "resumable-flow";
+    final var correlationId = "correlation-id";
+    final var request = new ExecutionRequest(flowId, correlationId);
+    // Create transaction with IN_PROGRESS status (not ERROR)
+    final var transaction = getTransaction(flowId, Status.IN_PROGRESS);
+
+    when(flowRepository.findById(flowId)).thenReturn(Optional.of(resumableFlow));
+    when(transactionRepository.findByFlowIdAndCorrelationId(flowId, correlationId))
+        .thenReturn(Optional.of(transaction));
+
+    // Should throw exception because transaction exists but is not in ERROR status
+    assertThatThrownBy(() -> executorWithCheckpoints.execute(request))
+        .isInstanceOf(WorkflowException.class)
+        .hasMessage(
+            "Flow 'resumable-flow' with correlation ID 'correlation-id' has already been initiated.");
+  }
+
+  @Test
   @DisplayName(
       "Should throw exception when resumeFromFailure enabled but checkpoint repository is null")
   void shouldThrowExceptionWhenCheckpointRepositoryIsNull() {
     final var flowId = "resumable-flow";
     final var correlationId = "correlation-id";
     final var request = new ExecutionRequest(flowId, correlationId);
-    final var transaction = getTransaction();
+    // Use ERROR status to trigger resume logic
+    final var transaction = getTransaction(flowId, ERROR);
 
     when(flowRepository.findById(flowId)).thenReturn(Optional.of(resumableFlow));
     when(transactionRepository.findByFlowIdAndCorrelationId(flowId, correlationId))
@@ -260,7 +283,8 @@ class WorkflowExecutorTest {
     final var flowId = "resumable-flow";
     final var correlationId = "correlation-id";
     final var request = new ExecutionRequest(flowId, correlationId);
-    final var transaction = getTransaction();
+    // Use ERROR status to trigger resume logic
+    final var transaction = getTransaction(flowId, ERROR);
 
     when(flowRepository.findById(flowId)).thenReturn(Optional.of(resumableFlow));
     when(transactionRepository.findByFlowIdAndCorrelationId(flowId, correlationId))
@@ -280,7 +304,8 @@ class WorkflowExecutorTest {
     final var flowId = "resumable-flow";
     final var correlationId = "correlation-id";
     final var request = new ExecutionRequest(flowId, correlationId);
-    final var transaction = getTransaction();
+    // Use ERROR status to trigger resume logic
+    final var transaction = getTransaction(flowId, ERROR);
     final var checkpoint =
         new Checkpoint(
             transaction.getTransactionId(),
@@ -324,7 +349,8 @@ class WorkflowExecutorTest {
     final var flowId = "resumable-flow";
     final var correlationId = "correlation-id";
     final var request = new ExecutionRequest(flowId, correlationId);
-    final var transaction = getTransaction();
+    // Use ERROR status to trigger resume logic
+    final var transaction = getTransaction(flowId, ERROR);
     final var checkpointMetadata =
         Map.<String, Serializable>of("checkpoint-key", "checkpoint-value");
     final var checkpointPayload = Map.<String, Serializable>of("checkpoint-data", "resume-payload");

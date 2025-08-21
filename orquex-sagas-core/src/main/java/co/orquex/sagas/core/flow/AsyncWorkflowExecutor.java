@@ -9,6 +9,7 @@ import co.orquex.sagas.domain.exception.WorkflowException;
 import co.orquex.sagas.domain.execution.ExecutionRequest;
 import co.orquex.sagas.domain.flow.Flow;
 import co.orquex.sagas.domain.stage.Stage;
+import co.orquex.sagas.domain.transaction.Status;
 import co.orquex.sagas.domain.transaction.Transaction;
 import lombok.extern.slf4j.Slf4j;
 
@@ -107,8 +108,8 @@ public class AsyncWorkflowExecutor extends AbstractAsyncExecutable<ExecutionRequ
     // If already exists check if is resume from failure.
     final var resumeFromFailure = flow.configuration().resumeFromFailure();
 
-    // Early return, if not resuming, exit immediately
-    if (!resumeFromFailure) {
+    // Early return, if not resuming or in error, exit immediately
+    if (!resumeFromFailure || !transaction.getStatus().equals(Status.ERROR)) {
       return false;
     }
 

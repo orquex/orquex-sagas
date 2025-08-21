@@ -4,6 +4,7 @@
   "initialStage": "check-user-stage",
   "stages": {
     "get-user-stage": {
+      "id": "get-user-stage",
       "type": "activity",
       "name": "Get user stage",
       "activityTasks": [
@@ -29,6 +30,7 @@
       "outgoing": "check-odd-stage"
     },
     "check-user-stage": {
+      "id": "check-user-stage",
       "type": "evaluation",
       "name": "Check user stage",
       "evaluationTask": {
@@ -43,6 +45,7 @@
       "defaultOutgoing": "general-error-task"
     },
     "check-odd-stage": {
+      "id": "check-odd-stage",
       "type": "evaluation",
       "name": "Check if ID is odd",
       "evaluationTask": {
@@ -57,6 +60,7 @@
       "defaultOutgoing": "lower-case-stage"
     },
     "upper-case-stage": {
+      "id": "upper-case-stage",
       "type": "activity",
       "name": "Upper case stage",
       "activityTasks": [
@@ -70,6 +74,7 @@
       "outgoing": "split-name-stage"
     },
     "lower-case-stage": {
+      "id": "lower-case-stage",
       "type": "activity",
       "name": "Lower case stage",
       "activityTasks": [
@@ -83,6 +88,7 @@
       "outgoing": "split-name-stage"
     },
     "split-name-stage": {
+      "id": "split-name-stage",
       "type": "activity",
       "name": "Split name",
       "activityTasks": [
@@ -95,6 +101,7 @@
       ]
     },
     "general-error-task": {
+      "id": "general-error-task",
       "type": "activity",
       "name": "General error stage",
       "activityTasks": [

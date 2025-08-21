@@ -4,6 +4,7 @@
   "initialStage": "check-cup-size",
   "stages": {
     "check-cup-size": {
+      "id": "check-cup-size",
       "type": "evaluation",
       "name": "Check cup size",
       "evaluationTask": {
@@ -21,6 +22,7 @@
       }
     },
     "coffee-shop-promotion": {
+      "id": "coffee-shop-promotion",
       "type": "activity",
       "name": "Coffee shop promotion stage",
       "activityTasks": [
@@ -37,6 +39,7 @@
       "outgoing": "coffee-shop-service"
     },
     "coffee-shop-service": {
+      "id": "coffee-shop-service",
       "type": "activity",
       "name": "Coffee shop service stage",
       "activityTasks": [
@@ -53,6 +56,7 @@
       "outgoing": "coffee-shop-notification"
     },
     "coffee-shop-notification": {
+      "id": "coffee-shop-notification",
       "type": "activity",
       "name": "Coffee shop notification stage",
       "activityTasks": [

@@ -4,6 +4,7 @@
   "initialStage": "add-product-stage",
   "stages": {
     "add-product-stage": {
+      "id": "add-product-stage",
       "type": "activity",
       "name": "Add Product Stage",
       "activityTasks": [
@@ -29,6 +30,7 @@
       "outgoing": "failed-stage"
     },
     "failed-stage": {
+      "id": "failed-stage",
       "type": "activity",
       "name": "Failed Stage",
       "activityTasks": [
