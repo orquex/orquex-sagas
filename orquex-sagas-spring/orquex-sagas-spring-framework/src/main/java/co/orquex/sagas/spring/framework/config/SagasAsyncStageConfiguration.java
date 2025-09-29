@@ -46,21 +46,13 @@ public class SagasAsyncStageConfiguration {
         activityStrategy, evaluationStrategy, workflowEventPublisher);
   }
 
-  @Bean
-  @ConditionalOnProperty(name = "orquex.sagas.spring.compensation.enabled", havingValue = "true")
-  @ConditionalOnMissingBean(name = {"defaultAsyncCompensationHandler", "asyncCompensationHandler"})
-  public AsyncCompensationHandler asyncCompensationHandler(
-      WorkflowEventPublisher workflowEventPublisher) {
-    return compensation -> workflowEventPublisher.publish(new EventMessage<>(compensation));
-  }
-
-  @Bean
+  @Bean({"defaultAsyncCompensationHandler", "asyncCompensationHandler"})
   @ConditionalOnProperty(
       name = "orquex.sagas.spring.compensation.enabled",
-      havingValue = "false",
+      havingValue = "true",
       matchIfMissing = true)
   @ConditionalOnMissingBean(name = {"defaultAsyncCompensationHandler", "asyncCompensationHandler"})
-  public AsyncCompensationHandler defaultAsyncCompensationHandler(
+  public AsyncCompensationHandler asyncCompensationHandler(
       WorkflowEventPublisher workflowEventPublisher) {
     return compensation -> workflowEventPublisher.publish(new EventMessage<>(compensation));
   }
