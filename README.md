@@ -106,7 +106,6 @@ mvn clean install
 
 - [orquex-sagas-task-groovy](./orquex-sagas-task/orquex-sagas-task-groovy)
 - [orquex-sagas-task-http-api](./orquex-sagas-task/orquex-sagas-task-http/orquex-sagas-task-http-api)
-- [orquex-sagas-task-okhttp](./orquex-sagas-task/orquex-sagas-task-http/orquex-sagas-task-okhttp)
 - [orquex-sagas-task-jsonata](orquex-sagas-task/orquex-sagas-task-jsonata)
 
 ---
