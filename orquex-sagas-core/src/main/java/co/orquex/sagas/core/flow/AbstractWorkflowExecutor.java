@@ -90,14 +90,16 @@ abstract class AbstractWorkflowExecutor {
    * @return the initialized transaction.
    */
   protected Transaction initializeTransaction(final Flow flow, final ExecutionRequest request) {
-    final var transaction = new Transaction();
-    transaction.setTransactionId(UUID.randomUUID().toString());
-    transaction.setFlowId(flow.id());
-    transaction.setCorrelationId(request.correlationId());
-    transaction.setData(request);
-    transaction.setStatus(Status.IN_PROGRESS);
-    transaction.setStartedAt(Instant.now());
-    transaction.setExpiresAt(Instant.now().plus(flow.configuration().timeout()));
+    final var transaction =
+        new Transaction(
+            UUID.randomUUID().toString(),
+            flow.id(),
+            request.correlationId(),
+            request,
+            Status.IN_PROGRESS,
+            Instant.now(),
+            Instant.now(),
+            Instant.now().plus(flow.configuration().timeout()));
     return transactionRepository.save(transaction);
   }
 

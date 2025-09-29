@@ -4,6 +4,7 @@ import static java.util.Objects.isNull;
 
 import co.orquex.sagas.core.event.WorkflowEventPublisher;
 import co.orquex.sagas.core.event.impl.EventMessage;
+import co.orquex.sagas.domain.api.AsyncExecutable;
 import co.orquex.sagas.domain.api.repository.FlowRepository;
 import co.orquex.sagas.domain.api.repository.TransactionRepository;
 import co.orquex.sagas.domain.event.Error;
@@ -15,10 +16,12 @@ import lombok.extern.slf4j.Slf4j;
 /**
  * This class executes a workflow stage in a choreography manner.
  *
- * @see AbstractAsyncExecutable
+ * @see AbstractWorkflowExecutor
+ * @see AsyncExecutable
  */
 @Slf4j
-public class AsyncWorkflowStageExecutor extends AbstractAsyncExecutable<Checkpoint> {
+public class AsyncWorkflowStageExecutor extends AbstractWorkflowExecutor
+    implements AsyncExecutable<Checkpoint> {
 
   private final WorkflowEventPublisher workflowEventPublisher;
 

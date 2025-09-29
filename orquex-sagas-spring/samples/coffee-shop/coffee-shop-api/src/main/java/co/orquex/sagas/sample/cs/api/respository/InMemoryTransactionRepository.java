@@ -22,8 +22,8 @@ public class InMemoryTransactionRepository implements TransactionRepository {
     return transactions.values().stream()
         .anyMatch(
             transaction ->
-                transaction.getFlowId().equals(flowId)
-                    && transaction.getCorrelationId().equals(correlationId));
+                transaction.flowId().equals(flowId)
+                    && transaction.correlationId().equals(correlationId));
   }
 
   @Override
@@ -31,14 +31,14 @@ public class InMemoryTransactionRepository implements TransactionRepository {
     return transactions.values().stream()
         .filter(
             transaction ->
-                transaction.getFlowId().equals(flowId)
-                    && transaction.getCorrelationId().equals(correlationId))
+                transaction.flowId().equals(flowId)
+                    && transaction.correlationId().equals(correlationId))
         .findFirst();
   }
 
   @Override
   public Transaction save(Transaction transaction) {
-    transactions.put(transaction.getTransactionId(), transaction);
+    transactions.put(transaction.transactionId(), transaction);
     return transaction;
   }
 }

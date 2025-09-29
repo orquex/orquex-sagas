@@ -8,6 +8,7 @@ import static org.mockito.Mockito.*;
 
 import co.orquex.sagas.core.event.impl.DefaultWorkflowEventPublisher;
 import co.orquex.sagas.core.event.manager.impl.DefaultEventManagerFactory;
+import co.orquex.sagas.core.fixture.TransactionFixture;
 import co.orquex.sagas.core.stage.DefaultAsyncStageExecutor;
 import co.orquex.sagas.core.stage.DefaultStageEventListener;
 import co.orquex.sagas.core.stage.InMemoryStageExecutorRegistry;
@@ -26,7 +27,6 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -109,11 +109,11 @@ class AsyncWorkflowExecutorTest {
     when(flowRepository.findById(flowId)).thenReturn(Optional.of(simpleFlow));
     when(transactionRepository.findByFlowIdAndCorrelationId(anyString(), anyString()))
         .thenReturn(Optional.empty());
-    final var transaction = new Transaction();
-    transaction.setTransactionId(UUID.randomUUID().toString());
+    final var transaction = TransactionFixture.getTransaction();
     when(transactionRepository.save(any(Transaction.class))).thenReturn(transaction);
 
-    executor.execute(request);
+    final var transactionId = executor.execute(request);
+    assertThat(transactionId).isEqualTo(transaction.transactionId());
 
     verify(stageExecutor, timeout(100)).execute(any(StageRequest.class));
   }
@@ -143,7 +143,7 @@ class AsyncWorkflowExecutorTest {
     final var flowId = "resumable-flow";
     final var correlationId = CORRELATION_ID;
     final var request = new ExecutionRequest(flowId, correlationId);
-    // Create transaction with IN_PROGRESS status (not ERROR)
+    // Create a transaction with IN_PROGRESS status (not ERROR)
     final var transaction = getTransaction(flowId, Status.IN_PROGRESS);
 
     when(flowRepository.findById(flowId)).thenReturn(Optional.of(resumableFlow));
@@ -171,7 +171,7 @@ class AsyncWorkflowExecutorTest {
     when(transactionRepository.findByFlowIdAndCorrelationId(flowId, correlationId))
         .thenReturn(Optional.of(transaction));
 
-    // Using executor without checkpoint repository
+    // Using executor without a checkpoint repository
     assertThatThrownBy(() -> executor.execute(request))
         .isInstanceOf(WorkflowException.class)
         .hasMessage(
@@ -190,7 +190,7 @@ class AsyncWorkflowExecutorTest {
     when(flowRepository.findById(flowId)).thenReturn(Optional.of(resumableFlow));
     when(transactionRepository.findByFlowIdAndCorrelationId(flowId, correlationId))
         .thenReturn(Optional.of(transaction));
-    when(checkpointRepository.findByTransactionId(transaction.getTransactionId()))
+    when(checkpointRepository.findByTransactionId(transaction.transactionId()))
         .thenReturn(Optional.empty());
 
     assertThatThrownBy(() -> executorWithCheckpoints.execute(request))
@@ -210,7 +210,7 @@ class AsyncWorkflowExecutorTest {
 
     final var checkpoint =
         new Checkpoint(
-            transaction.getTransactionId(),
+            transaction.transactionId(),
             null, // status
             flowId,
             correlationId,
@@ -227,10 +227,10 @@ class AsyncWorkflowExecutorTest {
     when(flowRepository.findById(flowId)).thenReturn(Optional.of(resumableFlow));
     when(transactionRepository.findByFlowIdAndCorrelationId(flowId, correlationId))
         .thenReturn(Optional.of(transaction));
-    when(checkpointRepository.findByTransactionId(transaction.getTransactionId()))
+    when(checkpointRepository.findByTransactionId(transaction.transactionId()))
         .thenReturn(Optional.of(checkpoint));
 
-    // Should not throw exception and should execute the stage from checkpoint
+    // Should not throw exception and should execute the stage from a checkpoint
     assertThatCode(() -> executorWithCheckpoints.execute(request)).doesNotThrowAnyException();
 
     // Verify that stage executor was called (once for resume execution)
@@ -251,7 +251,7 @@ class AsyncWorkflowExecutorTest {
     final var checkpointPayload = Map.<String, Serializable>of("checkpoint-data", "resume-payload");
     final var checkpoint =
         new Checkpoint(
-            transaction.getTransactionId(),
+            transaction.transactionId(),
             null, // status
             flowId,
             correlationId,
@@ -268,7 +268,7 @@ class AsyncWorkflowExecutorTest {
     when(flowRepository.findById(flowId)).thenReturn(Optional.of(resumableFlow));
     when(transactionRepository.findByFlowIdAndCorrelationId(flowId, correlationId))
         .thenReturn(Optional.of(transaction));
-    when(checkpointRepository.findByTransactionId(transaction.getTransactionId()))
+    when(checkpointRepository.findByTransactionId(transaction.transactionId()))
         .thenReturn(Optional.of(checkpoint));
 
     executorWithCheckpoints.execute(request);

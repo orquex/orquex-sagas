@@ -1,5 +1,6 @@
 package co.orquex.sagas.spring.framework.config.event.handler;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.*;
 
@@ -16,6 +17,7 @@ import co.orquex.sagas.domain.stage.StageConfiguration;
 import co.orquex.sagas.domain.transaction.Checkpoint;
 import co.orquex.sagas.domain.transaction.Status;
 import co.orquex.sagas.domain.transaction.Transaction;
+import java.time.Instant;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -34,6 +36,8 @@ class DefaultCheckpointEventListenerHandlerTest {
   @Mock TransactionRepository transactionRepository;
   @Mock GlobalContext globalContext;
 
+  @Captor ArgumentCaptor<Transaction> transactionCaptor;
+
   @InjectMocks DefaultCheckpointEventListenerHandler checkpointEventListenerHandler;
 
   @Test
@@ -46,12 +50,16 @@ class DefaultCheckpointEventListenerHandlerTest {
 
   @Test
   void testHandleCheckpointCompletedWithoutOutgoing() {
-    final var transaction = Mockito.mock(Transaction.class);
+    final var transaction = getTransaction();
     when(transactionRepository.findById(anyString())).thenReturn(Optional.of(transaction));
     final var checkpoint = getCheckpoint(Status.COMPLETED);
     checkpointEventListenerHandler.handle(checkpoint);
     verify(workflowStageExecutor, never()).execute(checkpoint);
-    verify(transactionRepository).save(transaction);
+    // Check that the transaction status was updated to COMPLETED and saved
+    verify(transactionRepository).save(transactionCaptor.capture());
+    final var savedTransaction = transactionCaptor.getValue();
+    assertThat(savedTransaction).isNotNull().returns(Status.COMPLETED, Transaction::status);
+    // Check that the global context was cleaned up
     verify(globalContext).remove(anyString());
   }
 
@@ -60,7 +68,7 @@ class DefaultCheckpointEventListenerHandlerTest {
     final var flow = Mockito.mock(Flow.class, Mockito.RETURNS_DEEP_STUBS);
     when(flow.configuration().allOrNothing()).thenReturn(true);
     when(flowRepository.findById(anyString())).thenReturn(Optional.of(flow));
-    final var transaction = Mockito.mock(Transaction.class);
+    final var transaction = getTransaction();
     when(transactionRepository.findById(anyString())).thenReturn(Optional.of(transaction));
     final var checkpoint = getCheckpoint(Status.ERROR);
     checkpointEventListenerHandler.handle(checkpoint);
@@ -73,11 +81,15 @@ class DefaultCheckpointEventListenerHandlerTest {
   void testHandleCheckpointErrorWhenOutgoingNotPresent() {
     final var flow = Mockito.mock(Flow.class, Mockito.RETURNS_DEEP_STUBS);
     when(flowRepository.findById(anyString())).thenReturn(Optional.of(flow));
-    final var transaction = Mockito.mock(Transaction.class);
+    final var transaction = getTransaction();
     when(transactionRepository.findById(anyString())).thenReturn(Optional.of(transaction));
     final var checkpoint = getCheckpoint(Status.ERROR);
     checkpointEventListenerHandler.handle(checkpoint);
-    verify(transactionRepository).save(transaction);
+    // Check that the transaction status was updated to ERROR and saved
+    verify(transactionRepository).save(transactionCaptor.capture());
+    final var savedTransaction = transactionCaptor.getValue();
+    assertThat(savedTransaction).isNotNull().returns(Status.ERROR, Transaction::status);
+    // Check that the compensation was executed
     verify(compensationExecutor).execute(anyString());
     verify(workflowStageExecutor, never()).execute(checkpoint);
     verify(globalContext, never()).remove(anyString());
@@ -119,10 +131,14 @@ class DefaultCheckpointEventListenerHandlerTest {
   @Test
   void testHandleCheckpointCanceled() {
     final var checkpoint = getCheckpoint(Status.CANCELED);
-    final var transaction = Mockito.mock(Transaction.class);
+    final var transaction = getTransaction();
     when(transactionRepository.findById(anyString())).thenReturn(Optional.of(transaction));
     checkpointEventListenerHandler.handle(checkpoint);
-    verify(transactionRepository).save(transaction);
+    // Check that the transaction status was updated to ERROR and saved
+    verify(transactionRepository).save(transactionCaptor.capture());
+    final var savedTransaction = transactionCaptor.getValue();
+    assertThat(savedTransaction).isNotNull().returns(Status.CANCELED, Transaction::status);
+    // Check that the compensation was executed
     verify(compensationExecutor).execute(anyString());
     verify(workflowStageExecutor, never()).execute(checkpoint);
     verify(globalContext, never()).remove(anyString());
@@ -159,5 +175,17 @@ class DefaultCheckpointEventListenerHandlerTest {
         .incoming(stage)
         .outgoing(outgoing)
         .build();
+  }
+
+  private static Transaction getTransaction() {
+    return new Transaction(
+        UUID.randomUUID().toString(),
+        "flow-id",
+        "correlation-id",
+        null,
+        Status.IN_PROGRESS,
+        Instant.now(),
+        Instant.now(),
+        Instant.now().plusSeconds(60));
   }
 }

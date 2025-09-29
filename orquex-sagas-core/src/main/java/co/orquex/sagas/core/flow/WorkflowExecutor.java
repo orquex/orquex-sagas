@@ -12,6 +12,7 @@ import co.orquex.sagas.domain.api.repository.FlowRepository;
 import co.orquex.sagas.domain.api.repository.TransactionRepository;
 import co.orquex.sagas.domain.exception.WorkflowException;
 import co.orquex.sagas.domain.execution.ExecutionRequest;
+import co.orquex.sagas.domain.execution.ExecutionResponse;
 import co.orquex.sagas.domain.flow.Flow;
 import co.orquex.sagas.domain.stage.Stage;
 import co.orquex.sagas.domain.stage.StageResponse;
@@ -25,7 +26,7 @@ import java.util.concurrent.*;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * Synchronous workflow executor that orchestrates saga workflows using orchestration pattern.
+ * Synchronous workflow executor that orchestrates saga workflows using an orchestration pattern.
  * Handles workflow execution, transaction management, and resume-from-failure capabilities through
  * checkpoint recovery. Each workflow stage is executed synchronously with configurable timeouts.
  *
@@ -33,7 +34,7 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 public class WorkflowExecutor extends AbstractWorkflowExecutor
-    implements Executable<ExecutionRequest, Map<String, Serializable>> {
+    implements Executable<ExecutionRequest, ExecutionResponse> {
 
   private final StageExecutor stageExecutor;
   private final ExecutorService executor;
@@ -93,7 +94,7 @@ public class WorkflowExecutor extends AbstractWorkflowExecutor
 
   /** {@inheritDoc} */
   @Override
-  public Map<String, Serializable> execute(ExecutionRequest executionRequest) {
+  public ExecutionResponse execute(ExecutionRequest executionRequest) {
     if (executionRequest == null) throw new WorkflowException("Execution request required.");
     final var flow = getFlow(executionRequest.flowId());
     final var correlationId = executionRequest.correlationId();
@@ -106,10 +107,10 @@ public class WorkflowExecutor extends AbstractWorkflowExecutor
     if (optTransaction.isPresent()) {
       final var transaction = optTransaction.get();
       final var resumeFromFailure = flow.configuration().resumeFromFailure();
-      if (resumeFromFailure && transaction.getStatus().equals(Status.ERROR)) {
+      if (resumeFromFailure && transaction.status().equals(Status.ERROR)) {
         return resumeFlow(flow, correlationId, transaction);
       } else {
-        // Otherwise, throw exception.
+        // Otherwise, throw an exception.
         throw new WorkflowException(
             "Flow '%s' with correlation ID '%s' has already been initiated."
                 .formatted(flowId, correlationId));
@@ -119,7 +120,7 @@ public class WorkflowExecutor extends AbstractWorkflowExecutor
     // Merge request and flow metadata.
     executionRequest = executionRequest.mergeMetadata(flow.metadata());
 
-    // Get initial stage from flow
+    // Get the initial stage from flow
     final var initialStage = getStage(flow, flow.initialStage());
 
     return executeFlow(flow, executionRequest, initialStage);
@@ -133,10 +134,9 @@ public class WorkflowExecutor extends AbstractWorkflowExecutor
    * @param correlationId the correlation identifier for the transaction
    * @param transaction the existing transaction to resume
    * @return the workflow execution response
-   * @throws WorkflowException if checkpoint repository is not available or no checkpoint is found
+   * @throws WorkflowException if a checkpoint repository is not available or no checkpoint is found
    */
-  private Map<String, Serializable> resumeFlow(
-      Flow flow, String correlationId, Transaction transaction) {
+  private ExecutionResponse resumeFlow(Flow flow, String correlationId, Transaction transaction) {
     final var flowId = flow.id();
     // Checkpoint repository is required to resume from failure
     if (checkpointRepository == null) {
@@ -147,7 +147,7 @@ public class WorkflowExecutor extends AbstractWorkflowExecutor
     // Get the checkpoint to resume from
     final var checkpoint =
         checkpointRepository
-            .findByTransactionId(transaction.getTransactionId())
+            .findByTransactionId(transaction.transactionId())
             .orElseThrow(
                 () ->
                     new WorkflowException(
@@ -162,7 +162,7 @@ public class WorkflowExecutor extends AbstractWorkflowExecutor
     final var resumeStage = getStage(flow, checkpoint.stageId());
     final var request =
         new ExecutionRequest(flowId, correlationId, checkpoint.metadata(), checkpoint.payload());
-    // Execute the stage from current checkpoint.
+    // Execute the stage from the current checkpoint.
     return executeFlow(flow, request, resumeStage);
   }
 
@@ -176,12 +176,12 @@ public class WorkflowExecutor extends AbstractWorkflowExecutor
    * @param startingStage the stage to begin execution from (initial stage or resume stage)
    * @return the final workflow response containing output data from the last executed stage
    */
-  private Map<String, Serializable> executeFlow(
+  private ExecutionResponse executeFlow(
       final Flow flow, final ExecutionRequest executionRequest, final Stage startingStage) {
     // Get the flow configuration to get the timeout duration
     final var flowConfiguration = flow.configuration();
     // Register the transaction
-    final var transaction = initializeTransaction(flow, executionRequest);
+    var transaction = initializeTransaction(flow, executionRequest);
     // Submit the flow execution to the executor
     final Future<Map<String, Serializable>> future =
         executor.submit(
@@ -189,15 +189,16 @@ public class WorkflowExecutor extends AbstractWorkflowExecutor
     final var timeout = flowConfiguration.timeout();
 
     try {
-      return future.get(timeout.toMillis(), TimeUnit.MILLISECONDS);
+      final var responsePayload = future.get(timeout.toMillis(), TimeUnit.MILLISECONDS);
+      return new ExecutionResponse(transaction.transactionId(), responsePayload);
     } catch (InterruptedException e) {
-      transaction.setStatus(Status.ERROR);
+      transaction = transaction.withStatus(Status.ERROR);
       log.error(e.getMessage(), e);
       Thread.currentThread().interrupt();
       throw new WorkflowException(
           "An error occurred while executing flow '%s'.".formatted(flow.id()));
     } catch (ExecutionException e) {
-      transaction.setStatus(Status.ERROR);
+      transaction = transaction.withStatus(Status.ERROR);
       if (e.getCause() instanceof WorkflowException we) {
         throw we;
       }
@@ -205,18 +206,19 @@ public class WorkflowExecutor extends AbstractWorkflowExecutor
       throw new WorkflowException(
           "An error occurred while executing flow '%s'.".formatted(flow.id()));
     } catch (TimeoutException e) {
-      transaction.setStatus(Status.ERROR);
+      transaction = transaction.withStatus(Status.ERROR);
       throw new WorkflowException(
           "Flow '%s' timed out after %s.".formatted(flow.id(), timeout.toString()));
     } finally {
       // Execute compensation if the transaction is not completed
-      if (transaction.getStatus().equals(Status.ERROR)) {
-        compensationExecutor.execute(transaction.getTransactionId());
+      if (transaction.status().equals(Status.ERROR)) {
+        compensationExecutor.execute(transaction.transactionId());
       } else {
         // Clean up the context if the transaction is not in error
-        globalContext.remove(transaction.getTransactionId());
+        globalContext.remove(transaction.transactionId());
       }
       // Update the transaction status
+      transaction = transaction.withStatus(Status.COMPLETED);
       updateTransaction(transaction);
     }
   }
@@ -281,7 +283,7 @@ public class WorkflowExecutor extends AbstractWorkflowExecutor
    */
   private StageResponse executeStage(
       Transaction transaction, Stage stage, ExecutionRequest request) {
-    final var stageRequest = getStageRequest(transaction.getTransactionId(), stage, request);
+    final var stageRequest = getStageRequest(transaction.transactionId(), stage, request);
     return stageExecutor.execute(stageRequest);
   }
 }

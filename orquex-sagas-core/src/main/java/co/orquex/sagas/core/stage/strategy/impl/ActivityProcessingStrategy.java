@@ -193,13 +193,13 @@ public class ActivityProcessingStrategy extends AbstractStageProcessingStrategy<
       executionRequest = executionRequest.withPayload(preProcessorPayload);
     }
     log.debug(
-        "Executing task '{}' at flow '{}' with correlation ID '{}'",
-        activityTask.task(),
+        "Executing activity task '{}' at flow '{}' with correlation ID '{}'",
+        activityTask.name(),
         executionRequest.flowId(),
         executionRequest.correlationId());
     // Execute the task with the pre-processed payload
     final var taskResponse = executeTask(transactionId, activityTask.task(), executionRequest);
-    // Publish the compensation's event once the task is executed
+    // Publish the compensation event once the task is executed
     publishCompensation(transactionId, activityTask, executionRequest, taskResponse);
     // Post process the payload, generating a new one
     final var postProcessor = activityTask.postProcessor();
@@ -250,8 +250,8 @@ public class ActivityProcessingStrategy extends AbstractStageProcessingStrategy<
    * Handles a WorkflowException.
    *
    * <p>This method checks if the cause of the provided Throwable is a WorkflowException. If it is,
-   * it returns the cause directly. If it is not, it creates a new WorkflowException with the
-   * message of the provided Throwable and returns it.
+   * it directly returns the exception cause. If it is not, it creates a new WorkflowException with
+   * the message of the provided Throwable and returns it.
    *
    * @param throwable The Throwable to be handled.
    * @return A WorkflowException derived from the provided Throwable.

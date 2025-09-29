@@ -11,13 +11,11 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class AsyncFlowController {
 
-    private final AsyncWorkflowExecutor workflowExecutor;
+  private final AsyncWorkflowExecutor workflowExecutor;
 
-    @PostMapping
-    public ResponseEntity<Void> upperCase(@RequestBody ExecutionRequest request) {
-        workflowExecutor.execute(request);
-        return ResponseEntity.ok().build();
-    }
-
+  @PostMapping
+  public ResponseEntity<Void> upperCase(@RequestBody ExecutionRequest request) {
+    final var transactionId = workflowExecutor.execute(request);
+    return ResponseEntity.ok().header("Transaction-Id", transactionId).build();
+  }
 }
-

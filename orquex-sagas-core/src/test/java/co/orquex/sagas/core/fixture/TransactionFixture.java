@@ -17,13 +17,14 @@ public final class TransactionFixture {
   }
 
   public static Transaction getTransaction(String flowId, Status status) {
-    final var transaction = new Transaction();
-    transaction.setTransactionId(UUID.randomUUID().toString());
-    transaction.setFlowId(flowId);
-    transaction.setCorrelationId(CORRELATION_ID);
-    transaction.setStatus(status);
-    transaction.setExpiresAt(Instant.now().plusSeconds(30));
-    transaction.setStartedAt(Instant.now());
-    return transaction;
+    return new Transaction(
+        UUID.randomUUID().toString(),
+        flowId,
+        CORRELATION_ID,
+        null,
+        status,
+        Instant.now(),
+        Instant.now(),
+        Instant.now().plusSeconds(30));
   }
 }

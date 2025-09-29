@@ -36,6 +36,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.AdditionalAnswers;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -99,6 +100,16 @@ class WorkflowExecutorTest {
     final var executionRequest = new ExecutionRequest(FLOW_ID, CORRELATION_ID);
     final var response = orchestratorExecutor.execute(executionRequest);
     assertThat(response).isNotNull();
+
+    // Capture the transactions saved
+    ArgumentCaptor<Transaction> transactionCaptor = ArgumentCaptor.forClass(Transaction.class);
+    verify(transactionRepository, times(2)).save(transactionCaptor.capture());
+    final var savedTransactions = transactionCaptor.getAllValues();
+    assertThat(savedTransactions)
+        .hasSize(2)
+        .extracting(Transaction::status)
+        .containsExactly(Status.IN_PROGRESS, Status.COMPLETED);
+
     verify(globalContext).remove(anyString());
   }
 
@@ -242,7 +253,7 @@ class WorkflowExecutorTest {
     final var flowId = "resumable-flow";
     final var correlationId = "correlation-id";
     final var request = new ExecutionRequest(flowId, correlationId);
-    // Create transaction with IN_PROGRESS status (not ERROR)
+    // Create a transaction with IN_PROGRESS status (not ERROR)
     final var transaction = getTransaction(flowId, Status.IN_PROGRESS);
 
     when(flowRepository.findById(flowId)).thenReturn(Optional.of(resumableFlow));
@@ -270,7 +281,7 @@ class WorkflowExecutorTest {
     when(transactionRepository.findByFlowIdAndCorrelationId(flowId, correlationId))
         .thenReturn(Optional.of(transaction));
 
-    // Using executor without checkpoint repository
+    // Using executor without a checkpoint repository
     assertThatThrownBy(() -> orchestratorExecutor.execute(request))
         .isInstanceOf(WorkflowException.class)
         .hasMessage(
@@ -289,7 +300,7 @@ class WorkflowExecutorTest {
     when(flowRepository.findById(flowId)).thenReturn(Optional.of(resumableFlow));
     when(transactionRepository.findByFlowIdAndCorrelationId(flowId, correlationId))
         .thenReturn(Optional.of(transaction));
-    when(checkpointRepository.findByTransactionId(transaction.getTransactionId()))
+    when(checkpointRepository.findByTransactionId(transaction.transactionId()))
         .thenReturn(Optional.empty());
 
     assertThatThrownBy(() -> executorWithCheckpoints.execute(request))
@@ -308,7 +319,7 @@ class WorkflowExecutorTest {
     final var transaction = getTransaction(flowId, ERROR);
     final var checkpoint =
         new Checkpoint(
-            transaction.getTransactionId(),
+            transaction.transactionId(),
             null, // status
             flowId,
             correlationId,
@@ -325,7 +336,7 @@ class WorkflowExecutorTest {
     when(flowRepository.findById(flowId)).thenReturn(Optional.of(resumableFlow));
     when(transactionRepository.findByFlowIdAndCorrelationId(flowId, correlationId))
         .thenReturn(Optional.of(transaction));
-    when(checkpointRepository.findByTransactionId(transaction.getTransactionId()))
+    when(checkpointRepository.findByTransactionId(transaction.transactionId()))
         .thenReturn(Optional.of(checkpoint));
     when(transactionRepository.save(any(Transaction.class)))
         .thenAnswer(AdditionalAnswers.returnsFirstArg());
@@ -337,7 +348,9 @@ class WorkflowExecutorTest {
 
     // Should not throw exception and should return the workflow response
     final var response = executorWithCheckpoints.execute(request);
-    assertThat(response).isNotNull().containsEntry("result", "success");
+    assertThat(response).isNotNull();
+    assertThat(response.transactionId()).isNotNull();
+    assertThat(response.payload()).isNotNull().containsEntry("result", "success");
 
     // Verify that global context was cleaned up (indicating successful completion)
     verify(globalContext).remove(anyString());
@@ -356,7 +369,7 @@ class WorkflowExecutorTest {
     final var checkpointPayload = Map.<String, Serializable>of("checkpoint-data", "resume-payload");
     final var checkpoint =
         new Checkpoint(
-            transaction.getTransactionId(),
+            transaction.transactionId(),
             null, // status
             flowId,
             correlationId,
@@ -373,7 +386,7 @@ class WorkflowExecutorTest {
     when(flowRepository.findById(flowId)).thenReturn(Optional.of(resumableFlow));
     when(transactionRepository.findByFlowIdAndCorrelationId(flowId, correlationId))
         .thenReturn(Optional.of(transaction));
-    when(checkpointRepository.findByTransactionId(transaction.getTransactionId()))
+    when(checkpointRepository.findByTransactionId(transaction.transactionId()))
         .thenReturn(Optional.of(checkpoint));
     when(transactionRepository.save(any(Transaction.class)))
         .thenAnswer(AdditionalAnswers.returnsFirstArg());
@@ -395,6 +408,6 @@ class WorkflowExecutorTest {
                       && executionRequest.payload().equals(checkpointPayload);
                 }));
 
-    assertThat(response).isEqualTo(checkpointPayload);
+    assertThat(response.payload()).isEqualTo(checkpointPayload);
   }
 }

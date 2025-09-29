@@ -53,8 +53,8 @@ public class DefaultCheckpointEventListenerHandler implements CheckpointEventLis
     if (nonNull(checkpoint.outgoing())) {
       workflowStageExecutor.execute(checkpoint);
     } else {
-      final var transaction = getTransaction(checkpoint.transactionId());
-      transaction.setStatus(Status.COMPLETED);
+      final var transaction =
+          getTransaction(checkpoint.transactionId()).withStatus(Status.COMPLETED);
       transactionRepository.save(transaction);
       log.info(
           "Flow '{}' with correlation id '{}' has been completed",
@@ -69,10 +69,9 @@ public class DefaultCheckpointEventListenerHandler implements CheckpointEventLis
     final var flow = getFlow(checkpoint.flowId());
     final var allOrNothing = flow.configuration().allOrNothing();
     if (allOrNothing || isNull(checkpoint.outgoing())) {
-      // If it is all or nothing or there is not outgoing then executes the compensation
+      // If it is all or nothing or there is not outgoing, then executes the compensation
       // Also updates the transaction status
-      final var transaction = getTransaction(checkpoint.transactionId());
-      transaction.setStatus(Status.ERROR);
+      final var transaction = getTransaction(checkpoint.transactionId()).withStatus(Status.ERROR);
       transactionRepository.save(transaction);
       log.info(
           "Flow '{}' with correlation ID '{}' has been completed with error at stage '{}'",
@@ -88,8 +87,7 @@ public class DefaultCheckpointEventListenerHandler implements CheckpointEventLis
 
   private void handleCheckpointCanceled(Checkpoint checkpoint) {
     log.trace(getCheckpointStatus(checkpoint));
-    final var transaction = getTransaction(checkpoint.transactionId());
-    transaction.setStatus(Status.CANCELED);
+    final var transaction = getTransaction(checkpoint.transactionId()).withStatus(Status.CANCELED);
     transactionRepository.save(transaction);
     log.info(
         "Flow '{}' with correlation ID '{}' has been cancelled by stage '{}'",
