@@ -14,7 +14,6 @@
 
     <modules>
         <module>orquex-sagas-task-http-api</module>
-        <module>orquex-sagas-task-okhttp</module>
     </modules>
 
     <properties>
@@ -28,11 +27,6 @@
             <dependency>
                 <groupId>co.orquex.sagas</groupId>
                 <artifactId>orquex-sagas-task-http-api</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>co.orquex.sagas</groupId>
-                <artifactId>orquex-sagas-task-okhttp</artifactId>
                 <version>${project.version}</version>
             </dependency>
         </dependencies>

@@ -36,6 +36,67 @@
   {
     "id": "general-error",
     "name": "General Error Task",
-    "implementation": "general-error"
+    "implementation": "general-message",
+    "metadata": {
+      "code": "0001",
+      "message": "General Error"
+    }
+  },
+  {
+    "id": "general-message",
+    "name": "General Message Task",
+    "implementation": "general-message"
+  },
+  {
+    "id": "failed",
+    "name": "Failed Task",
+    "implementation": "failed"
+  },
+  {
+    "id": "http-status",
+    "name": "HTTP Status",
+    "implementation": "okhttp-get",
+    "metadata": {
+      "__client_provider": "basic-provider"
+    },
+    "configuration": {
+      "resilience": {
+        "retry": {
+          "maxAttempts": 2,
+          "waitDuration": "PT1S",
+          "retryWorkflowException": true,
+          "successPolicyTask": {
+            "task": "status-ok-policy"
+          }
+        },
+        "circuitBreaker": {
+          "waitDurationInOpenState": "PT1M",
+          "failureThreshold": 2,
+          "successThreshold": 1,
+          "successPolicyTask": {
+            "task": "status-ok-policy"
+          },
+          "fallbackTask": {
+            "task": "general-resilience-response"
+          }
+        }
+      }
+    }
+  },
+  {
+    "id": "general-resilience-response",
+    "name": "General Resilience Response",
+    "implementation": "groovy",
+    "metadata": {
+      "__script": "cmVzcG9uc2UucHV0QWxsKFsKICAnbWVzc2FnZSc6ICdTZXJ2aWNlIHVuYXZhaWxhYmxlJwpdKTs="
+    }
+  },
+  {
+    "id": "status-ok-policy",
+    "name": "Status OK Policy",
+    "implementation": "groovy-eval",
+    "metadata": {
+      "__expression": "payload.code == 200"
+    }
   }
 ]

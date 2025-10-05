@@ -13,7 +13,8 @@ import org.springframework.context.annotation.Import;
   SagasAsyncStageConfiguration.class,
   SagasStageConfiguration.class,
   SagasContextRefreshedListener.class,
-  SagasGlobalContextConfiguration.class
+  SagasGlobalContextConfiguration.class,
+  SagasResilienceConfiguration.class
 })
 @ConditionalOnProperty(
     prefix = "orquex.sagas.spring.stage",

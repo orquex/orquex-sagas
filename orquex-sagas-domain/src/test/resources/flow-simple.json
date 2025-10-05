@@ -4,6 +4,7 @@
   "initialStage": "evaluation-impl",
   "stages": {
     "activity-impl": {
+      "id": "activity-impl",
       "type": "activity",
       "name": "Simple Activity",
       "activityTasks": [
@@ -14,6 +15,7 @@
       "outgoing": "outgoing-test"
     },
     "evaluation-impl": {
+      "id": "evaluation-impl",
       "type": "evaluation",
       "name": "Simple Evaluation",
       "evaluationTask": {

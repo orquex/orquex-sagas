@@ -1,0 +1,27 @@
+{
+  "id": "resilience-flow",
+  "name": "Resilience Sample Flow",
+  "initialStage": "get-http-status",
+  "stages": {
+    "get-http-status": {
+      "id": "get-http-status",
+      "type": "activity",
+      "name": "Get HTTP status",
+      "activityTasks": [
+        {
+          "task": "http-status",
+          "preProcessor": {
+            "task": "default-groovy-activity",
+            "metadata": {
+              "__script": "ZGVmIHJlcXVlc3QgPSBbCiAgJ3VybCc6ICdodHRwOi8vbG9jYWxob3N0OjgwODAvc3RhdHVzLycgKyBwYXlsb2FkWydzdGF0dXMnXQpdOwpyZXNwb25zZS5wdXRBbGwocmVxdWVzdCk7"
+            }
+          }
+        }
+      ]
+    }
+  },
+  "configuration": {
+    "timeout": "PT5M",
+    "allOrNothing": true
+  }
+}

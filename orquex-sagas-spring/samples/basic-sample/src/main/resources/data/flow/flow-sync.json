@@ -1,0 +1,131 @@
+{
+  "id": "basic-sample-flow-sync",
+  "name": "Basic Sample Flow Sync",
+  "initialStage": "check-user-stage",
+  "stages": {
+    "check-user-stage": {
+      "id": "check-user-stage",
+      "type": "evaluation",
+      "name": "Check user stage",
+      "evaluationTask": {
+        "task": "default-groovy-evaluator"
+      },
+      "conditions": [
+        {
+          "expression": "payload.user.id <= 10",
+          "outgoing": "get-user-stage"
+        }
+      ],
+      "defaultOutgoing": "general-error-task",
+      "configuration": {
+        "implementation": "default-sync"
+      }
+    },
+    "get-user-stage": {
+      "id": "get-user-stage",
+      "type": "activity",
+      "name": "Get user stage",
+      "activityTasks": [
+        {
+          "task": "http-get",
+          "preProcessor": {
+            "task": "default-groovy-activity",
+            "metadata": {
+              "__script": "ZGVmIHJlcXVlc3QgPSBbCiAgICB1cmw6IG1ldGFkYXRhLl9fdXJsICsgIi8iICsgcGF5bG9hZC51c2VyLmlkCl0KcmVzcG9uc2UucHV0QWxsKHJlcXVlc3QpCg=="
+            }
+          },
+          "postProcessor": {
+            "task": "default-groovy-activity",
+            "metadata": {
+              "__script": "ZGVmIHJlcXVlc3QgPSBbCiAgICB1c2VyOiBwYXlsb2FkLmJvZHkKXQpyZXNwb25zZS5wdXRBbGwocmVxdWVzdCkK"
+            }
+          },
+          "metadata": {
+            "__url": "https://jsonplaceholder.org/users"
+          }
+        }
+      ],
+      "outgoing": "check-odd-stage",
+      "configuration": {
+        "implementation": "default-sync"
+      }
+    },
+    "check-odd-stage": {
+      "id": "check-odd-stage",
+      "type": "evaluation",
+      "name": "Check if ID is odd",
+      "evaluationTask": {
+        "task": "default-groovy-evaluator"
+      },
+      "conditions": [
+        {
+          "expression": "payload.user.id % 2 != 0",
+          "outgoing": "upper-case-stage"
+        }
+      ],
+      "defaultOutgoing": "lower-case-stage",
+      "configuration": {
+        "implementation": "default-sync"
+      }
+    },
+    "upper-case-stage": {
+      "id": "upper-case-stage",
+      "type": "activity",
+      "name": "Upper case stage",
+      "activityTasks": [
+        {
+          "task": "default-groovy-activity",
+          "metadata": {
+            "__script": "dmFyIHVzZXIgPSBwYXlsb2FkLnVzZXIuZmlyc3RuYW1lICsgIiAiICsgcGF5bG9hZC51c2VyLiBsYXN0bmFtZSAKcmVzcG9uc2UucHV0KCJ1c2VyIiwgdXNlci50b1VwcGVyQ2FzZSgpKTs="
+          }
+        }
+      ],
+      "outgoing": "split-name-stage"
+    },
+    "lower-case-stage": {
+      "id": "lower-case-stage",
+      "type": "activity",
+      "name": "Lower case stage",
+      "activityTasks": [
+        {
+          "task": "default-groovy-activity",
+          "metadata": {
+            "__script": "dmFyIHVzZXIgPSBwYXlsb2FkLnVzZXIuZmlyc3RuYW1lICsgIiAiICsgcGF5bG9hZC51c2VyLiBsYXN0bmFtZSAKcmVzcG9uc2UucHV0KCJ1c2VyIiwgdXNlci50b0xvd2VyQ2FzZSgpKTs="
+          }
+        }
+      ],
+      "outgoing": "split-name-stage"
+    },
+    "split-name-stage": {
+      "id": "split-name-stage",
+      "type": "activity",
+      "name": "Split name",
+      "activityTasks": [
+        {
+          "task": "default-groovy-activity",
+          "metadata": {
+            "__script": "cmVzcG9uc2UucHV0KCJyZXN1bHQiLCBwYXlsb2FkLnVzZXIuc3BsaXQoJ1xccycpKTs="
+          }
+        }
+      ],
+      "configuration": {
+        "implementation": "default-sync"
+      }
+    },
+    "general-error-task": {
+      "id": "general-error-task",
+      "type": "activity",
+      "name": "General error stage",
+      "activityTasks": [
+        {
+          "task": "general-error"
+        }
+      ],
+      "configuration": {
+        "implementation": "default-sync"
+      }
+    }
+  },
+  "configuration": {},
+  "metadata": {}
+}

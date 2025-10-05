@@ -1,0 +1,206 @@
+{
+  "id": "resume-from-failure",
+  "name": "Resume From Failure Flow",
+  "initialStage": "validate-order",
+  "configuration": {
+    "timeout": "PT5M",
+    "allOrNothing": false,
+    "resumeFromFailure": true
+  },
+  "metadata": {
+    "environment": "test",
+    "description": "Sample flow to test resume from failure functionality using existing Groovy tasks"
+  },
+  "stages": {
+    "validate-order": {
+      "id": "validate-order",
+      "type": "activity",
+      "name": "Validate Order Information",
+      "activityTasks": [
+        {
+          "id": "validate-order-task",
+          "task": "default-groovy-activity",
+          "metadata": {
+            "checkpoint": "order-validation",
+            "__script": "cHJpbnRsbiAnVmFsaWRhdGluZyBvcmRlcjogJyArIHBheWxvYWQub3JkZXJJZDsgcGF5bG9hZC52YWxpZGF0ZWQgPSB0cnVlOyByZXNwb25zZS5wdXRBbGwocGF5bG9hZCk="
+          }
+        }
+      ],
+      "outgoing": "payment-processing"
+    },
+    "payment-processing": {
+      "id": "payment-processing",
+      "type": "activity",
+      "name": "Process Payment",
+      "activityTasks": [
+        {
+          "id": "charge-payment-task",
+          "task": "default-groovy-activity",
+          "compensation": {
+            "task": "default-groovy-activity",
+            "metadata": {
+              "compensation_type": "payment_reversal",
+              "__script": "cHJpbnRsbiAnUmVmdW5kaW5nIHBheW1lbnQgZm9yIG9yZGVyOiAnICsgcGF5bG9hZC5vcmRlcklkOyBwYXlsb2FkLnBheW1lbnRSZWZ1bmRlZCA9IHRydWU7IHJlc3BvbnNlLnB1dEFsbChwYXlsb2FkKQ=="
+            }
+          },
+          "metadata": {
+            "checkpoint": "payment-processing",
+            "critical": true,
+            "__script": "cHJpbnRsbiAnQ2hhcmdpbmcgcGF5bWVudCBmb3Igb3JkZXI6ICcgKyBwYXlsb2FkLm9yZGVySWQ7IHBheWxvYWQucGF5bWVudElkID0gJ3BheV8nICsgU3lzdGVtLmN1cnJlbnRUaW1lTWlsbGlzKCk7IHBheWxvYWQuY2hhcmdlZCA9IHRydWU7IHJlc3BvbnNlLnB1dEFsbChwYXlsb2FkKQ=="
+          }
+        }
+      ],
+      "outgoing": "inventory-check"
+    },
+    "inventory-check": {
+      "id": "inventory-check",
+      "type": "activity",
+      "name": "Check and Reserve Inventory",
+      "activityTasks": [
+        {
+          "id": "check-inventory-task",
+          "task": "default-groovy-activity",
+          "metadata": {
+            "checkpoint": "inventory-availability",
+            "__script": "cHJpbnRsbiAnQ2hlY2tpbmcgaW52ZW50b3J5IGZvciBvcmRlcjogJyArIHBheWxvYWQub3JkZXJJZDsgcGF5bG9hZC5pbnZlbnRvcnlBdmFpbGFibGUgPSB0cnVlOyByZXNwb25zZS5wdXRBbGwocGF5bG9hZCk="
+          }
+        },
+        {
+          "id": "reserve-inventory-task",
+          "task": "default-groovy-activity",
+          "compensation": {
+            "task": "default-groovy-activity",
+            "metadata": {
+              "compensation_type": "inventory_release",
+              "__script": "cHJpbnRsbiAnUmVsZWFzaW5nIGludmVudG9yeSByZXNlcnZhdGlvbiBmb3Igb3JkZXI6ICcgKyBwYXlsb2FkLm9yZGVySWQ7IHBheWxvYWQuaW52ZW50b3J5UmVsZWFzZWQgPSB0cnVlOyByZXNwb25zZS5wdXRBbGwocGF5bG9hZCk="
+            }
+          },
+          "metadata": {
+            "checkpoint": "inventory-reservation",
+            "failure_prone": true,
+            "__script": "cHJpbnRsbiAnUmVzZXJ2aW5nIGludmVudG9yeSBmb3Igb3JkZXI6ICcgKyBwYXlsb2FkLm9yZGVySWQ7IGlmIChNYXRoLnJhbmRvbSgpIDwgMC4zKSB7IHRocm93IG5ldyBSdW50aW1lRXhjZXB0aW9uKCdJbnZlbnRvcnkgcmVzZXJ2YXRpb24gZmFpbGVkIC0gc2ltdWxhdGluZyBmYWlsdXJlIGZvciByZXN1bWUgdGVzdCcpOyB9IHBheWxvYWQuaW52ZW50b3J5UmVzZXJ2ZWQgPSB0cnVlOyBwYXlsb2FkLnJlc2VydmF0aW9uSWQgPSAncmVzXycgKyBTeXN0ZW0uY3VycmVudFRpbWVNaWxsaXMoKTsgcmVzcG9uc2UucHV0QWxsKHBheWxvYWQp"
+          }
+        }
+      ],
+      "outgoing": "shipping-evaluation"
+    },
+    "shipping-evaluation": {
+      "id": "shipping-evaluation",
+      "type": "evaluation",
+      "name": "Determine Shipping Method",
+      "evaluationTask": {
+        "id": "shipping-decision-task",
+        "task": "default-groovy-activity",
+        "metadata": {
+          "checkpoint": "shipping-evaluation",
+          "__script": "cHJpbnRsbiAnRXZhbHVhdGluZyBzaGlwcGluZyBvcHRpb25zIGZvciBvcmRlcjogJyArIHBheWxvYWQub3JkZXJJZDsgcGF5bG9hZC5zaGlwcGluZ0V2YWx1YXRlZCA9IHRydWU7IHJlc3BvbnNlLnB1dEFsbChwYXlsb2FkKQ=="
+        }
+      },
+      "conditions": [
+        {
+          "expression": "payload.expedited == true",
+          "outgoing": "expedited-shipping"
+        },
+        {
+          "expression": "payload.totalAmount > 100",
+          "outgoing": "premium-shipping"
+        }
+      ],
+      "defaultOutgoing": "standard-shipping"
+    },
+    "expedited-shipping": {
+      "id": "expedited-shipping",
+      "type": "activity",
+      "name": "Expedited Shipping Process",
+      "activityTasks": [
+        {
+          "id": "expedited-shipment-task",
+          "task": "default-groovy-activity",
+          "compensation": {
+            "task": "default-groovy-activity",
+            "metadata": {
+              "compensation_type": "shipment_cancellation",
+              "__script": "cHJpbnRsbiAnQ2FuY2VsbGluZyBleHBlZGl0ZWQgc2hpcG1lbnQgZm9yIG9yZGVyOiAnICsgcGF5bG9hZC5vcmRlcklkOyBwYXlsb2FkLnNoaXBtZW50Q2FuY2VsbGVkID0gdHJ1ZTsgcmVzcG9uc2UucHV0QWxsKHBheWxvYWQp"
+            }
+          },
+          "metadata": {
+            "checkpoint": "expedited-shipping",
+            "high_failure_rate": true,
+            "__script": "cHJpbnRsbiAnQ3JlYXRpbmcgZXhwZWRpdGVkIHNoaXBtZW50IGZvciBvcmRlcjogJyArIHBheWxvYWQub3JkZXJJZDsgaWYgKE1hdGgucmFuZG9tKCkgPCAwLjQpIHsgdGhyb3cgbmV3IFJ1bnRpbWVFeGNlcHRpb24oJ0V4cGVkaXRlZCBzaGlwcGluZyBmYWlsZWQgLSBzaW11bGF0aW5nIGZhaWx1cmUgZm9yIHJlc3VtZSB0ZXN0Jyk7IH0gcGF5bG9hZC5zaGlwbWVudElkID0gJ2V4cF8nICsgU3lzdGVtLmN1cnJlbnRUaW1lTWlsbGlzKCk7IHBheWxvYWQuZXhwZWRpdGVkU2hpcG1lbnRDcmVhdGVkID0gdHJ1ZTsgcmVzcG9uc2UucHV0QWxsKHBheWxvYWQp"
+          }
+        }
+      ],
+      "outgoing": "notification"
+    },
+    "premium-shipping": {
+      "id": "premium-shipping",
+      "type": "activity",
+      "name": "Premium Shipping Process",
+      "activityTasks": [
+        {
+          "id": "premium-shipment-task",
+          "task": "default-groovy-activity",
+          "compensation": {
+            "task": "default-groovy-activity",
+            "metadata": {
+              "compensation_type": "shipment_cancellation",
+              "__script": "cHJpbnRsbiAnQ2FuY2VsbGluZyBwcmVtaXVtIHNoaXBtZW50IGZvciBvcmRlcjogJyArIHBheWxvYWQub3JkZXJJZDsgcGF5bG9hZC5zaGlwbWVudENhbmNlbGxlZCA9IHRydWU7IHJlc3BvbnNlLnB1dEFsbChwYXlsb2FkKQ=="
+            }
+          },
+          "metadata": {
+            "checkpoint": "premium-shipping",
+            "__script": "cHJpbnRsbiAnQ3JlYXRpbmcgcHJlbWl1bSBzaGlwbWVudCBmb3Igb3JkZXI6ICcgKyBwYXlsb2FkLm9yZGVySWQ7IHBheWxvYWQuc2hpcG1lbnRJZCA9ICdwcmVtXycgKyBTeXN0ZW0uY3VycmVudFRpbWVNaWxsaXMoKTsgcGF5bG9hZC5wcmVtaXVtU2hpcG1lbnRDcmVhdGVkID0gdHJ1ZTsgcmVzcG9uc2UucHV0QWxsKHBheWxvYWQp"
+          }
+        }
+      ],
+      "outgoing": "notification"
+    },
+    "standard-shipping": {
+      "id": "standard-shipping",
+      "type": "activity",
+      "name": "Standard Shipping Process",
+      "activityTasks": [
+        {
+          "id": "standard-shipment-task",
+          "task": "default-groovy-activity",
+          "compensation": {
+            "task": "default-groovy-activity",
+            "metadata": {
+              "compensation_type": "shipment_cancellation",
+              "__script": "cHJpbnRsbiAnQ2FuY2VsbGluZyBzdGFuZGFyZCBzaGlwbWVudCBmb3Igb3JkZXI6ICcgKyBwYXlsb2FkLm9yZGVySWQ7IHBheWxvYWQuc2hpcG1lbnRDYW5jZWxsZWQgPSB0cnVlOyByZXNwb25zZS5wdXRBbGwocGF5bG9hZCk="
+            }
+          },
+          "metadata": {
+            "checkpoint": "standard-shipping",
+            "__script": "cHJpbnRsbiAnQ3JlYXRpbmcgc3RhbmRhcmQgc2hpcG1lbnQgZm9yIG9yZGVyOiAnICsgcGF5bG9hZC5vcmRlcklkOyBwYXlsb2FkLnNoaXBtZW50SWQgPSAnc3RkXycgKyBTeXN0ZW0uY3VycmVudFRpbWVNaWxsaXMoKTsgcGF5bG9hZC5zdGFuZGFyZFNoaXBtZW50Q3JlYXRlZCA9IHRydWU7IHJlc3BvbnNlLnB1dEFsbChwYXlsb2FkKQ=="
+          }
+        }
+      ],
+      "outgoing": "notification"
+    },
+    "notification": {
+      "id": "notification",
+      "type": "activity",
+      "name": "Send Customer Notification",
+      "activityTasks": [
+        {
+          "id": "email-notification-task",
+          "task": "default-groovy-activity",
+          "metadata": {
+            "checkpoint": "email-notification",
+            "__script": "cHJpbnRsbiAnU2VuZGluZyBlbWFpbCBub3RpZmljYXRpb24gZm9yIG9yZGVyOiAnICsgcGF5bG9hZC5vcmRlcklkOyBwYXlsb2FkLmVtYWlsU2VudCA9IHRydWU7IHBheWxvYWQuZW1haWxUaW1lc3RhbXAgPSBTeXN0ZW0uY3VycmVudFRpbWVNaWxsaXMoKTsgcmVzcG9uc2UucHV0QWxsKHBheWxvYWQp"
+          }
+        },
+        {
+          "id": "sms-notification-task",
+          "task": "default-groovy-activity",
+          "metadata": {
+            "checkpoint": "sms-notification",
+            "optional": true,
+            "__script": "cHJpbnRsbiAnU2VuZGluZyBTTVMgbm90aWZpY2F0aW9uIGZvciBvcmRlcjogJyArIHBheWxvYWQub3JkZXJJZDsgcGF5bG9hZC5zbXNTZW50ID0gdHJ1ZTsgcGF5bG9hZC5zbXNUaW1lc3RhbXAgPSBTeXN0ZW0uY3VycmVudFRpbWVNaWxsaXMoKTsgcmVzcG9uc2UucHV0QWxsKHBheWxvYWQp"
+          }
+        }
+      ]
+    }
+  }
+}

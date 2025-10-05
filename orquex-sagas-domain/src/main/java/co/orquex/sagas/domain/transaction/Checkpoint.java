@@ -23,12 +23,13 @@ import lombok.Builder;
  *
  * <pre>
  * {
- *   "status": "status",
  *   "transactionId": "transaction-id",
+ *   "status": "status",
  *   "flowId": "flow-id",
  *   "correlationId": "correlation-id",
+ *   "stage": "stage-id",
  *   "metadata": {},
- *   "request": {},
+ *   "payload": {},
  *   "response": {},
  *   "outgoing": "outgoing-stage-id",
  *   "incoming": {},
@@ -42,12 +43,13 @@ import lombok.Builder;
  */
 @Builder
 public record Checkpoint(
-    Status status,
     String transactionId,
+    Status status,
     String flowId,
     String correlationId,
+    String stageId,
     Map<String, Serializable> metadata,
-    Map<String, Serializable> request,
+    Map<String, Serializable> payload,
     Map<String, Serializable> response,
     String outgoing,
     Stage incoming,

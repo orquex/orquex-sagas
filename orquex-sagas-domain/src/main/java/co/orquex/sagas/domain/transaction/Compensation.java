@@ -20,6 +20,7 @@ import java.util.Map;
  *
  * <pre>
  * {
+ *   "id": "compensation-id",
  *   "transactionId": "transaction-id",
  *   "flowId": "flow-id",
  *   "correlationId": "correlation-id",
@@ -36,6 +37,7 @@ import java.util.Map;
  * @see co.orquex.sagas.domain.task.TaskProcessor
  */
 public record Compensation(
+    String id,
     String transactionId,
     String flowId,
     String correlationId,
@@ -46,12 +48,27 @@ public record Compensation(
     TaskProcessor preProcessor,
     TaskProcessor postProcessor,
     Status status,
-    Instant createdAt)
+    Instant createdAt,
+    Instant updatedAt)
     implements Serializable {
 
   @Serial private static final long serialVersionUID = OrquexSagasVersion.SERIAL_VERSION;
 
-  public Compensation {
-    createdAt = Instant.now();
+  // Method to create a new Compensation instance with an updated status
+  public Compensation withStatus(Status status) {
+    return new Compensation(
+        this.id,
+        this.transactionId,
+        this.flowId,
+        this.correlationId,
+        this.task,
+        this.metadata,
+        this.request,
+        this.response,
+        this.preProcessor,
+        this.postProcessor,
+        status,
+        this.createdAt,
+        Instant.now());
   }
 }

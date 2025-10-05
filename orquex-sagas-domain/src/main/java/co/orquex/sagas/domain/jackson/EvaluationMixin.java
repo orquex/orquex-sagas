@@ -12,7 +12,7 @@ import java.util.Map;
 @JsonIgnoreProperties(ignoreUnknown = true)
 abstract class EvaluationMixin {
 
-  public EvaluationMixin(
+  protected EvaluationMixin(
       @JsonProperty("id") String id,
       @JsonProperty("name") String name,
       @JsonProperty("metadata") Map<String, Serializable> metadata,

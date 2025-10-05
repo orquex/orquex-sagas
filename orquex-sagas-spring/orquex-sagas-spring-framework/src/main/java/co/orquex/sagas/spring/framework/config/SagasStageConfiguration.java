@@ -1,5 +1,7 @@
 package co.orquex.sagas.spring.framework.config;
 
+import co.orquex.sagas.core.resilience.CircuitBreakerStateManager;
+import co.orquex.sagas.core.resilience.RetryStateManager;
 import co.orquex.sagas.core.stage.DefaultStageExecutor;
 import co.orquex.sagas.core.stage.strategy.impl.ActivityProcessingStrategy;
 import co.orquex.sagas.core.stage.strategy.impl.EvaluationProcessingStrategy;
@@ -25,17 +27,28 @@ public class SagasStageConfiguration {
   public StageExecutor defaultStageExecutor(
       Registry<TaskExecutor> taskExecutorRegistry,
       TaskRepository taskRepository,
-      CompensationHandler compensationHandler) {
+      CompensationHandler compensationHandler,
+      RetryStateManager retryStateManager,
+      CircuitBreakerStateManager circuitBreakerStateManager) {
     final var activityStrategy =
-        new ActivityProcessingStrategy(taskExecutorRegistry, taskRepository, compensationHandler);
+        new ActivityProcessingStrategy(
+            taskExecutorRegistry,
+            taskRepository,
+            retryStateManager,
+            circuitBreakerStateManager,
+            compensationHandler);
     final var evaluationStrategy =
-        new EvaluationProcessingStrategy(taskExecutorRegistry, taskRepository);
+        new EvaluationProcessingStrategy(
+            taskExecutorRegistry, taskRepository, retryStateManager, circuitBreakerStateManager);
 
     return new DefaultStageExecutor(activityStrategy, evaluationStrategy);
   }
 
-  @Bean
-  @ConditionalOnProperty(name = "orquex.sagas.spring.compensation.enabled", havingValue = "true")
+  @Bean({"defaultCompensationHandler", "compensationHandler"})
+  @ConditionalOnProperty(
+      name = "orquex.sagas.spring.compensation.enabled",
+      havingValue = "true",
+      matchIfMissing = true)
   @ConditionalOnMissingBean(name = {"defaultCompensationHandler", "compensationHandler"})
   public CompensationHandler compensationHandler(CompensationRepository compensationRepository) {
     return compensation -> {
@@ -53,21 +66,5 @@ public class SagasStageConfiguration {
           compensation.transactionId(),
           compensation.task());
     };
-  }
-
-  @Bean
-  @ConditionalOnProperty(
-      name = "orquex.sagas.spring.compensation.enabled",
-      havingValue = "false",
-      matchIfMissing = true)
-  @ConditionalOnMissingBean(name = {"defaultCompensationHandler", "compensationHandler"})
-  public CompensationHandler defaultCompensationHandler() {
-    return compensation ->
-        log.debug(
-            "Compensation received but not action taken for flow ID '{}', correlation ID '{}', transaction ID '{}' and task '{}'",
-            compensation.flowId(),
-            compensation.correlationId(),
-            compensation.transactionId(),
-            compensation.task());
   }
 }

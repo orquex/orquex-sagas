@@ -46,8 +46,8 @@ public record ActivityTask(
 
   public ActivityTask {
     id = checkArgumentNotNullOrElse(id, UUID.randomUUID().toString());
+    name = checkArgumentNotNullOrElse(name, id);
     task = checkArgumentNotEmpty(task, "activity's task required");
-    name = checkArgumentNotNullOrElse(name, task);
     metadata = checkArgumentNotNullOrElse(metadata, new HashMap<>());
   }
 
