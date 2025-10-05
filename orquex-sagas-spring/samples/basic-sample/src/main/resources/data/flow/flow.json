@@ -3,6 +3,21 @@
   "name": "Basic Sample Flow",
   "initialStage": "check-user-stage",
   "stages": {
+    "check-user-stage": {
+      "id": "check-user-stage",
+      "type": "evaluation",
+      "name": "Check user stage",
+      "evaluationTask": {
+        "task": "default-groovy-evaluator"
+      },
+      "conditions": [
+        {
+          "expression": "payload.user.id <= 10",
+          "outgoing": "get-user-stage"
+        }
+      ],
+      "defaultOutgoing": "general-error-task"
+    },
     "get-user-stage": {
       "id": "get-user-stage",
       "type": "activity",
@@ -23,26 +38,11 @@
             }
           },
           "metadata": {
-            "__url": "https://jsonplaceholder.typicode.com/users"
+            "__url": "https://jsonplaceholder.org/users"
           }
         }
       ],
       "outgoing": "check-odd-stage"
-    },
-    "check-user-stage": {
-      "id": "check-user-stage",
-      "type": "evaluation",
-      "name": "Check user stage",
-      "evaluationTask": {
-        "task": "default-groovy-evaluator"
-      },
-      "conditions": [
-        {
-          "expression": "payload.user.id <= 10",
-          "outgoing": "get-user-stage"
-        }
-      ],
-      "defaultOutgoing": "general-error-task"
     },
     "check-odd-stage": {
       "id": "check-odd-stage",
@@ -67,7 +67,7 @@
         {
           "task": "default-groovy-activity",
           "metadata": {
-            "__script": "cmVzcG9uc2UucHV0KCJ1c2VyIiwgcGF5bG9hZC51c2VyLm5hbWUudG9VcHBlckNhc2UoKSk7"
+            "__script": "dmFyIHVzZXIgPSBwYXlsb2FkLnVzZXIuZmlyc3RuYW1lICsgIiAiICsgcGF5bG9hZC51c2VyLiBsYXN0bmFtZSAKcmVzcG9uc2UucHV0KCJ1c2VyIiwgdXNlci50b1VwcGVyQ2FzZSgpKTs="
           }
         }
       ],
@@ -81,7 +81,7 @@
         {
           "task": "default-groovy-activity",
           "metadata": {
-            "__script": "cmVzcG9uc2UucHV0KCJ1c2VyIiwgcGF5bG9hZC51c2VyLm5hbWUudG9Mb3dlckNhc2UoKSk7"
+            "__script": "dmFyIHVzZXIgPSBwYXlsb2FkLnVzZXIuZmlyc3RuYW1lICsgIiAiICsgcGF5bG9hZC51c2VyLiBsYXN0bmFtZSAKcmVzcG9uc2UucHV0KCJ1c2VyIiwgdXNlci50b0xvd2VyQ2FzZSgpKTs="
           }
         }
       ],

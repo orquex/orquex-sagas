@@ -41,7 +41,7 @@
             }
           },
           "metadata": {
-            "__url": "https://jsonplaceholder.typicode.com/users"
+            "__url": "https://jsonplaceholder.org/users"
           }
         }
       ],
@@ -76,14 +76,11 @@
         {
           "task": "default-groovy-activity",
           "metadata": {
-            "__script": "cmVzcG9uc2UucHV0KCJ1c2VyIiwgcGF5bG9hZC51c2VyLm5hbWUudG9VcHBlckNhc2UoKSk7"
+            "__script": "dmFyIHVzZXIgPSBwYXlsb2FkLnVzZXIuZmlyc3RuYW1lICsgIiAiICsgcGF5bG9hZC51c2VyLiBsYXN0bmFtZSAKcmVzcG9uc2UucHV0KCJ1c2VyIiwgdXNlci50b1VwcGVyQ2FzZSgpKTs="
           }
         }
       ],
-      "outgoing": "split-name-stage",
-      "configuration": {
-        "implementation": "default-sync"
-      }
+      "outgoing": "split-name-stage"
     },
     "lower-case-stage": {
       "id": "lower-case-stage",
@@ -93,14 +90,11 @@
         {
           "task": "default-groovy-activity",
           "metadata": {
-            "__script": "cmVzcG9uc2UucHV0KCJ1c2VyIiwgcGF5bG9hZC51c2VyLm5hbWUudG9Mb3dlckNhc2UoKSk7"
+            "__script": "dmFyIHVzZXIgPSBwYXlsb2FkLnVzZXIuZmlyc3RuYW1lICsgIiAiICsgcGF5bG9hZC51c2VyLiBsYXN0bmFtZSAKcmVzcG9uc2UucHV0KCJ1c2VyIiwgdXNlci50b0xvd2VyQ2FzZSgpKTs="
           }
         }
       ],
-      "outgoing": "split-name-stage",
-      "configuration": {
-        "implementation": "default-sync"
-      }
+      "outgoing": "split-name-stage"
     },
     "split-name-stage": {
       "id": "split-name-stage",
