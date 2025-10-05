@@ -18,7 +18,8 @@ import java.util.Map;
  *
  * <pre>
  * {
- *   "task": "task-name",
+ *   "task": "task-id",
+ *   "name": "compensation-name",
  *   "preProcessor": {},
  *   "postProcessor": {},
  *   "metadata": {}
@@ -29,6 +30,7 @@ import java.util.Map;
  */
 public record CompensationTask(
     String task,
+    String name,
     TaskProcessor preProcessor,
     TaskProcessor postProcessor,
     Map<String, Serializable> metadata)
@@ -38,7 +40,7 @@ public record CompensationTask(
 
   public CompensationTask {
     task = checkArgumentNotEmpty(task, "compensation's task required");
+    name = checkArgumentNotNullOrElse(name, task);
     metadata = checkArgumentNotNullOrElse(metadata, new HashMap<>());
   }
-
 }

@@ -227,11 +227,15 @@ public class ActivityProcessingStrategy extends AbstractStageProcessingStrategy<
       final Map<String, Serializable> taskResponse) {
     final var compensationProcessor = activityTask.compensation();
     if (compensationProcessor != null) {
-      log.debug("Publishing compensation for task '{}'", activityTask.task());
+      log.debug(
+          "Publishing compensation '{}' for task '{}'",
+          compensationProcessor.name(),
+          activityTask.name());
       final var metadata =
           Maps.merge(executionRequest.metadata(), compensationProcessor.metadata());
       compensationConsumer.accept(
           new Compensation(
+              UUID.randomUUID().toString(),
               transactionId,
               executionRequest.flowId(),
               executionRequest.correlationId(),
@@ -242,6 +246,7 @@ public class ActivityProcessingStrategy extends AbstractStageProcessingStrategy<
               compensationProcessor.preProcessor(),
               compensationProcessor.postProcessor(),
               Status.CREATED,
+              Instant.now(),
               Instant.now()));
     }
   }

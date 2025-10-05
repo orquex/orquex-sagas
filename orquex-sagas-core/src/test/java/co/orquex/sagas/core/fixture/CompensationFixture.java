@@ -24,6 +24,7 @@ public class CompensationFixture {
   public static Compensation getCompensation(
       String transactionId, String task, TaskProcessor preProcessor, TaskProcessor postProcessor) {
     return new Compensation(
+        UUID.randomUUID().toString(),
         transactionId,
         FLOW_ID,
         CORRELATION_ID,
@@ -34,6 +35,7 @@ public class CompensationFixture {
         preProcessor,
         postProcessor,
         Status.CREATED,
+        Instant.now(),
         Instant.now());
   }
 
