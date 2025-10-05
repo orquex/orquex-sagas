@@ -4,6 +4,7 @@
   "initialStage": "evaluation-stage",
   "stages": {
     "activity-stage": {
+      "id": "activity-stage",
       "type": "activity",
       "activityTasks": [
         {
@@ -13,6 +14,7 @@
       "outgoing": null
     },
     "evaluation-stage": {
+      "id": "evaluation-stage",
       "type": "evaluation",
       "evaluationTask": {
         "task": "default-evaluator"

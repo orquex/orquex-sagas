@@ -141,7 +141,7 @@ class JSONata4JActivityTest {
   @Test
   void shouldThrowExceptionWhenBase64ExpressionIsInvalid() {
     // When
-    final var metadata = Map.of(EXPRESSION, "invalid-base64");
+    final Map<String, Serializable> metadata = Map.of(EXPRESSION, "invalid-base64");
     final var taskRequest = new TaskRequest(TRANSACTION_ID, metadata, payload);
     // Then
     assertThatThrownBy(() -> jsonata.execute(taskRequest))

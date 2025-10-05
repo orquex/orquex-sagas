@@ -29,7 +29,7 @@
         <dependency>
             <groupId>org.apache.groovy</groupId>
             <artifactId>groovy-jsr223</artifactId>
-            <version>4.0.18</version>
+            <version>${groovy-jsr223.version}</version>
         </dependency>
         <!-- Logging -->
         <dependency>

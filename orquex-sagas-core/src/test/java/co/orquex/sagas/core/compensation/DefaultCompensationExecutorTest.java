@@ -1,6 +1,7 @@
 package co.orquex.sagas.core.compensation;
 
 import static co.orquex.sagas.core.fixture.TaskProcessorFixture.getTaskProcessor;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -15,15 +16,15 @@ import co.orquex.sagas.domain.api.repository.TaskRepository;
 import co.orquex.sagas.domain.exception.WorkflowException;
 import co.orquex.sagas.domain.execution.ExecutionRequest;
 import co.orquex.sagas.domain.task.Task;
+import co.orquex.sagas.domain.transaction.Compensation;
+import co.orquex.sagas.domain.transaction.Status;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Answers;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
+import org.mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
@@ -41,6 +42,8 @@ class DefaultCompensationExecutorTest {
   @Mock(answer = Answers.RETURNS_DEEP_STUBS)
   Task task;
 
+  @Captor ArgumentCaptor<Compensation> compensationCaptor;
+
   @InjectMocks DefaultCompensationExecutor defaultCompensationExecutor;
 
   @Test
@@ -54,6 +57,19 @@ class DefaultCompensationExecutorTest {
         .thenReturn(Collections.emptyMap());
 
     defaultCompensationExecutor.execute(TRANSACTION_ID);
+
+    verify(compensationRepository, atLeast(3)).save(compensationCaptor.capture());
+    // Assert all compensation statuses in order: IN_PROGRESS, COMPLETED, IN_PROGRESS, COMPLETED
+    assertThat(compensationCaptor.getAllValues())
+        .extracting(Compensation::status)
+        .containsExactly(
+            Status.IN_PROGRESS,
+            Status.COMPLETED,
+            Status.IN_PROGRESS,
+            Status.COMPLETED,
+            Status.IN_PROGRESS,
+            Status.COMPLETED);
+
     verify(taskExecutor, times(3))
         .execute(anyString(), any(Task.class), any(ExecutionRequest.class));
     verify(globalContext).remove(TRANSACTION_ID);
@@ -100,6 +116,19 @@ class DefaultCompensationExecutorTest {
         .thenReturn(Collections.emptyMap());
 
     defaultCompensationExecutor.execute(TRANSACTION_ID);
+
+    verify(compensationRepository, atLeast(3)).save(compensationCaptor.capture());
+    // Expect: IN_PROGRESS, COMPLETED, IN_PROGRESS, ERROR, IN_PROGRESS, COMPLETED
+    assertThat(compensationCaptor.getAllValues())
+        .extracting(Compensation::status)
+        .containsExactly(
+            Status.IN_PROGRESS,
+            Status.COMPLETED,
+            Status.IN_PROGRESS,
+            Status.ERROR,
+            Status.IN_PROGRESS,
+            Status.COMPLETED);
+
     verify(taskExecutor, times(3))
         .execute(anyString(), any(Task.class), any(ExecutionRequest.class));
     verify(globalContext).remove(TRANSACTION_ID);

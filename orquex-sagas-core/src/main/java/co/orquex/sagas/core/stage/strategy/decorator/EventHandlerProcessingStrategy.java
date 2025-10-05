@@ -25,8 +25,9 @@ public class EventHandlerProcessingStrategy<S extends Stage> implements StagePro
             .transactionId(transactionId)
             .flowId(request.flowId())
             .correlationId(request.correlationId())
+            .stageId(stage.getId())
             .metadata(request.metadata())
-            .request(request.payload())
+            .payload(request.payload())
             .incoming(stage);
     try {
       workflowEventPublisher.publish(

@@ -9,7 +9,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class WorkflowEventPublisherFixture {
 
-  public static WorkflowEventPublisher getWorkflowEventPublisher(EventManagerFactory eventManagerFactory) {
+  public static WorkflowEventPublisher getWorkflowEventPublisher(
+      EventManagerFactory eventManagerFactory) {
     return new DefaultWorkflowEventPublisher(eventManagerFactory);
   }
 }

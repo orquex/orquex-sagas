@@ -50,12 +50,34 @@ public record Flow(
     name = checkArgumentNotNullOrElse(name, id); // if name not present set the id
     stages = checkArgumentNotEmpty(stages, "flow's stages required");
     initialStage = checkArgumentNotEmpty(initialStage, "flow's initial stage required");
+
+    // Validate that stage map keys match their corresponding stage IDs
+    validateStageMapConsistency(name, stages);
+
     // Check if the initial stage already exists in the stage's map
     if (!stages.containsKey(initialStage))
       throw new IllegalArgumentException(
           "flow '%s' does not contains the initial stage '%s'".formatted(name, initialStage));
     metadata = checkArgumentNotNullOrElse(metadata, new HashMap<>());
     configuration = checkArgumentNotNullOrElse(configuration, new FlowConfiguration());
+  }
+
+  /**
+   * Validates that each stage map key matches its corresponding stage ID.
+   *
+   * @param flowName the name of the flow for error context
+   * @param stages the stages map to validate
+   * @throws IllegalArgumentException if any stage map key doesn't match its stage ID
+   */
+  private static void validateStageMapConsistency(String flowName, Map<String, Stage> stages) {
+    stages.forEach(
+        (key, stage) -> {
+          if (!key.equals(stage.getId())) {
+            throw new IllegalArgumentException(
+                "flow '%s': stage map key '%s' does not match stage id '%s'"
+                    .formatted(flowName, key, stage.getId()));
+          }
+        });
   }
 
   public Flow(String id, String initialStage, Map<String, Stage> stages) {

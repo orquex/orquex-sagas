@@ -21,15 +21,19 @@
         <maven.compiler.target>21</maven.compiler.target>
         <maven.compiler.release>21</maven.compiler.release>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <lombok.version>1.18.32</lombok.version>
-        <jackson.version>2.17.1</jackson.version>
-        <slf4j.version>2.0.13</slf4j.version>
-        <junit-jupiter.version>5.10.2</junit-jupiter.version>
-        <assertj.version>3.26.0</assertj.version>
-        <mockito.version>5.12.0</mockito.version>
-        <awaitility.version>4.2.1</awaitility.version>
-        <bytebuddy.version>1.14.17</bytebuddy.version>
-        <checkerframework.version>3.47.0</checkerframework.version>
+        <maven-surefire-plugin.version>3.5.3</maven-surefire-plugin.version>
+        <lombok.version>1.18.38</lombok.version>
+        <jackson.version>2.19.2</jackson.version>
+        <slf4j.version>2.0.17</slf4j.version>
+        <junit-jupiter.version>5.12.2</junit-jupiter.version>
+        <assertj.version>3.27.4</assertj.version>
+        <mockito.version>5.17.0</mockito.version>
+        <awaitility.version>4.2.2</awaitility.version>
+        <bytebuddy.version>1.17.17</bytebuddy.version>
+        <checkerframework.version>3.49.0</checkerframework.version>
+        <jsonata4java.version>2.5.1</jsonata4java.version>
+        <wiremock.version>3.9.1</wiremock.version>
+        <groovy-jsr223.version>4.0.18</groovy-jsr223.version>
     </properties>
 
     <dependencyManagement>
@@ -124,36 +128,42 @@
                 <artifactId>junit-jupiter-engine</artifactId>
                 <version>${junit-jupiter.version}</version>
                 <scope>test</scope>
+                <optional>true</optional>
             </dependency>
             <dependency>
                 <groupId>org.junit.jupiter</groupId>
                 <artifactId>junit-jupiter-params</artifactId>
                 <version>${junit-jupiter.version}</version>
                 <scope>test</scope>
+                <optional>true</optional>
             </dependency>
             <dependency>
                 <groupId>org.assertj</groupId>
                 <artifactId>assertj-core</artifactId>
                 <version>${assertj.version}</version>
                 <scope>test</scope>
+                <optional>true</optional>
             </dependency>
             <dependency>
                 <groupId>org.mockito</groupId>
                 <artifactId>mockito-junit-jupiter</artifactId>
                 <version>${mockito.version}</version>
                 <scope>test</scope>
+                <optional>true</optional>
             </dependency>
             <dependency>
                 <groupId>org.awaitility</groupId>
                 <artifactId>awaitility</artifactId>
                 <version>${awaitility.version}</version>
                 <scope>test</scope>
+                <optional>true</optional>
             </dependency>
             <dependency>
                 <groupId>org.slf4j</groupId>
                 <artifactId>slf4j-simple</artifactId>
                 <version>${slf4j.version}</version>
                 <scope>test</scope>
+                <optional>true</optional>
             </dependency>
         </dependencies>
     </dependencyManagement>
@@ -163,12 +173,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>3.2.5</version>
-                <configuration>
-                    <argLine>
-                        -javaagent:${settings.localRepository}/net/bytebuddy/byte-buddy-agent/${bytebuddy.version}/byte-buddy-agent-${bytebuddy.version}.jar
-                    </argLine>
-                </configuration>
+                <version>${maven-surefire-plugin.version}</version>
             </plugin>
         </plugins>
     </build>

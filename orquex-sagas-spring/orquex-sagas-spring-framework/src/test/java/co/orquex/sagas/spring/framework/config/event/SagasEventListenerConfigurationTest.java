@@ -19,6 +19,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
       SagasRegistryConfiguration.class,
       MockRepositoryConfiguration.class,
       SagasEventListenerConfiguration.class,
+      SagasResilienceConfiguration.class
     })
 class SagasEventListenerConfigurationTest {
 

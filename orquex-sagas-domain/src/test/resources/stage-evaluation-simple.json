@@ -1,4 +1,5 @@
 {
+  "id": "evaluation-impl",
   "type": "evaluation",
   "name": "Simple Evaluation",
   "evaluationTask": {

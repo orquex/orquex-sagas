@@ -16,7 +16,8 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
       SagasAsyncStageConfiguration.class,
       SagasWorkflowEventPublisherConfiguration.class,
       SagasRegistryConfiguration.class,
-      MockRepositoryConfiguration.class
+      MockRepositoryConfiguration.class,
+      SagasResilienceConfiguration.class
     })
 class SagasAsyncWorkflowConfigurationTest {
 

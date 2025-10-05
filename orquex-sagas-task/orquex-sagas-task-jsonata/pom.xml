@@ -5,9 +5,8 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>co.orquex.sagas</groupId>
-        <artifactId>orquex-sagas</artifactId>
+        <artifactId>orquex-sagas-task</artifactId>
         <version>1.0.0-SNAPSHOT</version>
-        <relativePath>../../pom.xml</relativePath>
     </parent>
 
     <artifactId>orquex-sagas-task-jsonata</artifactId>
@@ -16,7 +15,6 @@
         <maven.compiler.source>21</maven.compiler.source>
         <maven.compiler.target>21</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <jsonata4java.version>2.5.1</jsonata4java.version>
     </properties>
 
     <dependencies>

@@ -10,6 +10,7 @@ import java.io.Serial;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 /**
  * The activity task contains the information necessary to pre-process the input request of a task,
@@ -19,6 +20,8 @@ import java.util.Map;
  *
  * <pre>
  * {
+ *   "id": "",
+ *   "name": "Task name"
  *   "task": "task-name",
  *   "preProcessor": {},
  *   "postProcessor": {},
@@ -30,6 +33,8 @@ import java.util.Map;
  * @see Activity
  */
 public record ActivityTask(
+    String id,
+    String name,
     String task,
     TaskProcessor preProcessor,
     TaskProcessor postProcessor,
@@ -40,11 +45,13 @@ public record ActivityTask(
   @Serial private static final long serialVersionUID = OrquexSagasVersion.SERIAL_VERSION;
 
   public ActivityTask {
+    id = checkArgumentNotNullOrElse(id, UUID.randomUUID().toString());
+    name = checkArgumentNotNullOrElse(name, id);
     task = checkArgumentNotEmpty(task, "activity's task required");
     metadata = checkArgumentNotNullOrElse(metadata, new HashMap<>());
   }
 
   public ActivityTask(String task) {
-    this(task, null, null, null, null);
+    this(UUID.randomUUID().toString(), task, task, null, null, null, null);
   }
 }

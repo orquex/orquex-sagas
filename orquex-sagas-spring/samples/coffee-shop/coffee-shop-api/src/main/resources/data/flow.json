@@ -1,0 +1,78 @@
+{
+  "id": "coffee-shop-order",
+  "name": "Coffee Shop Orders Flow",
+  "initialStage": "check-cup-size",
+  "stages": {
+    "check-cup-size": {
+      "id": "check-cup-size",
+      "type": "evaluation",
+      "name": "Check cup size",
+      "evaluationTask": {
+        "task": "default-groovy-evaluator"
+      },
+      "conditions": [
+        {
+          "expression": "payload.size == 'medium' || payload.size == 'large'",
+          "outgoing": "coffee-shop-promotion"
+        }
+      ],
+      "defaultOutgoing": "coffee-shop-service",
+      "metadata": {
+        "test": "some value"
+      }
+    },
+    "coffee-shop-promotion": {
+      "id": "coffee-shop-promotion",
+      "type": "activity",
+      "name": "Coffee shop promotion stage",
+      "activityTasks": [
+        {
+          "task": "discount-calculator"
+        }
+      ],
+      "configuration": {
+        "implementation": "kafka-executor",
+        "parameters": {
+          "topic": "coffee.shop.stage.promotion"
+        }
+      },
+      "outgoing": "coffee-shop-service"
+    },
+    "coffee-shop-service": {
+      "id": "coffee-shop-service",
+      "type": "activity",
+      "name": "Coffee shop service stage",
+      "activityTasks": [
+        {
+          "task": "service-checkout"
+        }
+      ],
+      "configuration": {
+        "implementation": "kafka-executor",
+        "parameters": {
+          "topic": "coffee.shop.stage.service"
+        }
+      },
+      "outgoing": "coffee-shop-notification"
+    },
+    "coffee-shop-notification": {
+      "id": "coffee-shop-notification",
+      "type": "activity",
+      "name": "Coffee shop notification stage",
+      "activityTasks": [
+        {
+          "task": "notification-sender"
+        }
+      ],
+      "configuration": {
+        "implementation": "kafka-executor",
+        "parameters": {
+          "topic": "coffee.shop.stage.notification"
+        }
+      },
+      "outgoing": null
+    }
+  },
+  "configuration": {},
+  "metadata": {}
+}

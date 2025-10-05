@@ -1,5 +1,7 @@
 package co.orquex.sagas.core.stage.strategy.impl;
 
+import co.orquex.sagas.core.resilience.CircuitBreakerStateManager;
+import co.orquex.sagas.core.resilience.RetryStateManager;
 import co.orquex.sagas.domain.api.TaskExecutor;
 import co.orquex.sagas.domain.api.registry.Registry;
 import co.orquex.sagas.domain.api.repository.TaskRepository;
@@ -30,10 +32,12 @@ public class ActivityProcessingStrategy extends AbstractStageProcessingStrategy<
   private final Consumer<Compensation> compensationConsumer;
 
   public ActivityProcessingStrategy(
-      Registry<TaskExecutor> taskExecutorRegistry,
-      TaskRepository taskRepository,
-      Consumer<Compensation> compensationConsumer) {
-    super(taskExecutorRegistry, taskRepository);
+      final Registry<TaskExecutor> taskExecutorRegistry,
+      final TaskRepository taskRepository,
+      final RetryStateManager retryStateManager,
+      final CircuitBreakerStateManager circuitBreakerStateManager,
+      final Consumer<Compensation> compensationConsumer) {
+    super(taskExecutorRegistry, taskRepository, retryStateManager, circuitBreakerStateManager);
     this.compensationConsumer = compensationConsumer;
   }
 
@@ -189,13 +193,13 @@ public class ActivityProcessingStrategy extends AbstractStageProcessingStrategy<
       executionRequest = executionRequest.withPayload(preProcessorPayload);
     }
     log.debug(
-        "Executing task '{}' at flow '{}' with correlation ID '{}'",
-        activityTask.task(),
+        "Executing activity task '{}' at flow '{}' with correlation ID '{}'",
+        activityTask.name(),
         executionRequest.flowId(),
         executionRequest.correlationId());
     // Execute the task with the pre-processed payload
     final var taskResponse = executeTask(transactionId, activityTask.task(), executionRequest);
-    // Publish the compensation's event once the task is executed
+    // Publish the compensation event once the task is executed
     publishCompensation(transactionId, activityTask, executionRequest, taskResponse);
     // Post process the payload, generating a new one
     final var postProcessor = activityTask.postProcessor();
@@ -223,11 +227,15 @@ public class ActivityProcessingStrategy extends AbstractStageProcessingStrategy<
       final Map<String, Serializable> taskResponse) {
     final var compensationProcessor = activityTask.compensation();
     if (compensationProcessor != null) {
-      log.debug("Publishing compensation for task '{}'", activityTask.task());
+      log.debug(
+          "Publishing compensation '{}' for task '{}'",
+          compensationProcessor.name(),
+          activityTask.name());
       final var metadata =
           Maps.merge(executionRequest.metadata(), compensationProcessor.metadata());
       compensationConsumer.accept(
           new Compensation(
+              UUID.randomUUID().toString(),
               transactionId,
               executionRequest.flowId(),
               executionRequest.correlationId(),
@@ -238,6 +246,7 @@ public class ActivityProcessingStrategy extends AbstractStageProcessingStrategy<
               compensationProcessor.preProcessor(),
               compensationProcessor.postProcessor(),
               Status.CREATED,
+              Instant.now(),
               Instant.now()));
     }
   }
@@ -246,8 +255,8 @@ public class ActivityProcessingStrategy extends AbstractStageProcessingStrategy<
    * Handles a WorkflowException.
    *
    * <p>This method checks if the cause of the provided Throwable is a WorkflowException. If it is,
-   * it returns the cause directly. If it is not, it creates a new WorkflowException with the
-   * message of the provided Throwable and returns it.
+   * it directly returns the exception cause. If it is not, it creates a new WorkflowException with
+   * the message of the provided Throwable and returns it.
    *
    * @param throwable The Throwable to be handled.
    * @return A WorkflowException derived from the provided Throwable.

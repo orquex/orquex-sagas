@@ -17,6 +17,8 @@ public interface TransactionRepository {
    */
   boolean existsByFlowIdAndCorrelationId(String flowId, String correlationId);
 
+  Optional<Transaction> findByFlowIdAndCorrelationId(String flowId, String correlationId);
+
   /**
    * Save or update the transaction.
    *
