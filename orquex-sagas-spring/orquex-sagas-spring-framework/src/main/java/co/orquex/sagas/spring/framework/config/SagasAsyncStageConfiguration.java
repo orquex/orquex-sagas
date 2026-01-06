@@ -14,12 +14,16 @@ import co.orquex.sagas.domain.api.repository.TaskRepository;
 import co.orquex.sagas.spring.framework.config.annotation.ConditionalOnMissingBean;
 import co.orquex.sagas.spring.framework.config.annotation.ConditionalOnProperty;
 import co.orquex.sagas.spring.framework.config.compensation.AsyncCompensationHandler;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 /** Configure the required Stage beans. */
 @Configuration
 public class SagasAsyncStageConfiguration {
+
+   private static final Logger log = LoggerFactory.getLogger(SagasAsyncStageConfiguration.class);
 
   @Bean
   @ConditionalOnMissingBean(name = {"defaultAsyncStageExecutor", "asyncStageExecutor"})
@@ -46,7 +50,7 @@ public class SagasAsyncStageConfiguration {
         activityStrategy, evaluationStrategy, workflowEventPublisher);
   }
 
-  @Bean({"defaultAsyncCompensationHandler", "asyncCompensationHandler"})
+  @Bean
   @ConditionalOnProperty(
       name = "orquex.sagas.spring.compensation.enabled",
       havingValue = "true",
@@ -55,5 +59,17 @@ public class SagasAsyncStageConfiguration {
   public AsyncCompensationHandler asyncCompensationHandler(
       WorkflowEventPublisher workflowEventPublisher) {
     return compensation -> workflowEventPublisher.publish(new EventMessage<>(compensation));
+  }
+
+  @Bean
+  @ConditionalOnProperty(name = "orquex.sagas.spring.compensation.enabled", havingValue = "false")
+  @ConditionalOnMissingBean(name = {"defaultAsyncCompensationHandler", "asyncCompensationHandler"})
+  public AsyncCompensationHandler defaultAsyncCompensationHandler() {
+    return compensation -> log.debug(
+            "Compensation received but not action taken for flow ID '{}', correlation ID '{}', transaction ID '{}' and task '{}'",
+            compensation.flowId(),
+            compensation.correlationId(),
+            compensation.transactionId(),
+            compensation.task());
   }
 }
