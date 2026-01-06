@@ -19,6 +19,8 @@ import co.orquex.sagas.domain.event.metric.FlowStartedEvent;
 import co.orquex.sagas.domain.exception.WorkflowException;
 import co.orquex.sagas.domain.execution.ExecutionRequest;
 import co.orquex.sagas.domain.execution.ExecutionResponse;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.Collections;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -31,13 +33,13 @@ import org.mockito.junit.jupiter.MockitoExtension;
 @DisplayName("WorkflowExecutorMetricDecorator Tests")
 class WorkflowExecutorMetricDecoratorTest {
 
-  private static final String TRANSACTION_ID = "test-transaction-id";
+  static final String TRANSACTION_ID = "test-transaction-id";
 
-  @Mock private Executable<ExecutionRequest, ExecutionResponse> delegate;
-  @Mock private WorkflowEventPublisher eventPublisher;
+  @Mock Executable<ExecutionRequest, ExecutionResponse> delegate;
+  @Mock WorkflowEventPublisher eventPublisher;
 
-  private WorkflowExecutorMetricDecorator decorator;
-  private ExecutionRequest executionRequest;
+  WorkflowExecutorMetricDecorator decorator;
+  ExecutionRequest executionRequest;
 
   @BeforeEach
   void setUp() {
@@ -66,10 +68,12 @@ class WorkflowExecutorMetricDecoratorTest {
         .publish(
             argThat(
                 (EventMessage<?> event) ->
-                    event.message() instanceof FlowStartedEvent flowStarted
-                        && flowStarted.flowId().equals(executionRequest.flowId())
-                        && flowStarted.correlationId().equals(executionRequest.correlationId())
-                        && flowStarted.timestamp() != null));
+                    event.message()
+                            instanceof
+                            FlowStartedEvent(String flowId, String correlationId, Instant timestamp)
+                        && flowId.equals(executionRequest.flowId())
+                        && correlationId.equals(executionRequest.correlationId())
+                        && timestamp != null));
     verify(eventPublisher)
         .publish(
             argThat(
@@ -105,11 +109,17 @@ class WorkflowExecutorMetricDecoratorTest {
         .publish(
             argThat(
                 (EventMessage<?> event) ->
-                    event.message() instanceof FlowFailedEvent flowFailed
-                        && flowFailed.flowId().equals(executionRequest.flowId())
-                        && flowFailed.correlationId().equals(executionRequest.correlationId())
-                        && flowFailed.timestamp() != null
-                        && flowFailed.duration() != null));
+                    event.message()
+                            instanceof
+                            FlowFailedEvent(
+                                String flowId,
+                                String correlationId,
+                                Instant timestamp,
+                                Duration duration)
+                        && flowId.equals(executionRequest.flowId())
+                        && correlationId.equals(executionRequest.correlationId())
+                        && timestamp != null
+                        && duration != null));
     verify(eventPublisher, never())
         .publish(argThat((EventMessage<?> event) -> event.message() instanceof FlowCompletedEvent));
   }
@@ -128,11 +138,12 @@ class WorkflowExecutorMetricDecoratorTest {
     final var actualResponse = decorator.execute(executionRequest);
 
     // Assert
-    assertThat(actualResponse).isNotNull().returns(TRANSACTION_ID, ExecutionResponse::transactionId);
+    assertThat(actualResponse)
+        .isNotNull()
+        .returns(TRANSACTION_ID, ExecutionResponse::transactionId);
     verify(delegate).execute(executionRequest);
     verify(eventPublisher)
-        .publish(
-            argThat((EventMessage<?> event) -> event.message() instanceof FlowCompletedEvent));
+        .publish(argThat((EventMessage<?> event) -> event.message() instanceof FlowCompletedEvent));
   }
 
   @Test
@@ -149,12 +160,15 @@ class WorkflowExecutorMetricDecoratorTest {
     final var actualResponse = decorator.execute(executionRequest);
 
     // Assert
-    assertThat(actualResponse).isNotNull().returns(TRANSACTION_ID, ExecutionResponse::transactionId);
+    assertThat(actualResponse)
+        .isNotNull()
+        .returns(TRANSACTION_ID, ExecutionResponse::transactionId);
     verify(delegate).execute(executionRequest);
   }
 
   @Test
-  @DisplayName("should publish failed event and rethrow exception even if failed event publishing fails")
+  @DisplayName(
+      "should publish failed event and rethrow exception even if failed event publishing fails")
   void shouldRethrowExceptionEvenIfFailedEventPublishingFails() {
     // Arrange
     final var exception = new WorkflowException("Workflow execution failed");

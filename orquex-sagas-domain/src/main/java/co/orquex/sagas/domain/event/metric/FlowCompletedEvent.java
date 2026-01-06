@@ -5,4 +5,8 @@ import java.time.Instant;
 
 /** Event indicating that a flow execution has been completed. */
 public record FlowCompletedEvent(
-    String flowId, String correlationId, Instant timestamp, Duration duration) {}
+    String flowId,
+    String correlationId,
+    String transactionId,
+    Instant timestamp,
+    Duration duration) {}

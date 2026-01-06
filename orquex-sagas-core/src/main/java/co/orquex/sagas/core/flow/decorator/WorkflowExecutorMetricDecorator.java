@@ -1,7 +1,6 @@
 package co.orquex.sagas.core.flow.decorator;
 
 import co.orquex.sagas.core.event.WorkflowEventPublisher;
-import co.orquex.sagas.core.event.impl.EventMessage;
 import co.orquex.sagas.domain.api.Executable;
 import co.orquex.sagas.domain.event.metric.FlowCompletedEvent;
 import co.orquex.sagas.domain.event.metric.FlowFailedEvent;
@@ -10,8 +9,6 @@ import co.orquex.sagas.domain.execution.ExecutionRequest;
 import co.orquex.sagas.domain.execution.ExecutionResponse;
 import java.time.Duration;
 import java.time.Instant;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 
 /**
  * A decorator implementation that provides metrics collection capabilities for workflow execution.
@@ -52,20 +49,25 @@ import lombok.extern.slf4j.Slf4j;
  * @see FlowCompletedEvent
  * @see FlowFailedEvent
  */
-@Slf4j
-@RequiredArgsConstructor
 public class WorkflowExecutorMetricDecorator
     implements Executable<ExecutionRequest, ExecutionResponse> {
 
   private final Executable<ExecutionRequest, ExecutionResponse> delegate;
-  private final WorkflowEventPublisher eventPublisher;
+  private final WorkflowExecutorMetricPublisher executorMetricPublisher;
+
+  public WorkflowExecutorMetricDecorator(
+      final Executable<ExecutionRequest, ExecutionResponse> delegate,
+      final WorkflowEventPublisher eventPublisher) {
+    this.delegate = delegate;
+    this.executorMetricPublisher = new WorkflowExecutorMetricPublisher(eventPublisher);
+  }
 
   @Override
   public ExecutionResponse execute(final ExecutionRequest request) {
     final var startTime = Instant.now();
 
     // Publish FlowEventStarted (before transaction creation)
-    publishFlowStartedEvent(request, startTime);
+    executorMetricPublisher.publishFlowStartedEvent(request, startTime);
 
     try {
       // Execute the actual workflow
@@ -73,75 +75,18 @@ public class WorkflowExecutorMetricDecorator
 
       // Calculate execution duration and publish FlowEventCompleted
       final var executionDuration = Duration.between(startTime, Instant.now());
-      publishFlowCompletedEvent(request, response.transactionId(), executionDuration);
+      executorMetricPublisher.publishFlowCompletedEvent(
+          request, response.transactionId(), executionDuration);
 
       return response;
 
     } catch (final Exception exception) {
       // Calculate execution duration and publish FlowEventFailed
       final var executionDuration = Duration.between(startTime, Instant.now());
-      publishFlowFailedEvent(request, executionDuration);
+      executorMetricPublisher.publishFlowFailedEvent(request, executionDuration);
 
       // Re-throw the exception to maintain original behavior
       throw exception;
-    }
-  }
-
-  private void publishFlowStartedEvent(final ExecutionRequest request, final Instant timestamp) {
-    try {
-      final var event = new FlowStartedEvent(request.flowId(), request.correlationId(), timestamp);
-      eventPublisher.publish(new EventMessage<>(event));
-      log.debug(
-          "Published FlowEventStarted for flowId: {}, correlationId: {}",
-          request.flowId(),
-          request.correlationId());
-    } catch (final Exception exception) {
-      log.warn(
-          "Failed to publish FlowEventStarted for flowId: {}, correlationId: {}",
-          request.flowId(),
-          request.correlationId(),
-          exception);
-    }
-  }
-
-  private void publishFlowCompletedEvent(
-      final ExecutionRequest request, final String transactionId, final Duration duration) {
-    try {
-      final var event =
-          new FlowCompletedEvent(
-              request.flowId(), request.correlationId(), Instant.now(), duration);
-      eventPublisher.publish(new EventMessage<>(event));
-      log.debug(
-          "Published FlowEventCompleted for flowId: {}, correlationId: {}, transactionId: {}, duration: {}ms",
-          request.flowId(),
-          request.correlationId(),
-          transactionId,
-          duration.toMillis());
-    } catch (final Exception exception) {
-      log.warn(
-          "Failed to publish FlowEventCompleted for flowId: {}, correlationId: {}",
-          request.flowId(),
-          request.correlationId(),
-          exception);
-    }
-  }
-
-  private void publishFlowFailedEvent(final ExecutionRequest request, final Duration duration) {
-    try {
-      final var event =
-          new FlowFailedEvent(request.flowId(), request.correlationId(), Instant.now(), duration);
-      eventPublisher.publish(new EventMessage<>(event));
-      log.debug(
-          "Published FlowEventFailed for flowId: {}, correlationId: {}, duration: {}ms",
-          request.flowId(),
-          request.correlationId(),
-          duration.toMillis());
-    } catch (final Exception exception) {
-      log.warn(
-          "Failed to publish FlowEventFailed for flowId: {}, correlationId: {}",
-          request.flowId(),
-          request.correlationId(),
-          exception);
     }
   }
 }
