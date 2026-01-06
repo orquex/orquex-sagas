@@ -14,6 +14,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.hc.client5.http.classic.HttpClient;
 import org.apache.hc.client5.http.classic.methods.HttpUriRequestBase;
 import org.apache.hc.core5.http.Header;
@@ -23,10 +24,11 @@ import org.apache.hc.core5.http.message.BasicHeader;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
+@Slf4j
 public abstract class HttpClientAbstractTaskImplementation
     extends AbstractHttpClientTaskImplementation<HttpClient> {
 
-    protected HttpClientAbstractTaskImplementation(
+  protected HttpClientAbstractTaskImplementation(
       HttpClientProviderRegistry<HttpClient> registry, ObjectMapper objectMapper) {
     super(registry, objectMapper);
   }
@@ -45,7 +47,8 @@ public abstract class HttpClientAbstractTaskImplementation
                   getBody(response.getEntity()),
                   getHeaders(response.getHeaders())));
     } catch (IOException e) {
-      throw new WorkflowException("An error occurred while executing the HTTP request", e);
+      log.error("An error occurred while executing the HTTP request", e);
+      throw new WorkflowException("An error occurred while executing the HTTP request");
     }
   }
 
@@ -78,7 +81,8 @@ public abstract class HttpClientAbstractTaskImplementation
         try {
           return objectMapper.readValue(bytes, new TypeReference<>() {});
         } catch (IOException e) {
-          throw new WorkflowException("An error occurred while deserializing the request body", e);
+          log.error("An error occurred while deserializing the request body", e);
+          throw new WorkflowException("An error occurred while deserializing the request body");
         }
       }
     }
@@ -89,7 +93,8 @@ public abstract class HttpClientAbstractTaskImplementation
     try {
       return objectMapper.writeValueAsString(object);
     } catch (IOException e) {
-      throw new WorkflowException("An error occurred while serializing the request body", e);
+      log.error("An error occurred while serializing the request body", e);
+      throw new WorkflowException("An error occurred while serializing the request body");
     }
   }
 
