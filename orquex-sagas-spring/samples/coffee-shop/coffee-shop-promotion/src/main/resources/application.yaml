@@ -23,3 +23,5 @@ orquex:
         enabled: false
       event:
         default-checkpoint-event-listener: false
+      compensation:
+        enabled: false

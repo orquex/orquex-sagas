@@ -12,6 +12,7 @@ public class SagasConfigurationProperties {
   private WorkflowConfiguration workflow;
   private StageConfiguration stage;
   private EventConfiguration event;
+  private CompensationConfiguration compensation;
 
   @Getter
   @Setter
@@ -30,5 +31,11 @@ public class SagasConfigurationProperties {
   static class EventConfiguration {
     private boolean enabled = true;
     private boolean defaultCheckpointEventListener = true;
+  }
+
+  @Getter
+  @Setter
+  static class CompensationConfiguration {
+    private boolean enabled = true;
   }
 }

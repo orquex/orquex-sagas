@@ -23,7 +23,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven-surefire-plugin.version>3.5.3</maven-surefire-plugin.version>
         <lombok.version>1.18.38</lombok.version>
-        <jackson.version>2.19.2</jackson.version>
+        <jackson.version>2.18.3</jackson.version>
         <slf4j.version>2.0.17</slf4j.version>
         <junit-jupiter.version>5.12.2</junit-jupiter.version>
         <assertj.version>3.27.4</assertj.version>
@@ -66,7 +66,7 @@
             </dependency>
             <dependency>
                 <groupId>co.orquex.sagas</groupId>
-                <artifactId>orquex-sagas-task-okhttp</artifactId>
+                <artifactId>orquex-sagas-task-http-client</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>

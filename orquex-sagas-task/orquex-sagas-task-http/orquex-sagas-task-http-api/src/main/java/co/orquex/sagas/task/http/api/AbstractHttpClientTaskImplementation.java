@@ -8,13 +8,15 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.Serializable;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.checkerframework.checker.nullness.qual.NonNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /** Abstract class that provides the basic implementation for the HTTP client task. */
-@Slf4j
 @RequiredArgsConstructor
 public abstract class AbstractHttpClientTaskImplementation<C> implements TaskImplementation {
+
+  private static final Logger log = LoggerFactory.getLogger(AbstractHttpClientTaskImplementation.class);
 
   protected final HttpClientProviderRegistry<C> registry;
   protected final ObjectMapper objectMapper;

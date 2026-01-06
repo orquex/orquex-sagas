@@ -67,4 +67,17 @@ public class SagasStageConfiguration {
           compensation.task());
     };
   }
+
+  @Bean
+  @ConditionalOnProperty(name = "orquex.sagas.spring.compensation.enabled", havingValue = "false")
+  @ConditionalOnMissingBean(name = {"defaultCompensationHandler", "compensationHandler"})
+  public CompensationHandler defaultCompensationHandler() {
+    return compensation ->
+        log.debug(
+            "Compensation received but not action taken for flow ID '{}', correlation ID '{}', transaction ID '{}' and task '{}'",
+            compensation.flowId(),
+            compensation.correlationId(),
+            compensation.transactionId(),
+            compensation.task());
+  }
 }
