@@ -19,8 +19,11 @@ class SagasTaskConfigurationTest {
   void shouldLoadTaskConfiguration() {
     assertThat(applicationContext.getBean("groovyActivity")).isNotNull();
     assertThat(applicationContext.getBean("groovyEvaluation")).isNotNull();
-    assertThat(applicationContext.getBean("okHttpGetActivity")).isNotNull();
-    assertThat(applicationContext.getBean("okHttpPostActivity")).isNotNull();
+    assertThat(applicationContext.getBean("httpClientGetActivity")).isNotNull();
+    assertThat(applicationContext.getBean("httpClientPostActivity")).isNotNull();
+    assertThat(applicationContext.getBean("httpClientPutActivity")).isNotNull();
+    assertThat(applicationContext.getBean("httpClientDeleteActivity")).isNotNull();
+    assertThat(applicationContext.getBean("httpClientPatchActivity")).isNotNull();
     assertThat(applicationContext.getBean("jSONata4JActivity")).isNotNull();
   }
 }

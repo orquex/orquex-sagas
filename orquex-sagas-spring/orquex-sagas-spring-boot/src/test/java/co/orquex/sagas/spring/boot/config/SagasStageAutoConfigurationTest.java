@@ -12,7 +12,11 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {SagasStageAutoConfiguration.class, MockConfiguration.class})
-@TestPropertySource(properties = {"orquex.sagas.spring.stage.enabled=true"})
+@TestPropertySource(
+    properties = {
+      "orquex.sagas.spring.stage.enabled=true",
+      "orquex.sagas.spring.compensation.enabled=false"
+    })
 class SagasStageAutoConfigurationTest {
 
   @Autowired ApplicationContext applicationContext;

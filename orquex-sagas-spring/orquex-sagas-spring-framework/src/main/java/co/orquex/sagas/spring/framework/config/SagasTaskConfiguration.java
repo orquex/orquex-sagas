@@ -6,15 +6,11 @@ import co.orquex.sagas.task.groovy.GroovyActivity;
 import co.orquex.sagas.task.groovy.GroovyEvaluation;
 import co.orquex.sagas.task.http.api.HttpClientProvider;
 import co.orquex.sagas.task.http.api.HttpClientProviderRegistry;
+import co.orquex.sagas.task.http.client.*;
 import co.orquex.sagas.task.jsonata.JSONata4JActivity;
-import co.orquex.sagas.task.okhttp.OkHttpDeleteActivity;
-import co.orquex.sagas.task.okhttp.OkHttpGetActivity;
-import co.orquex.sagas.task.okhttp.OkHttpInMemoryClientProviderRegistry;
-import co.orquex.sagas.task.okhttp.OkHttpPostActivity;
-import co.orquex.sagas.task.okhttp.OkHttpPutActivity;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.List;
-import okhttp3.OkHttpClient;
+import org.apache.hc.client5.http.classic.HttpClient;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -33,33 +29,39 @@ public class SagasTaskConfiguration {
   }
 
   @Bean
-  public TaskImplementation okHttpGetActivity(
-      HttpClientProviderRegistry<OkHttpClient> registry, ObjectMapper objectMapper) {
-    return new OkHttpGetActivity(registry, objectMapper);
+  public TaskImplementation httpClientGetActivity(
+      HttpClientProviderRegistry<HttpClient> registry, ObjectMapper objectMapper) {
+    return new HttpClientGetActivity(registry, objectMapper);
   }
 
   @Bean
-  public TaskImplementation okHttpPostActivity(
-      HttpClientProviderRegistry<OkHttpClient> registry, ObjectMapper objectMapper) {
-    return new OkHttpPostActivity(registry, objectMapper);
+  public TaskImplementation httpClientPostActivity(
+      HttpClientProviderRegistry<HttpClient> registry, ObjectMapper objectMapper) {
+    return new HttpClientPostActivity(registry, objectMapper);
   }
 
   @Bean
-  public TaskImplementation okHttpDeleteActivity(
-      HttpClientProviderRegistry<OkHttpClient> registry, ObjectMapper objectMapper) {
-    return new OkHttpDeleteActivity(registry, objectMapper);
+  public TaskImplementation httpClientDeleteActivity(
+      HttpClientProviderRegistry<HttpClient> registry, ObjectMapper objectMapper) {
+    return new HttpClientDeleteActivity(registry, objectMapper);
   }
 
   @Bean
-  public TaskImplementation okHttpPutActivity(
-      HttpClientProviderRegistry<OkHttpClient> registry, ObjectMapper objectMapper) {
-    return new OkHttpPutActivity(registry, objectMapper);
+  public TaskImplementation httpClientPutActivity(
+      HttpClientProviderRegistry<HttpClient> registry, ObjectMapper objectMapper) {
+    return new HttpClientGetActivity(registry, objectMapper);
   }
 
   @Bean
-  public HttpClientProviderRegistry<OkHttpClient> okHttpInMemoryClientRegistry(
-      List<HttpClientProvider<OkHttpClient>> okHttpClientProviders) {
-    return OkHttpInMemoryClientProviderRegistry.of(okHttpClientProviders);
+  public TaskImplementation httpClientPatchActivity(
+      HttpClientProviderRegistry<HttpClient> registry, ObjectMapper objectMapper) {
+    return new HttpClientPatchActivity(registry, objectMapper);
+  }
+
+  @Bean
+  public HttpClientProviderRegistry<HttpClient> httpClientInMemoryClientRegistry(
+      List<HttpClientProvider<HttpClient>> httpClientProviders) {
+    return HttpClientInMemoryClientProviderRegistry.of(httpClientProviders);
   }
 
   @Bean

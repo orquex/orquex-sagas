@@ -5,7 +5,7 @@ import static org.mockito.Mockito.when;
 import co.orquex.sagas.domain.api.context.GlobalContext;
 import co.orquex.sagas.task.http.api.HttpClientProvider;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import okhttp3.OkHttpClient;
+import org.apache.hc.client5.http.classic.HttpClient;
 import org.mockito.Mockito;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -16,7 +16,7 @@ public class MockTaskConfiguration {
 
   @Bean
   @SuppressWarnings("unchecked")
-  HttpClientProvider<OkHttpClient> okHttpClientProvider() {
+  HttpClientProvider<HttpClient> httpClientProvider() {
     final var mock = Mockito.mock(HttpClientProvider.class);
     when(mock.getKey()).thenReturn("mock-client-provider");
     return mock;

@@ -1,6 +1,7 @@
 package co.orquex.sagas.domain.exception;
 
 import co.orquex.sagas.domain.version.OrquexSagasVersion;
+import java.io.IOException;
 import java.io.Serial;
 
 /**
@@ -27,5 +28,9 @@ public class WorkflowException extends RuntimeException {
 
   public WorkflowException(String message) {
     super(message);
+  }
+
+  public WorkflowException(String message, IOException e) {
+    super(message, e);
   }
 }

@@ -2,7 +2,7 @@
   {
     "id": "http-get",
     "name": "General HTTP GET Task",
-    "implementation": "okhttp-get",
+    "implementation": "http-get",
     "metadata": {
       "__client_provider": "basic-provider"
     }
@@ -10,7 +10,7 @@
   {
     "id": "http-post",
     "name": "General HTTP POST Task",
-    "implementation": "okhttp-post",
+    "implementation": "http-post",
     "metadata": {
       "__client_provider": "basic-provider"
     }
@@ -18,7 +18,7 @@
   {
     "id": "http-delete",
     "name": "General HTTP DELETE Task",
-    "implementation": "okhttp-delete",
+    "implementation": "http-delete",
     "metadata": {
       "__client_provider": "basic-provider"
     }
@@ -55,7 +55,7 @@
   {
     "id": "http-status",
     "name": "HTTP Status",
-    "implementation": "okhttp-get",
+    "implementation": "http-get",
     "metadata": {
       "__client_provider": "basic-provider"
     },

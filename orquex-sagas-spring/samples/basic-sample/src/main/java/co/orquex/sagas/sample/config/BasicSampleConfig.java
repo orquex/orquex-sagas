@@ -2,10 +2,13 @@ package co.orquex.sagas.sample.config;
 
 import co.orquex.sagas.domain.jackson.OrquexJacksonModule;
 import co.orquex.sagas.task.http.api.HttpClientProvider;
-import java.time.Duration;
 import lombok.RequiredArgsConstructor;
-import okhttp3.Dispatcher;
-import okhttp3.OkHttpClient;
+import org.apache.hc.client5.http.classic.HttpClient;
+import org.apache.hc.client5.http.config.ConnectionConfig;
+import org.apache.hc.client5.http.config.RequestConfig;
+import org.apache.hc.client5.http.impl.classic.HttpClientBuilder;
+import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManagerBuilder;
+import org.apache.hc.core5.util.Timeout;
 import org.springframework.boot.autoconfigure.jackson.Jackson2ObjectMapperBuilderCustomizer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -21,19 +24,22 @@ public class BasicSampleConfig {
   }
 
   @Bean
-  public HttpClientProvider<OkHttpClient> okHttpClientBasicProvider() {
+  public HttpClientProvider<HttpClient> httpClientBasicProvider() {
     return new HttpClientProvider<>() {
       @Override
-      public OkHttpClient getClient() {
-        final var dispatcher = new Dispatcher();
-        dispatcher.setMaxRequests(10); // Total concurrent requests
-        dispatcher.setMaxRequestsPerHost(2); // Per host
+      public HttpClient getClient() {
+        final var connectionConfig =
+            ConnectionConfig.custom().setConnectTimeout(Timeout.ofSeconds(30)).build();
+        final var connectionManager =
+            PoolingHttpClientConnectionManagerBuilder.create()
+                .setDefaultConnectionConfig(connectionConfig)
+                .build();
+        final var requestConfig =
+            RequestConfig.custom().setResponseTimeout(Timeout.ofSeconds(30)).build();
 
-        return new OkHttpClient.Builder()
-            .readTimeout(Duration.ofSeconds(30))
-            .connectTimeout(Duration.ofSeconds(30))
-            .retryOnConnectionFailure(false)
-            .dispatcher(dispatcher)
+        return HttpClientBuilder.create()
+            .setConnectionManager(connectionManager)
+            .setDefaultRequestConfig(requestConfig)
             .build();
       }
 
